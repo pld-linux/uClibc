@@ -12,7 +12,7 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
  
  //#define __NR_getdents         141
  #ifdef L_getdents
-@@ -1354,7 +1352,132 @@
+@@ -1354,7 +1352,138 @@
  //#define __NR_fcntl64            221
  
  
@@ -39,8 +39,11 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +
 +#ifdef L___stat64
 +#include <unistd.h>
++#define __USE_LARGEFILE64
++#define stat64 libc_stat64
 +#include <sys/stat.h>
-+int __xstat64(int version, const char * file_name, struct stat64 * stat64)
++#undef stat64
++int __xstat64(int version, const char * file_name, struct libc_stat64 * stat64)
 +{
 +	struct stat stat32;
 +	int result = stat(file_name, &stat32);
@@ -72,6 +75,7 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +
 +#ifdef L___lstat64
 +#include <unistd.h>
++#define __USE_LARGEFILE64
 +#include <sys/stat.h>
 +int __lxstat64(int version, const char * file_name, struct stat64 * stat64)
 +{
@@ -97,7 +101,7 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +	return result;
 +}
 +
-+int lstat64(const char *file_name, struct libc_stat64 *buf)
++int lstat64(const char *file_name, struct stat64 *buf)
 +{
 +	return(__lxstat64(0, file_name, buf));
 +}
@@ -105,6 +109,7 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +
 +#ifdef L___fstat64
 +#include <unistd.h>
++#define __USE_LARGEFILE64
 +#include <sys/stat.h>
 +int __fxstat64(int version, int fd, struct stat64 * stat64)
 +{
@@ -130,7 +135,7 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +	return result;
 +}
 +
-+int fstat64(int filedes, struct libc_stat64 *buf)
++int fstat64(int filedes, struct stat64 *buf)
 +{
 +	return(__fxstat64(0, filedes, buf));
 +}
@@ -139,9 +144,10 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +#ifdef L_getdents64
 +#include <unistd.h>
 +#include <dirent.h>
++extern int getdents __P ((unsigned int fd, struct dirent *dirp, unsigned int count));
 +int getdents64(int fd, char *dirp, size_t count)
 +{
-+	return getdents(fs, dirp, count);
++	return getdents(fd, dirp, count);
 +}
 +#endif
 +
