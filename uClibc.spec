@@ -1,27 +1,19 @@
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.26
-Release:	11
+Version:	0.9.27
+Release:	0.1
 Epoch:		2
 License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	7212713c432dd0de6ec2140c2a6212e4
-Patch0:		%{name}-asmflags.patch
-Patch1:		%{name}-newsoname.patch
-Patch2:		%{name}-use-kernel-headers.patch
-Patch3:		%{name}-alpha.patch
-Patch4:		%{name}-sparc.patch
-Patch5:		%{name}-toolchain-wrapper.patch
-Patch6:		%{name}-targetcpu.patch
-Patch7:		%{name}-linux2.6.patch
-Patch8:		%{name}-gcc34.patch
-Patch9:		%{name}-libgcc.patch
-Patch10:	%{name}-return.patch
-Patch11:	%{name}-sparc-ldso.patch
-Patch12:	%{name}-g.patch
-Patch13:	%{name}-O_DIRECT.patch
+# Source0-md5:	6250bd6524283bd8e7bc976d43a46ec0
+Patch0:		%{name}-newsoname.patch
+Patch1:		%{name}-alpha.patch
+Patch2:		%{name}-toolchain-wrapper.patch
+Patch3:		%{name}-targetcpu.patch
+Patch4:		%{name}-O_DIRECT.patch
+Patch5:		%{name}-asmflags.patch
 URL:		http://uclibc.org/
 BuildRequires:	gcc >= 3.0
 BuildRequires:	sed >= 4.0
@@ -73,15 +65,7 @@ Biblioteki statyczne uClibc.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
+#%patch5 -p1	-- update? or no longer needed?
 
 sed -e '
 %ifarch sparc sparc64 sparcv9
