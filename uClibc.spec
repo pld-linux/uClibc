@@ -3,13 +3,13 @@
 # - check/update configuration
 #
 # Conditional build:
-# _with_lfs - enable LFS support (requires patched 2.2 or 2.4 kernel)
+# _with_lfs	- enable LFS support (requires patched 2.2 or 2.4 kernel)
 #
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.19
-Release:	0.4
+Release:	1
 Epoch:		1
 License:	LGPL
 Group:		Libraries
