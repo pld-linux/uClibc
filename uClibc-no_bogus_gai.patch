@@ -1,0 +1,52 @@
+diff -ur uClibc-/include/netdb.h uClibc/include/netdb.h
+--- uClibc-/include/netdb.h	Thu Sep 27 07:21:09 2001
++++ uClibc/include/netdb.h	Wed Jan 23 01:08:22 2002
+@@ -411,6 +411,7 @@
+ 
+ /* Extension from POSIX.1g.  */
+ #ifdef	__USE_POSIX
++#if 0
+ /* Structure to contain information about address of a service provider.  */
+ struct addrinfo
+ {
+@@ -446,6 +447,7 @@
+ # define AI_PASSIVE	0x0001	/* Socket address is intended for `bind'.  */
+ # define AI_CANONNAME	0x0002	/* Request for canonical name.  */
+ # define AI_NUMERICHOST	0x0004	/* Don't use name resolution.  */
++#endif /* 0 */
+ 
+ /* Error values for `getaddrinfo' function.  */
+ # define EAI_BADFLAGS	  -1	/* Invalid value for `ai_flags' field.  */
+@@ -476,6 +478,7 @@
+ # define NI_NAMEREQD	8	/* Don't return numeric addresses.  */
+ # define NI_DGRAM	16	/* Look up UDP service rather than TCP.  */
+ 
++#if 0
+ /* Translate name of a service location and/or a service name to set of
+    socket addresses.  */
+ extern int getaddrinfo (__const char *__restrict __name,
+@@ -488,6 +491,7 @@
+ 
+ /* Convert error return from getaddrinfo() to a string.  */
+ extern __const char *gai_strerror (int __ecode) __THROW;
++#endif /* 0 */
+ 
+ /* Translate a socket address to a location and service name.  */
+ extern int getnameinfo (__const struct sockaddr *__restrict __sa,
+@@ -495,6 +499,7 @@
+ 			socklen_t __hostlen, char *__restrict __serv,
+ 			socklen_t __servlen, unsigned int __flags) __THROW;
+ 
++#if 0
+ # ifdef __USE_GNU
+ /* Enqueue ENT requests from the LIST.  If MODE is GAI_WAIT wait until all
+    requests are handled.  If WAIT is GAI_NOWAIT return immediately after
+@@ -515,6 +520,8 @@
+ /* Cancel the requests associated with GAICBP.  */
+ extern int gai_cancel (struct gaicb *__gaicbp) __THROW;
+ # endif	/* GNU */
++#endif /* 0 */
++
+ #endif	/* POSIX */
+ 
+ __END_DECLS
