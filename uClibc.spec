@@ -1,14 +1,17 @@
+# conditional build:
+# _with_lfs - enable LFS support (requires patched 2.2 or 2.4 kernel)
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.8
-Release:	3
+Release:	4
 Epoch:		1
 License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-setfsuid.patch
 Patch1:		%{name}-Makefile.patch
+Patch2:		%{name}-no_lfs.patch
 URL:		http://uclibc.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -62,6 +65,7 @@ Biblioteki statyczne uClibc.
 %setup -q -n %{name}
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386 Config
@@ -78,7 +82,16 @@ ln -sf extra/Configs/Config.powerpc Config
 
 %build
 cat Config > Config.tmp
-sed -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/; s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/' Config.tmp > Config
+
+%if %{!?_with_lfs:1}%{?_with_lfs:0}
+sed -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/;
+	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/;
+	s/^DOLFS *=.*$/DOLFS = true/' Config.tmp > Config
+%else
+sed -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/;
+	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/' Config.tmp > Config
+%endif
+
 %{__make} \
 	TARGET_ARCH="%{_arch}" \
 	KERNEL_SOURCE=%{_kernelsrcdir} \
