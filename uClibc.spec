@@ -3,16 +3,23 @@
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.8
-Release:	5
+Version:	0.9.9
+Release:	1
 Epoch:		1
 License:	LGPL
 Group:		Libraries
+Group(de):	Bibliotheken
+Group(es):	Bibliotecas
+Group(fr):	Librairies
+Group(pl):	Biblioteki
+Group(pt):	Bibliotecas
+Group(pt_BR):	Bibliotecas
+Group(ru):	Библиотеки
+Group(uk):	Б╕бл╕отеки
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-Patch0:		%{name}-setfsuid.patch
-Patch1:		%{name}-Makefile.patch
-Patch2:		%{name}-lfs.patch
-Patch3:		%{name}-no_bogus_gai.patch
+Patch0:		%{name}-Makefile.patch
+Patch1:		%{name}-lfs.patch
+Patch2:		%{name}-no_bogus_gai.patch
 URL:		http://uclibc.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -26,11 +33,12 @@ MaЁa libc do budowania aplikacji wbudowanych.
 Summary:	Development files for uClibc
 Summary(pl):	Pliki dla programistСw uClibc
 Group:		Development/Libraries
-Group(de):	Entwicklung/Libraries
+Group(de):	Entwicklung/Bibliotheken
 Group(es):	Desarrollo/Bibliotecas
 Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
 Group(pt_BR):	Desenvolvimento/Bibliotecas
+Group(pt):	Desenvolvimento/Bibliotecas
 Group(ru):	Разработка/Библиотеки
 Group(uk):	Розробка/Б╕бл╕отеки
 Requires:	%{name} = %{version}
@@ -47,11 +55,12 @@ MaЁa libc do budowania aplikacji wbudowanych.
 Summary:	Static uClibc libratries
 Summary(pl):	Biblioteki statyczne uClibc
 Group:		Development/Libraries
-Group(de):	Entwicklung/Libraries
+Group(de):	Entwicklung/Bibliotheken
 Group(es):	Desarrollo/Bibliotecas
 Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
 Group(pt_BR):	Desenvolvimento/Bibliotecas
+Group(pt):	Desenvolvimento/Bibliotecas
 Group(ru):	Разработка/Библиотеки
 Group(uk):	Розробка/Б╕бл╕отеки
 Requires:	%{name}-devel = %{version}
@@ -63,11 +72,10 @@ Static uClibc libratries.
 Biblioteki statyczne uClibc.
 
 %prep
-%setup -q -n %{name}
+%setup -q
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386 Config
