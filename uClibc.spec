@@ -90,6 +90,9 @@ sed -e '
 	' extra/Configs/Config.in > Conf.in.tmp
 mv -f Conf.in.tmp extra/Configs/Config.in
 
+grep -v 'HAVE_NO_SHARED\|ARCH_HAS_NO_LDSO' extra/Configs/Config.sparc > C.tmp
+mv -f C.tmp extra/Configs/Config.sparc
+
 %build
 %{__make} defconfig \
 	TARGET_ARCH="%{TARGET_ARCH}" \
