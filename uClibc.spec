@@ -1,7 +1,7 @@
 Summary:	C library optimized for size
 Name:		uClibc
 Version:	20010413
-Release:	1
+Release:	2
 License:	LGPL
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
