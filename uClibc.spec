@@ -153,7 +153,7 @@ rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm
 ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/linux
 rm $RPM_BUILD_ROOT/%{_prefix}/*-linux-uclibc/usr/include/.cvsignore
-exit1
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
