@@ -30,6 +30,8 @@ Group(pt_BR):	Desenvolvimento/Bibliotecas
 Group(ru):	Разработка/Библиотеки
 Group(uk):	Розробка/Б╕бл╕отеки
 Requires:	%{name} = %{version}
+Requires:	binutils
+Requires:	gcc
 
 %description devel
 Small libc for building embedded applications.
@@ -92,7 +94,7 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 mv $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc%{_bindir} \
 	$RPM_BUILD_ROOT%{_bindir}
 
-find $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc/include -name CVS -exec rm -rf {} \;
+find $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc/include -name CVS | xargs rm -rf
 
 gzip -9nf README TODO docs/threads.txt
 
