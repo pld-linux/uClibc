@@ -1,0 +1,10 @@
+--- uClibc-0.9.26/libc/Makefile.orig	2003-11-04 09:00:56.000000000 +0000
++++ uClibc-0.9.26/libc/Makefile	2004-05-05 21:12:01.000000000 +0000
+@@ -58,6 +58,7 @@
+ 	$(LD) $(LDFLAGS) $(VERSION_SCRIPT) -soname=$(SHARED_MAJORNAME) -o $(SHARED_FULLNAME) \
+ 		--whole-archive $(LIBNAME) \
+ 		$(TOPDIR)libc/misc/internals/interp.o --no-whole-archive \
++		`$(HOSTCC) -print-libgcc-file-name` \
+ 		-init __uClibc_init
+ 	@true #$(RM) -r tmp
+ 	$(INSTALL) -d $(TOPDIR)lib
