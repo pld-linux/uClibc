@@ -25,6 +25,7 @@ Patch6:		%{name}-targetcpu.patch
 #Patch:		%{name}-no_bogus_gai.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
+ExclusiveArch:	alpha %{ix86} ppc sparc sparc64
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # note: the 2nd '\' is needed (some shell expansions?)
@@ -98,10 +99,12 @@ mv -f Conf.in.tmp extra/Configs/Config.in
 	CC="%{__cc}"
 
 mv -f .config .config.tmp
-sed -e 's/^.*UCLIBC_HAS_IPV6 *=.*$/UCLIBC_HAS_IPV6=y/;
-	s/^.*DO_C99_MATH *=.*$/DO_C99_MATH=y/;
+sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
+	s/^.*DO_C99_MATH.*$/DO_C99_MATH=y/;
 	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set/
 	' .config.tmp > .config
+# force regeneration after .config changes
+rm -f include/bits/uClibc_config.h
 
 # note: defconfig and all must be run in separate make process because of macros
 %{__make} \
@@ -112,11 +115,6 @@ sed -e 's/^.*UCLIBC_HAS_IPV6 *=.*$/UCLIBC_HAS_IPV6=y/;
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os" \
 	CC="%{__cc}"
-
-%{__make} -C extra/gcc-uClibc \
-	TARGET_CPU="%{_target_cpu}" \
-	HOSTCC="%{__cc}" \
-	HOSTCFLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -146,12 +144,9 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %dir %{_prefix}/*-linux-uclibc
-%dir %{_prefix}/*-linux-uclibc/lib
 %ifarch %{ix86} ppc sparc sparc64
+%dir %{_prefix}/*-linux-uclibc/lib
 %attr(755,root,root) %{_prefix}/*-linux-uclibc/lib/*.so*
-%endif
-%ifarch ppc
-%{_prefix}/powerpc-linux-uclibc
 %endif
 
 %files devel
