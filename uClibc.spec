@@ -96,7 +96,8 @@ sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED = true/;
 	KERNEL_SOURCE=%{_kernelsrcdir} \
 	NATIVE_CC=%{__cc} \
 	NATIVE_CFLAGS="%{rpmcflags} %{rpmldflags}" \
-	OPTIMIZATION="%{rpmcflags} -Os"
+	OPTIMIZATION="%{rpmcflags} -Os" \
+	CC="%{__cc}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -107,6 +108,7 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 	NATIVE_CFLAGS="%{rpmcflags} %{rpmldflags}" \
 	TARGET_ARCH="%(echo %{_target_cpu} | sed -e 's/i.86\|athlon/i386/')" \
 	TARGET_CPU="%{_target_cpu}" \
+	CC="%{__cc}" \
 	PREFIX=$RPM_BUILD_ROOT
 
 %ifarch ppc
