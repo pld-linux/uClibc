@@ -1,5 +1,43 @@
---- uClibc-0.9.9/libc/sysdeps/linux/commonsyscalls.c.orig	Sat Feb  2 08:54:13 2002
-+++ uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c	Tue Feb  5 09:38:30 2002
+diff -ur uClibc-0.9.9/libc/stdio/stdio.c uClibc-0.9.9-lfs/libc/stdio/stdio.c
+--- uClibc-0.9.9/libc/stdio/stdio.c	Fri Mar 15 00:16:52 2002
++++ uClibc-0.9.9-lfs/libc/stdio/stdio.c	Fri Mar 15 00:17:05 2002
+@@ -1097,7 +1097,6 @@
+ #endif
+ 
+ #ifdef L_fopen64
+-#ifdef __UCLIBC_HAVE_LFS__
+ #ifndef O_LARGEFILE
+ #define O_LARGEFILE	0100000
+ #endif
+@@ -1106,6 +1105,5 @@
+ {
+ 	return __fopen(filename, -1, NULL, mode, O_LARGEFILE);
+ }
+-#endif /* __UCLIBC_HAVE_LFS__ */
+ #endif
+ 
+diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/open64.c uClibc-0.9.9-lfs/libc/sysdeps/linux/common/open64.c
+--- uClibc-0.9.9/libc/sysdeps/linux/common/open64.c	Wed Oct 17 01:10:28 2001
++++ uClibc-0.9.9-lfs/libc/sysdeps/linux/common/open64.c	Fri Mar 15 00:14:16 2002
+@@ -25,8 +25,6 @@
+ #define O_LARGEFILE	0100000
+ #endif
+ 
+-#ifdef __UCLIBC_HAVE_LFS__
+-
+ /* Open FILE with access OFLAG.  If OFLAG includes O_CREAT,
+    a third argument is the file protection.  */
+ int open64 (const char *file, int oflag, ...)
+@@ -43,6 +41,3 @@
+ 
+   return open(file, oflag | O_LARGEFILE, mode);
+ }
+-
+-#endif /* __UCLIBC_HAVE_LFS__ */
+-
+diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c uClibc-0.9.9-lfs/libc/sysdeps/linux/common/syscalls.c
+--- uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c	Sat Feb  2 07:54:13 2002
++++ uClibc-0.9.9-lfs/libc/sysdeps/linux/common/syscalls.c	Fri Mar 15 00:14:16 2002
 @@ -1093,10 +1093,8 @@
  
  	return ret ? (loff_t) ret : result;
