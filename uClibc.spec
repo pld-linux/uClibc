@@ -47,7 +47,10 @@ cp extra/Configs/Config.i386 Config
 perl -pi -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/g' Config
 %{__make} \
 %ifarch %{ix86}
+	TARGET_ARCH="i386" \
 	CPUFLAGS="-m386" \
+%else
+	TARGET_ARCH="%{_target_cpu}" \
 %endif
 	KERNEL_SOURCE=%{_kernelsrcdir}
 
