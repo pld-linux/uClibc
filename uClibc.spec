@@ -97,7 +97,7 @@ for f in $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc%{_bindir}/* ; do
 	ln -sf ../../../bin/`basename $f` $f
 done
 
-find $RPM_BUILD_ROOT/usr/%{_taget_arch}-linux-uclibc/include -name CVS | xargs rm -rf
+find $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc/include -name CVS | xargs rm -rf
 
 gzip -9nf README TODO docs/threads.txt
 
