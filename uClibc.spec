@@ -33,7 +33,7 @@ Ma³a libc do budowania aplikacji wbudowanych.
 Summary:	Development files for uClibc
 Summary(pl):	Pliki dla programistów uClibc
 Group:		Development/Libraries
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{epoch}:%{version}
 Requires:	binutils
 %requires_eq	gcc
 
@@ -47,7 +47,7 @@ Ma³a libc do budowania aplikacji wbudowanych.
 Summary:	Static uClibc libratries
 Summary(pl):	Biblioteki statyczne uClibc
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{version}
+Requires:	%{name}-devel = %{epoch}:%{version}
 Provides:	libc-static
 
 %description static
