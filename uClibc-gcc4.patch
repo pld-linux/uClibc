@@ -1,0 +1,111 @@
+GCC-4 build fixes:
+
+ldso.c:74: error: static declaration of '_dl_malloc_addr' follows non-static declaration
+../../ldso/include/ldso.h:45: error: previous declaration of '_dl_malloc_addr' was here
+ldso.c:75: error: static declaration of '_dl_mmap_zero' follows non-static declaration
+../../ldso/include/ldso.h:46: error: previous declaration of '_dl_mmap_zero' was here
+In file included from ldso.c:943:
+
+free.c: In function 'malloc_trim':
+free.c:48: warning: implicit declaration of function '__malloc_trim'
+free.c: At top level:
+free.c:60: error: static declaration of '__malloc_trim' follows non-static declaration
+free.c:48: error: previous implicit declaration of '__malloc_trim' was here
+
+
+ ldso/ldso/ldso.c                   |    4 +-
+ libc/stdlib/malloc-standard/free.c |   63 ++++++++++++++++++-------------------
+ 2 files changed, 33 insertions(+), 34 deletions(-)
+
+--- uClibc-0.9.27/ldso/ldso/ldso.c.orig	2005-02-05 20:31:34.000000000 +0100
++++ uClibc-0.9.27/ldso/ldso/ldso.c	2005-02-05 20:40:01.000000000 +0100
+@@ -71,8 +71,8 @@
+ {
+ }
+ 
+-static unsigned char *_dl_malloc_addr = 0;	/* Lets _dl_malloc use the already allocated memory page */
+-static unsigned char *_dl_mmap_zero   = 0;	/* Also used by _dl_malloc */
++unsigned char *_dl_malloc_addr = 0;	/* Lets _dl_malloc use the already allocated memory page */
++unsigned char *_dl_mmap_zero   = 0;	/* Also used by _dl_malloc */
+ 
+ #if defined (__SUPPORT_LD_DEBUG__)
+ static void debug_fini (int status, void *arg)
+--- uClibc-0.9.27/libc/stdlib/malloc-standard/free.c.orig	2005-01-12 08:59:21.000000000 +0100
++++ uClibc-0.9.27/libc/stdlib/malloc-standard/free.c	2005-02-05 20:57:29.938715152 +0100
+@@ -16,38 +16,6 @@
+ 
+ #include "malloc.h"
+ 
+-
+-/* ------------------------- malloc_trim -------------------------
+-  malloc_trim(size_t pad);
+-
+-  If possible, gives memory back to the system (via negative
+-  arguments to sbrk) if there is unused memory at the `high' end of
+-  the malloc pool. You can call this after freeing large blocks of
+-  memory to potentially reduce the system-level memory requirements
+-  of a program. However, it cannot guarantee to reduce memory. Under
+-  some allocation patterns, some large free blocks of memory will be
+-  locked between two used chunks, so they cannot be given back to
+-  the system.
+-  
+-  The `pad' argument to malloc_trim represents the amount of free
+-  trailing space to leave untrimmed. If this argument is zero,
+-  only the minimum amount of memory to maintain internal data
+-  structures will be left (one page or less). Non-zero arguments
+-  can be supplied to maintain enough trailing space to service
+-  future expected allocations without having to re-obtain memory
+-  from the system.
+-  
+-  Malloc_trim returns 1 if it actually released any memory, else 0.
+-  On systems that do not support "negative sbrks", it will always
+-  return 0.
+-*/
+-int malloc_trim(size_t pad)
+-{
+-  mstate av = get_malloc_state();
+-  __malloc_consolidate(av);
+-  return __malloc_trim(pad, av);
+-}
+-
+ /* ------------------------- __malloc_trim -------------------------
+    __malloc_trim is an inverse of sorts to __malloc_alloc.  It gives memory
+    back to the system (via negative arguments to sbrk) if there is unused
+@@ -109,6 +77,37 @@
+     return 0;
+ }
+ 
++/* ------------------------- malloc_trim -------------------------
++  malloc_trim(size_t pad);
++
++  If possible, gives memory back to the system (via negative
++  arguments to sbrk) if there is unused memory at the `high' end of
++  the malloc pool. You can call this after freeing large blocks of
++  memory to potentially reduce the system-level memory requirements
++  of a program. However, it cannot guarantee to reduce memory. Under
++  some allocation patterns, some large free blocks of memory will be
++  locked between two used chunks, so they cannot be given back to
++  the system.
++  
++  The `pad' argument to malloc_trim represents the amount of free
++  trailing space to leave untrimmed. If this argument is zero,
++  only the minimum amount of memory to maintain internal data
++  structures will be left (one page or less). Non-zero arguments
++  can be supplied to maintain enough trailing space to service
++  future expected allocations without having to re-obtain memory
++  from the system.
++  
++  Malloc_trim returns 1 if it actually released any memory, else 0.
++  On systems that do not support "negative sbrks", it will always
++  return 0.
++*/
++int malloc_trim(size_t pad)
++{
++  mstate av = get_malloc_state();
++  __malloc_consolidate(av);
++  return __malloc_trim(pad, av);
++}
++
+ /*
+   Initialize a malloc_state struct.
+ 
