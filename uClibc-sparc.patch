@@ -1,0 +1,149 @@
+--- uClibc-0.9.27/ldso/ldso/sparc/elfinterp.c.orig	2005-01-16 10:50:58.798433255 +0000
++++ uClibc-0.9.27/ldso/ldso/sparc/elfinterp.c	2005-01-16 10:57:08.966876531 +0000
+@@ -93,7 +93,7 @@
+ 
+ 
+   if (unlikely(reloc_type != R_SPARC_JMP_SLOT)) {
+-    _dl_dprintf(2, "%s: incorrect relocation type in jump relocations (%d)\n",
++    _dl_dprintf(2, "%s: incorrect relocation type in jump relocations (%x)\n",
+ 		  _dl_progname, reloc_type);
+     _dl_exit(30);
+   };
+@@ -154,20 +154,20 @@
+   int reloc_type;
+   int symtab_index;
+   Elf32_Sym * symtab;
+-  Elf32_Rela * rpnt;
++  Elf32_Rela * relpnt;
+   unsigned int * reloc_addr;
+   struct elf_resolve * tpnt = rpnt->dyn;
+ 
+   /* Now parse the relocation information */
+-  rpnt = (Elf32_Rela *) (rel_addr + tpnt->loadaddr);
++  relpnt = (Elf32_Rela *) (rel_addr + tpnt->loadaddr);
+ 
+   symtab =  (Elf32_Sym *) (tpnt->dynamic_info[DT_SYMTAB] + tpnt->loadaddr);
+   strtab = ( char *) (tpnt->dynamic_info[DT_STRTAB] + tpnt->loadaddr);
+ 
+-  for(i=0; i< rel_size; i += sizeof(Elf32_Rela), rpnt++){
+-    reloc_addr = (int *) (tpnt->loadaddr + (int)rpnt->r_offset);
+-    reloc_type = ELF32_R_TYPE(rpnt->r_info);
+-    symtab_index = ELF32_R_SYM(rpnt->r_info);
++  for(i=0; i< rel_size; i += sizeof(Elf32_Rela), relpnt++){
++    reloc_addr = (int *) (tpnt->loadaddr + (int)relpnt->r_offset);
++    reloc_type = ELF32_R_TYPE(relpnt->r_info);
++    symtab_index = ELF32_R_SYM(relpnt->r_info);
+ 
+     switch(reloc_type){
+     case R_SPARC_NONE:
+@@ -194,22 +194,22 @@
+   int reloc_type;
+   int goof = 0;
+   Elf32_Sym * symtab;
+-  Elf32_Rela * rpnt;
++  Elf32_Rela * relpnt;
+   unsigned int * reloc_addr;
+   unsigned int symbol_addr;
+   int symtab_index;
+   struct elf_resolve * tpnt = rpnt->dyn;
+   /* Now parse the relocation information */
+ 
+-  rpnt = (Elf32_Rela *) (rel_addr + tpnt->loadaddr);
++  relpnt = (Elf32_Rela *) (rel_addr + tpnt->loadaddr);
+ 
+   symtab =  (Elf32_Sym *) (tpnt->dynamic_info[DT_SYMTAB] + tpnt->loadaddr);
+   strtab = ( char *) (tpnt->dynamic_info[DT_STRTAB] + tpnt->loadaddr);
+ 
+-  for(i=0; i< rel_size; i+= sizeof(Elf32_Rela), rpnt++){
+-    reloc_addr = (int *) (tpnt->loadaddr + (int)rpnt->r_offset);
+-    reloc_type = ELF32_R_TYPE(rpnt->r_info);
+-    symtab_index = ELF32_R_SYM(rpnt->r_info);
++  for(i=0; i< rel_size; i+= sizeof(Elf32_Rela), relpnt++){
++    reloc_addr = (int *) (tpnt->loadaddr + (int)relpnt->r_offset);
++    reloc_type = ELF32_R_TYPE(relpnt->r_info);
++    symtab_index = ELF32_R_SYM(relpnt->r_info);
+     symbol_addr = 0;
+ 
+     if(symtab_index) {
+@@ -229,33 +229,33 @@
+     case R_SPARC_NONE:
+ 	break;
+     case R_SPARC_32:
+-      *reloc_addr = symbol_addr + rpnt->r_addend;
++      *reloc_addr = symbol_addr + relpnt->r_addend;
+       break;
+     case R_SPARC_DISP32:
+-      *reloc_addr = symbol_addr + rpnt->r_addend - (unsigned int) reloc_addr;
++      *reloc_addr = symbol_addr + relpnt->r_addend - (unsigned int) reloc_addr;
+       break;
+     case R_SPARC_GLOB_DAT:
+-      *reloc_addr = symbol_addr + rpnt->r_addend;
++      *reloc_addr = symbol_addr + relpnt->r_addend;
+       break;
+     case R_SPARC_JMP_SLOT:
+       reloc_addr[1] = 0x03000000 | ((symbol_addr >> 10) & 0x3fffff);
+       reloc_addr[2] = 0x81c06000 | (symbol_addr & 0x3ff);
+       break;
+     case R_SPARC_RELATIVE:
+-      *reloc_addr += (unsigned int) tpnt->loadaddr + rpnt->r_addend;
++      *reloc_addr += (unsigned int) tpnt->loadaddr + relpnt->r_addend;
+       break;
+     case R_SPARC_HI22:
+       if (!symbol_addr)
+-        symbol_addr = tpnt->loadaddr + rpnt->r_addend;
++        symbol_addr = tpnt->loadaddr + relpnt->r_addend;
+       else
+-	symbol_addr += rpnt->r_addend;
++	symbol_addr += relpnt->r_addend;
+       *reloc_addr = (*reloc_addr & 0xffc00000)|(symbol_addr >> 10);
+       break;
+     case R_SPARC_LO10:
+       if (!symbol_addr)
+-        symbol_addr = tpnt->loadaddr + rpnt->r_addend;
++        symbol_addr = tpnt->loadaddr + relpnt->r_addend;
+       else
+-	symbol_addr += rpnt->r_addend;
++	symbol_addr += relpnt->r_addend;
+       *reloc_addr = (*reloc_addr & ~0x3ff)|(symbol_addr & 0x3ff);
+       break;
+     case R_SPARC_WDISP30:
+--- uClibc-0.9.27/ldso/ldso/ldso.c.orig	2005-01-12 07:59:21.000000000 +0000
++++ uClibc-0.9.27/ldso/ldso/ldso.c	2005-01-16 11:21:49.751151256 +0000
+@@ -648,7 +648,7 @@
+ 					struct elf_resolve *here = init_fini_list[k];
+ #ifdef __SUPPORT_LD_DEBUG__
+ 					if(_dl_debug)
+-						_dl_dprintf(2, "Move %s from pos %d to %d in INIT/FINI list.\n", here->libname, k, j);
++						_dl_dprintf(2, "Move %s from pos %x to %x in INIT/FINI list.\n", here->libname, k, j);
+ #endif
+ 					for (i = (k - j); i; --i)
+ 						init_fini_list[i+j] = init_fini_list[i+j-1];
+@@ -911,7 +911,7 @@
+ 
+ #if 0
+ #ifdef __SUPPORT_LD_DEBUG_EARLY__
+-	_dl_dprintf(2, "malloc: request for %d bytes\n", size);
++	_dl_dprintf(2, "malloc: request for %x bytes\n", size);
+ #endif
+ #endif
+ 
+--- uClibc-0.9.27/ldso/ldso/dl-elf.c.orig	2005-01-12 07:59:21.000000000 +0000
++++ uClibc-0.9.27/ldso/ldso/dl-elf.c	2005-01-16 11:23:39.541794934 +0000
+@@ -827,7 +827,8 @@
+ 					else
+ 						_dl_write(fd, string, _dl_strlen(string));
+ 					break;
+-
++#ifndef __sparc__
++				/* _dl_simple_ltoa uses undefined .udiv */
+ 				case 'i':
+ 				case 'd':
+ 					{
+@@ -838,6 +839,7 @@
+ 						_dl_write(fd, string, _dl_strlen(string));
+ 						break;
+ 					}
++#endif
+ 				case 'x':
+ 				case 'X':
+ 					{
