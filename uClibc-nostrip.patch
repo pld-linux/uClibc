@@ -1,0 +1,1733 @@
+diff -ur uClibc-0.9.26.orig/ldso/ldso/Makefile uClibc-0.9.26/ldso/ldso/Makefile
+--- uClibc-0.9.26.orig/ldso/ldso/Makefile	Sat Nov 22 19:32:59 2003
++++ uClibc-0.9.26/ldso/ldso/Makefile	Sun Feb  6 23:11:16 2005
+@@ -84,11 +84,9 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(XXFLAGS) -I../libdl -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(AOBJS): %.o : %.S
+ 	$(CC) $(XXFLAGS) -I../libdl -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ldso.o: ldso.c hash.c readelflib1.c $(TARGET_ARCH)/elfinterp.c _dl_progname.h
+ 
+diff -ur uClibc-0.9.26.orig/ldso/libdl/Makefile uClibc-0.9.26/ldso/libdl/Makefile
+--- uClibc-0.9.26.orig/ldso/libdl/Makefile	Tue Nov  4 14:07:42 2003
++++ uClibc-0.9.26/ldso/libdl/Makefile	Sun Feb  6 23:11:16 2005
+@@ -63,11 +63,9 @@
+ 
+ dlib.o: dlib.c
+ 	$(CC) $(XXFLAGS_NOPIC) -c dlib.c -o dlib.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ dlib_pic.o: dlib.c
+ 	$(CC) $(XXFLAGS) -c dlib.c -o dlib_pic.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libc/inet/Makefile uClibc-0.9.26/libc/inet/Makefile
+--- uClibc-0.9.26.orig/libc/inet/Makefile	Tue Dec  2 18:59:06 2003
++++ uClibc-0.9.26/libc/inet/Makefile	Sun Feb  6 23:11:16 2005
+@@ -68,19 +68,15 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ2): $(MSRC2)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ3): $(MSRC3)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean: subdirs_clean
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/inet/rpc/Makefile uClibc-0.9.26/libc/inet/rpc/Makefile
+--- uClibc-0.9.26.orig/libc/inet/rpc/Makefile	Sun Feb  6 22:54:17 2005
++++ uClibc-0.9.26/libc/inet/rpc/Makefile	Sun Feb  6 23:11:16 2005
+@@ -59,7 +59,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/assert/Makefile uClibc-0.9.26/libc/misc/assert/Makefile
+--- uClibc-0.9.26.orig/libc/misc/assert/Makefile	Sat Oct 18 12:18:44 2003
++++ uClibc-0.9.26/libc/misc/assert/Makefile	Sun Feb  6 23:11:16 2005
+@@ -37,7 +37,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/ctype/Makefile uClibc-0.9.26/libc/misc/ctype/Makefile
+--- uClibc-0.9.26.orig/libc/misc/ctype/Makefile	Sat Oct 18 12:18:45 2003
++++ uClibc-0.9.26/libc/misc/ctype/Makefile	Sun Feb  6 23:11:16 2005
+@@ -56,11 +56,9 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJx): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* -D__UCLIBC_DO_XLOCALE $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJS): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libc/misc/dirent/Makefile uClibc-0.9.26/libc/misc/dirent/Makefile
+--- uClibc-0.9.26.orig/libc/misc/dirent/Makefile	Sat Oct 18 12:18:46 2003
++++ uClibc-0.9.26/libc/misc/dirent/Makefile	Sun Feb  6 23:11:16 2005
+@@ -39,7 +39,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/error/Makefile uClibc-0.9.26/libc/misc/error/Makefile
+--- uClibc-0.9.26.orig/libc/misc/error/Makefile	Sat Oct 18 12:18:48 2003
++++ uClibc-0.9.26/libc/misc/error/Makefile	Sun Feb  6 23:11:16 2005
+@@ -32,7 +32,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/file/Makefile uClibc-0.9.26/libc/misc/file/Makefile
+--- uClibc-0.9.26.orig/libc/misc/file/Makefile	Sat Oct 18 12:18:50 2003
++++ uClibc-0.9.26/libc/misc/file/Makefile	Sun Feb  6 23:11:16 2005
+@@ -41,7 +41,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/fnmatch/Makefile uClibc-0.9.26/libc/misc/fnmatch/Makefile
+--- uClibc-0.9.26.orig/libc/misc/fnmatch/Makefile	Sat Oct 18 12:18:52 2003
++++ uClibc-0.9.26/libc/misc/fnmatch/Makefile	Sun Feb  6 23:11:16 2005
+@@ -37,7 +37,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/ftw/Makefile uClibc-0.9.26/libc/misc/ftw/Makefile
+--- uClibc-0.9.26.orig/libc/misc/ftw/Makefile	Sat Oct 18 12:18:53 2003
++++ uClibc-0.9.26/libc/misc/ftw/Makefile	Sun Feb  6 23:11:16 2005
+@@ -36,7 +36,6 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/glob/Makefile uClibc-0.9.26/libc/misc/glob/Makefile
+--- uClibc-0.9.26.orig/libc/misc/glob/Makefile	Sat Oct 18 12:18:55 2003
++++ uClibc-0.9.26/libc/misc/glob/Makefile	Sun Feb  6 23:11:16 2005
+@@ -37,7 +37,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ glob64.o: glob64.c glob.c
+ 
+diff -ur uClibc-0.9.26.orig/libc/misc/gnu/Makefile uClibc-0.9.26/libc/misc/gnu/Makefile
+--- uClibc-0.9.26.orig/libc/misc/gnu/Makefile	Sat Oct 18 12:18:57 2003
++++ uClibc-0.9.26/libc/misc/gnu/Makefile	Sun Feb  6 23:11:16 2005
+@@ -37,7 +37,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/internals/Makefile uClibc-0.9.26/libc/misc/internals/Makefile
+--- uClibc-0.9.26.orig/libc/misc/internals/Makefile	Sat Oct 18 12:18:58 2003
++++ uClibc-0.9.26/libc/misc/internals/Makefile	Sun Feb  6 23:11:16 2005
+@@ -46,11 +46,9 @@
+ 
+ interp.o: interp.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] interp.c *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/intl/Makefile uClibc-0.9.26/libc/misc/intl/Makefile
+--- uClibc-0.9.26.orig/libc/misc/intl/Makefile	Sat Oct 18 12:18:59 2003
++++ uClibc-0.9.26/libc/misc/intl/Makefile	Sun Feb  6 23:11:16 2005
+@@ -39,11 +39,9 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/locale/Makefile uClibc-0.9.26/libc/misc/locale/Makefile
+--- uClibc-0.9.26.orig/libc/misc/locale/Makefile	Sat Oct 18 12:50:45 2003
++++ uClibc-0.9.26/libc/misc/locale/Makefile	Sun Feb  6 23:11:16 2005
+@@ -53,16 +53,13 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJx): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* -D__UCLIBC_DO_XLOCALE $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ locale_data.o:
+ 	$(LN) -sf ../../../extra/locale/locale_data.c
+ 	$(CC) $(CFLAGS) -c -D__WCHAR_ENABLED -I../../../extra/locale locale_data.c -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJS): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libc/misc/mntent/Makefile uClibc-0.9.26/libc/misc/mntent/Makefile
+--- uClibc-0.9.26.orig/libc/misc/mntent/Makefile	Sat Oct 18 12:19:02 2003
++++ uClibc-0.9.26/libc/misc/mntent/Makefile	Sun Feb  6 23:11:16 2005
+@@ -37,7 +37,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/pthread/Makefile uClibc-0.9.26/libc/misc/pthread/Makefile
+--- uClibc-0.9.26.orig/libc/misc/pthread/Makefile	Sat Oct 18 12:19:04 2003
++++ uClibc-0.9.26/libc/misc/pthread/Makefile	Sun Feb  6 23:11:16 2005
+@@ -42,7 +42,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/regex/Makefile uClibc-0.9.26/libc/misc/regex/Makefile
+--- uClibc-0.9.26.orig/libc/misc/regex/Makefile	Sat Oct 18 12:19:05 2003
++++ uClibc-0.9.26/libc/misc/regex/Makefile	Sun Feb  6 23:11:16 2005
+@@ -37,7 +37,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/search/Makefile uClibc-0.9.26/libc/misc/search/Makefile
+--- uClibc-0.9.26.orig/libc/misc/search/Makefile	Sat Oct 18 12:19:06 2003
++++ uClibc-0.9.26/libc/misc/search/Makefile	Sun Feb  6 23:11:16 2005
+@@ -50,23 +50,18 @@
+ 
+ $(MOBJ1): $(MSRC1)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ2): $(MSRC2)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ3): $(MSRC3)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ4): $(MSRC4)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/statfs/Makefile uClibc-0.9.26/libc/misc/statfs/Makefile
+--- uClibc-0.9.26.orig/libc/misc/statfs/Makefile	Sat Oct 18 12:19:08 2003
++++ uClibc-0.9.26/libc/misc/statfs/Makefile	Sun Feb  6 23:11:17 2005
+@@ -40,7 +40,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/syslog/Makefile uClibc-0.9.26/libc/misc/syslog/Makefile
+--- uClibc-0.9.26.orig/libc/misc/syslog/Makefile	Sat Oct 18 12:19:09 2003
++++ uClibc-0.9.26/libc/misc/syslog/Makefile	Sun Feb  6 23:11:17 2005
+@@ -37,7 +37,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/sysvipc/Makefile uClibc-0.9.26/libc/misc/sysvipc/Makefile
+--- uClibc-0.9.26.orig/libc/misc/sysvipc/Makefile	Sat Oct 18 12:19:11 2003
++++ uClibc-0.9.26/libc/misc/sysvipc/Makefile	Sun Feb  6 23:11:17 2005
+@@ -50,19 +50,15 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ2): $(MSRC2)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ3): $(MSRC3)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean: subdirs_clean
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/time/Makefile uClibc-0.9.26/libc/misc/time/Makefile
+--- uClibc-0.9.26.orig/libc/misc/time/Makefile	Fri Nov  7 07:08:27 2003
++++ uClibc-0.9.26/libc/misc/time/Makefile	Sun Feb  6 23:11:17 2005
+@@ -54,15 +54,12 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJx): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* -D__UCLIBC_DO_XLOCALE $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/ttyent/Makefile uClibc-0.9.26/libc/misc/ttyent/Makefile
+--- uClibc-0.9.26.orig/libc/misc/ttyent/Makefile	Sat Oct 18 12:19:14 2003
++++ uClibc-0.9.26/libc/misc/ttyent/Makefile	Sun Feb  6 23:11:17 2005
+@@ -32,7 +32,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/utmp/Makefile uClibc-0.9.26/libc/misc/utmp/Makefile
+--- uClibc-0.9.26.orig/libc/misc/utmp/Makefile	Sat Oct 18 12:19:15 2003
++++ uClibc-0.9.26/libc/misc/utmp/Makefile	Sun Feb  6 23:11:17 2005
+@@ -37,7 +37,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/wchar/Makefile uClibc-0.9.26/libc/misc/wchar/Makefile
+--- uClibc-0.9.26.orig/libc/misc/wchar/Makefile	Thu Dec  4 07:36:51 2003
++++ uClibc-0.9.26/libc/misc/wchar/Makefile	Sun Feb  6 23:11:17 2005
+@@ -54,11 +54,9 @@
+ 
+ $(MOBJ1): $(MSRC1)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ2): $(MSRC2)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/wctype/Makefile uClibc-0.9.26/libc/misc/wctype/Makefile
+--- uClibc-0.9.26.orig/libc/misc/wctype/Makefile	Sat Oct 18 12:19:18 2003
++++ uClibc-0.9.26/libc/misc/wctype/Makefile	Sun Feb  6 23:11:17 2005
+@@ -50,11 +50,9 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJx): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* -D__UCLIBC_DO_XLOCALE $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/misc/wordexp/Makefile uClibc-0.9.26/libc/misc/wordexp/Makefile
+--- uClibc-0.9.26.orig/libc/misc/wordexp/Makefile	Sat Oct 18 12:19:19 2003
++++ uClibc-0.9.26/libc/misc/wordexp/Makefile	Sun Feb  6 23:11:17 2005
+@@ -32,7 +32,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/pwd_grp/Makefile uClibc-0.9.26/libc/pwd_grp/Makefile
+--- uClibc-0.9.26.orig/libc/pwd_grp/Makefile	Thu Nov  6 21:56:03 2003
++++ uClibc-0.9.26/libc/pwd_grp/Makefile	Sun Feb  6 23:11:17 2005
+@@ -55,11 +55,9 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJ): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libc/signal/Makefile uClibc-0.9.26/libc/signal/Makefile
+--- uClibc-0.9.26.orig/libc/signal/Makefile	Sat Oct 18 12:19:21 2003
++++ uClibc-0.9.26/libc/signal/Makefile	Sun Feb  6 23:11:17 2005
+@@ -37,7 +37,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/stdio/Makefile uClibc-0.9.26/libc/stdio/Makefile
+--- uClibc-0.9.26.orig/libc/stdio/Makefile	Sat Oct 18 12:19:23 2003
++++ uClibc-0.9.26/libc/stdio/Makefile	Sun Feb  6 23:11:17 2005
+@@ -90,19 +90,15 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ2): $(MSRC2)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ3): $(MSRC3)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libc/stdlib/Makefile uClibc-0.9.26/libc/stdlib/Makefile
+--- uClibc-0.9.26.orig/libc/stdlib/Makefile	Tue Dec 30 11:40:48 2003
++++ uClibc-0.9.26/libc/stdlib/Makefile	Sun Feb  6 23:11:17 2005
+@@ -103,27 +103,21 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJx): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* -D__UCLIBC_DO_XLOCALE $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ1): $(MSRC1)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ1x): $(MSRC1)
+ 	$(CC) $(CFLAGS) -DL_$* -D__UCLIBC_DO_XLOCALE $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJ2): $(MSRC2)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libc/stdlib/malloc/Makefile uClibc-0.9.26/libc/stdlib/malloc/Makefile
+--- uClibc-0.9.26.orig/libc/stdlib/malloc/Makefile	Tue Dec 30 11:40:48 2003
++++ uClibc-0.9.26/libc/stdlib/malloc/Makefile	Sun Feb  6 23:11:17 2005
+@@ -52,7 +52,6 @@
+ # Depend on uClinux_config.h to cache changes in __UCLIBC_MALLOC_DEBUGGING__
+ $(COBJS): %.o : %.c ../../../include/bits/uClibc_config.h
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/stdlib/malloc-simple/Makefile uClibc-0.9.26/libc/stdlib/malloc-simple/Makefile
+--- uClibc-0.9.26.orig/libc/stdlib/malloc-simple/Makefile	Tue Dec 30 02:41:14 2003
++++ uClibc-0.9.26/libc/stdlib/malloc-simple/Makefile	Sun Feb  6 23:11:17 2005
+@@ -37,7 +37,6 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	rm -f *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/stdlib/malloc-standard/Makefile uClibc-0.9.26/libc/stdlib/malloc-standard/Makefile
+--- uClibc-0.9.26.orig/libc/stdlib/malloc-standard/Makefile	Tue Dec 30 11:40:49 2003
++++ uClibc-0.9.26/libc/stdlib/malloc-standard/Makefile	Sun Feb  6 23:11:17 2005
+@@ -44,7 +44,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/string/Makefile uClibc-0.9.26/libc/string/Makefile
+--- uClibc-0.9.26.orig/libc/string/Makefile	Wed Dec 17 08:57:31 2003
++++ uClibc-0.9.26/libc/string/Makefile	Sun Feb  6 23:11:17 2005
+@@ -68,23 +68,18 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJx): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* -D__UCLIBC_DO_XLOCALE $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJW): $(MSRC)
+ 	$(CC) $(CFLAGS) -DWANT_WIDE -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(MOBJWx): $(MSRC)
+ 	$(CC) $(CFLAGS) -DWANT_WIDE -DL_$* -D__UCLIBC_DO_XLOCALE $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean: subdirs_clean
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/string/arm/Makefile uClibc-0.9.26/libc/string/arm/Makefile
+--- uClibc-0.9.26.orig/libc/string/arm/Makefile	Thu Nov 20 16:23:03 2003
++++ uClibc-0.9.26/libc/string/arm/Makefile	Sun Feb  6 23:11:17 2005
+@@ -32,7 +32,6 @@
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/string/i386/Makefile uClibc-0.9.26/libc/string/i386/Makefile
+--- uClibc-0.9.26.orig/libc/string/i386/Makefile	Thu Nov  6 10:39:45 2003
++++ uClibc-0.9.26/libc/string/i386/Makefile	Sun Feb  6 23:11:17 2005
+@@ -34,11 +34,9 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/string/sh64/Makefile uClibc-0.9.26/libc/string/sh64/Makefile
+--- uClibc-0.9.26.orig/libc/string/sh64/Makefile	Wed Dec 17 08:57:32 2003
++++ uClibc-0.9.26/libc/string/sh64/Makefile	Sun Feb  6 23:11:17 2005
+@@ -31,7 +31,6 @@
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/alpha/Makefile uClibc-0.9.26/libc/sysdeps/linux/alpha/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/alpha/Makefile	Sat Nov 22 22:21:39 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/alpha/Makefile	Sun Feb  6 23:11:17 2005
+@@ -43,15 +43,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/arm/Makefile uClibc-0.9.26/libc/sysdeps/linux/arm/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/arm/Makefile	Thu Dec  4 23:07:51 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/arm/Makefile	Sun Feb  6 23:11:17 2005
+@@ -44,15 +44,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_PROFILING)),y)
+ gmon-start.S: ../common/gmon-start.c
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/common/Makefile uClibc-0.9.26/libc/sysdeps/linux/common/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/common/Makefile	Sat Jan  3 00:34:11 2004
++++ uClibc-0.9.26/libc/sysdeps/linux/common/Makefile	Sun Feb  6 23:11:17 2005
+@@ -52,11 +52,9 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ headers:
+ 	$(LN) -fs ../libc/sysdeps/linux/common/fpu_control.h $(TOPDIR)/include/
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/cris/Makefile uClibc-0.9.26/libc/sysdeps/linux/cris/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/cris/Makefile	Sat Nov 22 22:21:47 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/cris/Makefile	Sun Feb  6 23:11:17 2005
+@@ -45,15 +45,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/e1/Makefile uClibc-0.9.26/libc/sysdeps/linux/e1/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/e1/Makefile	Sat Nov 22 22:21:53 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/e1/Makefile	Sun Feb  6 23:11:17 2005
+@@ -48,15 +48,12 @@
+ 
+ $(CRT0_OBJ): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/h8300/Makefile uClibc-0.9.26/libc/sysdeps/linux/h8300/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/h8300/Makefile	Sat Nov 22 22:21:56 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/h8300/Makefile	Sun Feb  6 23:11:17 2005
+@@ -45,15 +45,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/i386/Makefile uClibc-0.9.26/libc/sysdeps/linux/i386/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/i386/Makefile	Sun Feb  6 16:41:58 2005
++++ uClibc-0.9.26/libc/sysdeps/linux/i386/Makefile	Sun Feb  6 23:11:17 2005
+@@ -58,15 +58,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(ASFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(ASFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_PROFILING)),y)
+ gmon-start.S: ../common/gmon-start.c
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/i960/Makefile uClibc-0.9.26/libc/sysdeps/linux/i960/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/i960/Makefile	Sat Nov 22 22:22:02 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/i960/Makefile	Sun Feb  6 23:11:17 2005
+@@ -45,15 +45,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/m68k/Makefile uClibc-0.9.26/libc/sysdeps/linux/m68k/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/m68k/Makefile	Sat Nov 22 22:22:05 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/m68k/Makefile	Sun Feb  6 23:11:17 2005
+@@ -49,15 +49,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/microblaze/Makefile uClibc-0.9.26/libc/sysdeps/linux/microblaze/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/microblaze/Makefile	Sat Nov 22 22:22:07 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/microblaze/Makefile	Sun Feb  6 23:11:17 2005
+@@ -50,15 +50,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(SFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/mips/Makefile uClibc-0.9.26/libc/sysdeps/linux/mips/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/mips/Makefile	Fri Nov 28 20:39:51 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/mips/Makefile	Sun Feb  6 23:11:17 2005
+@@ -43,15 +43,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/powerpc/Makefile uClibc-0.9.26/libc/sysdeps/linux/powerpc/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/powerpc/Makefile	Sun Feb  6 16:41:58 2005
++++ uClibc-0.9.26/libc/sysdeps/linux/powerpc/Makefile	Sun Feb  6 23:11:17 2005
+@@ -47,15 +47,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_PROFILING)),y)
+ gmon-start.S: ../common/gmon-start.c
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/sh/Makefile uClibc-0.9.26/libc/sysdeps/linux/sh/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/sh/Makefile	Thu Dec  4 00:12:14 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/sh/Makefile	Sun Feb  6 23:11:18 2005
+@@ -46,15 +46,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(SFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_PROFILING)),y)
+ gmon-start.S: ../common/gmon-start.c
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/sh64/Makefile uClibc-0.9.26/libc/sysdeps/linux/sh64/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/sh64/Makefile	Thu Dec  4 00:07:50 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/sh64/Makefile	Sun Feb  6 23:11:18 2005
+@@ -47,15 +47,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(SFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/sparc/Makefile uClibc-0.9.26/libc/sysdeps/linux/sparc/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/sparc/Makefile	Sat Nov 22 22:22:25 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/sparc/Makefile	Sun Feb  6 23:11:18 2005
+@@ -43,15 +43,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/v850/Makefile uClibc-0.9.26/libc/sysdeps/linux/v850/Makefile
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/v850/Makefile	Sat Nov 22 22:22:28 2003
++++ uClibc-0.9.26/libc/sysdeps/linux/v850/Makefile	Sun Feb  6 23:11:18 2005
+@@ -47,15 +47,12 @@
+ 
+ $(CRT0_OBJ): $(CRT0_SRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(SFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ ifeq ($(strip $(UCLIBC_CTOR_DTOR)),y)
+ crti.o: crti.S
+diff -ur uClibc-0.9.26.orig/libc/termios/Makefile uClibc-0.9.26/libc/termios/Makefile
+--- uClibc-0.9.26.orig/libc/termios/Makefile	Sat Oct 18 12:19:56 2003
++++ uClibc-0.9.26/libc/termios/Makefile	Sun Feb  6 23:11:18 2005
+@@ -44,11 +44,9 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libc/unistd/Makefile uClibc-0.9.26/libc/unistd/Makefile
+--- uClibc-0.9.26.orig/libc/unistd/Makefile	Fri Jan  2 09:44:58 2004
++++ uClibc-0.9.26/libc/unistd/Makefile	Sun Feb  6 23:11:18 2005
+@@ -50,11 +50,9 @@
+ 
+ $(MOBJ1): $(MSRC1)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libcrypt/Makefile uClibc-0.9.26/libcrypt/Makefile
+--- uClibc-0.9.26.orig/libcrypt/Makefile	Tue Nov  4 09:51:17 2003
++++ uClibc-0.9.26/libcrypt/Makefile	Sun Feb  6 23:11:18 2005
+@@ -43,7 +43,6 @@
+ 
+ $(OBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libintl/Makefile uClibc-0.9.26/libintl/Makefile
+--- uClibc-0.9.26.orig/libintl/Makefile	Tue Nov  4 09:52:10 2003
++++ uClibc-0.9.26/libintl/Makefile	Sun Feb  6 23:11:18 2005
+@@ -48,7 +48,6 @@
+ 
+ $(MOBJ): $(MSRC)
+ 	$(CC) $(CFLAGS) -DL_$* $< -c -o $*.o
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ shared: all
+ 	$(LD) $(LDFLAGS) -soname=$(LIBINTL_SHARED).$(MAJOR_VERSION) \
+diff -ur uClibc-0.9.26.orig/libm/Makefile uClibc-0.9.26/libm/Makefile
+--- uClibc-0.9.26.orig/libm/Makefile	Thu Nov 20 15:42:42 2003
++++ uClibc-0.9.26/libm/Makefile	Sun Feb  6 23:11:18 2005
+@@ -112,7 +112,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libm/powerpc/Makefile uClibc-0.9.26/libm/powerpc/Makefile
+--- uClibc-0.9.26.orig/libm/powerpc/Makefile	Sat Oct 18 12:20:14 2003
++++ uClibc-0.9.26/libm/powerpc/Makefile	Sun Feb  6 23:11:18 2005
+@@ -59,7 +59,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libnsl/Makefile uClibc-0.9.26/libnsl/Makefile
+--- uClibc-0.9.26.orig/libnsl/Makefile	Tue Nov  4 09:53:36 2003
++++ uClibc-0.9.26/libnsl/Makefile	Sun Feb  6 23:11:18 2005
+@@ -38,7 +38,6 @@
+ 
+ $(OBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libpthread/Makefile uClibc-0.9.26/libpthread/Makefile
+--- uClibc-0.9.26.orig/libpthread/Makefile	Sun Feb  6 16:41:58 2005
++++ uClibc-0.9.26/libpthread/Makefile	Sun Feb  6 23:11:18 2005
+@@ -72,7 +72,6 @@
+ 
+ $(OBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libpthread/linuxthreads/Makefile uClibc-0.9.26/libpthread/linuxthreads/Makefile
+--- uClibc-0.9.26.orig/libpthread/linuxthreads/Makefile	Sun Dec 28 01:25:31 2003
++++ uClibc-0.9.26/libpthread/linuxthreads/Makefile	Sun Feb  6 23:11:18 2005
+@@ -69,7 +69,6 @@
+ ifeq ($(strip $(PTHREADS_DEBUG_SUPPORT)),y)
+ 	$(STRIPTOOL) -X --strip-debug -R .note -R .comment $*.o
+ else
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ endif
+ 
+ clean: subdirs_clean
+diff -ur uClibc-0.9.26.orig/libpthread/linuxthreads/sysdeps/sh64/Makefile uClibc-0.9.26/libpthread/linuxthreads/sysdeps/sh64/Makefile
+--- uClibc-0.9.26.orig/libpthread/linuxthreads/sysdeps/sh64/Makefile	Fri Dec  5 21:39:35 2003
++++ uClibc-0.9.26/libpthread/linuxthreads/sysdeps/sh64/Makefile	Sun Feb  6 23:11:18 2005
+@@ -38,11 +38,9 @@
+ 
+ $(SOBJS): %.o : %.S
+ 	$(CC) $(SFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libpthread/linuxthreads_db/Makefile uClibc-0.9.26/libpthread/linuxthreads_db/Makefile
+--- uClibc-0.9.26.orig/libpthread/linuxthreads_db/Makefile	Sat Oct 18 12:20:21 2003
++++ uClibc-0.9.26/libpthread/linuxthreads_db/Makefile	Sun Feb  6 23:11:18 2005
+@@ -66,7 +66,6 @@
+ 
+ $(COBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ clean:
+ 	$(RM) *.[oa] *~ core
+diff -ur uClibc-0.9.26.orig/libresolv/Makefile uClibc-0.9.26/libresolv/Makefile
+--- uClibc-0.9.26.orig/libresolv/Makefile	Tue Nov  4 09:59:26 2003
++++ uClibc-0.9.26/libresolv/Makefile	Sun Feb  6 23:11:18 2005
+@@ -44,7 +44,6 @@
+ 
+ $(OBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ $(OBJ): Makefile
+ 
+diff -ur uClibc-0.9.26.orig/libutil/Makefile uClibc-0.9.26/libutil/Makefile
+--- uClibc-0.9.26.orig/libutil/Makefile	Tue Nov  4 10:00:01 2003
++++ uClibc-0.9.26/libutil/Makefile	Sun Feb  6 23:11:18 2005
+@@ -47,7 +47,6 @@
+ 
+ $(OBJS): %.o : %.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $*.o
+ 
+ shared: all
+ 	$(LD) $(LDFLAGS) -soname=$(LIBUTIL_SHARED).$(MAJOR_VERSION) \
+diff -ur uClibc-0.9.26.orig/test/args/Makefile uClibc-0.9.26/test/args/Makefile
+--- uClibc-0.9.26.orig/test/args/Makefile	Sat Jan  3 00:07:36 2004
++++ uClibc-0.9.26/test/args/Makefile	Sun Feb  6 23:11:18 2005
+@@ -30,7 +30,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ a b c d e f g h
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/assert/Makefile uClibc-0.9.26/test/assert/Makefile
+--- uClibc-0.9.26.orig/test/assert/Makefile	Sat Jan  3 00:07:37 2004
++++ uClibc-0.9.26/test/assert/Makefile	Sun Feb  6 23:11:18 2005
+@@ -30,7 +30,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/crypt/Makefile uClibc-0.9.26/test/crypt/Makefile
+--- uClibc-0.9.26.orig/test/crypt/Makefile	Sat Jan  3 00:07:37 2004
++++ uClibc-0.9.26/test/crypt/Makefile	Sun Feb  6 23:11:18 2005
+@@ -33,7 +33,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ < crypt.input #> $@.out 2>&1
+ 	-@ echo " "
+ 
+@@ -44,7 +43,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ < crypt.input > $@.out 2>&1
+ 	-@ echo " "
+ 
+@@ -63,7 +61,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/ctype/Makefile uClibc-0.9.26/test/ctype/Makefile
+--- uClibc-0.9.26.orig/test/ctype/Makefile	Sat Jan  3 00:07:37 2004
++++ uClibc-0.9.26/test/ctype/Makefile	Sun Feb  6 23:11:18 2005
+@@ -29,7 +29,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 
+ ctype_run:
+ 	./ctype
+diff -ur uClibc-0.9.26.orig/test/malloc/Makefile uClibc-0.9.26/test/malloc/Makefile
+--- uClibc-0.9.26.orig/test/malloc/Makefile	Sat Jan  3 00:07:38 2004
++++ uClibc-0.9.26/test/malloc/Makefile	Sun Feb  6 23:11:18 2005
+@@ -33,7 +33,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -51,7 +50,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+@@ -64,7 +62,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+@@ -77,7 +74,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+@@ -90,7 +86,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+@@ -103,7 +98,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+@@ -116,7 +110,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+diff -ur uClibc-0.9.26.orig/test/math/Makefile uClibc-0.9.26/test/math/Makefile
+--- uClibc-0.9.26.orig/test/math/Makefile	Sat Jan  3 00:07:38 2004
++++ uClibc-0.9.26/test/math/Makefile	Sun Feb  6 23:11:18 2005
+@@ -64,7 +64,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ > $@.out 2>&1
+ 	-@ echo " "
+ 
+@@ -75,7 +74,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ > $@.out 2>&1
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/misc/Makefile uClibc-0.9.26/test/misc/Makefile
+--- uClibc-0.9.26.orig/test/misc/Makefile	Sat Jan  3 00:07:39 2004
++++ uClibc-0.9.26/test/misc/Makefile	Sun Feb  6 23:11:18 2005
+@@ -31,7 +31,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	./$@
+ 	-@ echo " "
+ 
+@@ -42,7 +41,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -53,7 +51,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -72,7 +69,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ dirent.c > $@.out
+ 	-@ echo " "
+ 
+@@ -83,7 +79,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ dirent.c > $@.out
+ 	-@ echo " "
+ 
+@@ -102,7 +97,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) $(CFLAGS64) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ dirent.c > $@.out
+ 	-@ echo " "
+ 
+@@ -113,7 +107,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) $(CFLAGS64) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ dirent.c > $@.out
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/mmap/Makefile uClibc-0.9.26/test/mmap/Makefile
+--- uClibc-0.9.26.orig/test/mmap/Makefile	Sat Jan  3 00:07:39 2004
++++ uClibc-0.9.26/test/mmap/Makefile	Sun Feb  6 23:11:18 2005
+@@ -30,7 +30,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/pthread/Makefile uClibc-0.9.26/test/pthread/Makefile
+--- uClibc-0.9.26.orig/test/pthread/Makefile	Sat Jan  3 00:07:41 2004
++++ uClibc-0.9.26/test/pthread/Makefile	Sun Feb  6 23:11:18 2005
+@@ -15,7 +15,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -26,7 +25,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -37,7 +35,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -48,7 +45,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -59,7 +55,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -70,7 +65,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -81,7 +75,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/pwd_grp/Makefile uClibc-0.9.26/test/pwd_grp/Makefile
+--- uClibc-0.9.26.orig/test/pwd_grp/Makefile	Sat Jan  3 00:07:42 2004
++++ uClibc-0.9.26/test/pwd_grp/Makefile	Sun Feb  6 23:11:18 2005
+@@ -36,7 +36,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >test_pwd.out
+ 	-@ echo " "
+ 
+@@ -47,7 +46,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >test_pwd_glibc.out
+ 	-@ echo " "
+ 
+@@ -58,7 +56,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >test_grp.out
+ 	-@ echo " "
+ 
+@@ -69,7 +66,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >test_grp_glibc.out
+ 	-@ echo " "
+ 
+@@ -80,7 +76,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >pwcat.out
+ 	-@ echo " "
+ 
+@@ -91,7 +86,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >pwcat_glibc.out
+ 	-@ echo " "
+ 
+@@ -102,7 +96,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >grcat.out
+ 	-@ echo " "
+ 
+@@ -113,7 +106,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >grcat_glibc.out
+ 	-@ echo " "
+ 
+@@ -124,7 +116,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >getgroups.out
+ 	-@ echo " "
+ 
+@@ -135,7 +126,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ 2>&1 >getgroups_glibc.out
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/setjmp/Makefile uClibc-0.9.26/test/setjmp/Makefile
+--- uClibc-0.9.26.orig/test/setjmp/Makefile	Sat Jan  3 00:07:45 2004
++++ uClibc-0.9.26/test/setjmp/Makefile	Sun Feb  6 23:11:18 2005
+@@ -30,7 +30,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/signal/Makefile uClibc-0.9.26/test/signal/Makefile
+--- uClibc-0.9.26.orig/test/signal/Makefile	Sat Jan  3 00:07:47 2004
++++ uClibc-0.9.26/test/signal/Makefile	Sun Feb  6 23:11:18 2005
+@@ -31,7 +31,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -42,7 +41,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -53,7 +51,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -64,7 +61,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/silly/Makefile uClibc-0.9.26/test/silly/Makefile
+--- uClibc-0.9.26.orig/test/silly/Makefile	Sat Jan  3 00:07:49 2004
++++ uClibc-0.9.26/test/silly/Makefile	Sun Feb  6 23:11:18 2005
+@@ -40,7 +40,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+@@ -53,7 +52,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+@@ -67,7 +65,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+diff -ur uClibc-0.9.26.orig/test/stat/Makefile uClibc-0.9.26/test/stat/Makefile
+--- uClibc-0.9.26.orig/test/stat/Makefile	Sat Jan  3 00:07:50 2004
++++ uClibc-0.9.26/test/stat/Makefile	Sun Feb  6 23:11:18 2005
+@@ -41,7 +41,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ stat.c > $@.out
+ 	-@ echo " "
+ 
+@@ -52,7 +51,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ stat.c > $@.out
+ 	-@ echo " "
+ 
+@@ -71,7 +69,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) $(CFLAGS64) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ stat.c > $@.out
+ 	-@ echo " "
+ 
+@@ -82,7 +79,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) $(CFLAGS64) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ stat.c > $@.out
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/stdlib/Makefile uClibc-0.9.26/test/stdlib/Makefile
+--- uClibc-0.9.26.orig/test/stdlib/Makefile	Sat Jan  3 00:07:52 2004
++++ uClibc-0.9.26/test/stdlib/Makefile	Sun Feb  6 23:11:18 2005
+@@ -43,7 +43,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@ > $@.out
+@@ -56,7 +55,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@ > $@.out
+@@ -77,7 +75,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@ > $@.out
+@@ -90,7 +87,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@ > $@.out
+@@ -111,7 +107,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@ > $@.out
+@@ -124,7 +119,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@ > $@.out
+@@ -145,7 +139,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@ > $@.out
+@@ -158,7 +151,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@ > $@.out
+@@ -179,7 +171,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+diff -ur uClibc-0.9.26.orig/test/string/Makefile uClibc-0.9.26/test/string/Makefile
+--- uClibc-0.9.26.orig/test/string/Makefile	Sat Jan  3 00:07:53 2004
++++ uClibc-0.9.26/test/string/Makefile	Sun Feb  6 23:11:18 2005
+@@ -33,7 +33,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -44,7 +43,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -55,7 +53,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ > testcopy.out
+ 	-@ echo " "
+ 
+@@ -66,7 +63,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@ > testcopy.gnu.out
+ 	-@ echo " "
+ 
+@@ -86,7 +82,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -DCHECK_BUF -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -97,7 +92,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -DCHECK_BUF -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/test/termios/Makefile uClibc-0.9.26/test/termios/Makefile
+--- uClibc-0.9.26.orig/test/termios/Makefile	Sat Jan  3 00:07:55 2004
++++ uClibc-0.9.26/test/termios/Makefile	Sun Feb  6 23:11:18 2005
+@@ -32,7 +32,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+@@ -45,7 +44,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-$(LDD) $@
+ 	ls -l $@
+ 	-./$@
+diff -ur uClibc-0.9.26.orig/test/unistd/Makefile uClibc-0.9.26/test/unistd/Makefile
+--- uClibc-0.9.26.orig/test/unistd/Makefile	Sat Jan  3 00:07:57 2004
++++ uClibc-0.9.26/test/unistd/Makefile	Sun Feb  6 23:11:18 2005
+@@ -31,7 +31,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	./$@
+ 	-@ echo " "
+ 
+@@ -42,7 +41,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	./$@
+ 	-@ echo " "
+ 
+@@ -53,7 +51,6 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+@@ -64,7 +61,6 @@
+ 	-@ echo " "
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	./$@
+ 	-@ echo " "
+ 
+@@ -75,28 +71,24 @@
+ 	-@ echo " "
+ 	$(HOSTCC) $(GLIBC_CFLAGS) -c $< -o $@.o
+ 	$(HOSTCC) $(GLIBC_LDFLAGS) $@.o -o $@
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	-./$@
+ 	-@ echo " "
+ 
+ getopt: getopt.c Makefile $(TESTDIR)/Config $(TESTDIR)/Rules.mak
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	./$@ -abcXXX -9
+ 	-@ echo " "
+ 
+ getopt_long: getopt_long.c Makefile $(TESTDIR)/Config $(TESTDIR)/Rules.mak
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	./$@ --add XXX --delete YYY --verbose
+ 	-@ echo " "
+ 
+ preadwrite: preadwrite.c Makefile $(TESTDIR)/Config $(TESTDIR)/Rules.mak
+ 	$(CC) $(CFLAGS) -c $< -o $@.o
+ 	$(CC) $(LDFLAGS) $@.o -o $@ $(EXTRA_LIBS)
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 	./$@
+ 	-@ echo " "
+ 
+diff -ur uClibc-0.9.26.orig/utils/Makefile uClibc-0.9.26/utils/Makefile
+--- uClibc-0.9.26.orig/utils/Makefile	Mon Dec 15 00:52:57 2003
++++ uClibc-0.9.26/utils/Makefile	Sun Feb  6 23:11:18 2005
+@@ -47,26 +47,22 @@
+ 
+ readelf: readelf.c
+ 	$(CC) $(CFLAGS) -Wl,-s $^ -o $@ $(LDADD_LIBFLOAT) -L../lib
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 
+ ldconfig:	ldconfig.c readsoname.c
+ 	$(CC) $(CFLAGS) $(XXFLAGS) -Wl,-s -static \
+ 		-DUCLIBC_RUNTIME_PREFIX=$(R_PREFIX) \
+ 		-DUCLIBC_LDSO=$(UCLIBC_LDSO) -I. -I../ldso/include \
+ 		$^ -o $@ $(LDADD_LIBFLOAT) -L../lib
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 
+ ldd:	ldd.c
+ 	$(CC) $(CFLAGS) $(XXFLAGS) -Wl,-s \
+ 		-DUCLIBC_RUNTIME_PREFIX=$(R_PREFIX) \
+ 		-DUCLIBC_LDSO=$(UCLIBC_LDSO) \
+ 		$^ -o $@ $(LDADD_LIBFLOAT) -L../lib
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 
+ iconv: ../libc/misc/wchar/wchar.c
+ 	$(CC) $(CFLAGS) -DL_iconv_main ../libc/misc/wchar/wchar.c -o $@ \
+ 		$(LDADD_LIBFLOAT) -L../lib
+-	$(STRIPTOOL) -x -R .note -R .comment $@
+ 
+ clean:
+ 	$(RM) $(TARGETS) *.o *~ core *.target elf.h iconv
