@@ -88,7 +88,12 @@ ln -sf extra/Configs/Config.powerpc.default Config
 cat Config > Config.tmp
 
 #	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX=\$\(DEVEL_PREFIX\)\/usr/;
-sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED=y/;
+sed -e '
+%ifarch alpha
+	s/^HAVE_SHARED *=.*$/HAVE_SHARED=n/;
+%else
+	s/^HAVE_SHARED *=.*$/HAVE_SHARED=y/;
+%endif
 	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX="\/usr"/;
 %if %{?_with_lfs:1}%{!?_with_lfs:0}
 	s/^DOLFS *=.*$/DOLFS=y/;
