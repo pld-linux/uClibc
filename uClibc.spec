@@ -9,7 +9,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.19
-Release:	0.2
+Release:	0.3
 Epoch:		1
 License:	LGPL
 Group:		Libraries
@@ -80,14 +80,14 @@ cat Config > Config.tmp
 
 #	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX=\$\(DEVEL_PREFIX\)\/usr/;
 sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED=y/;
-	s/^INCLUDE_RPC *=.*$/INCLUDE_RPC=y/;
 	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX="\/usr"/;
 %if %{?_with_lfs:1}%{!?_with_lfs:0}
 	s/^DOLFS *=.*$/DOLFS=y/;
 %endif
 	s/^HAS_SHADOW *=.*$/HAS_SHADOW=y/;
 	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6=y/;
-	s/^DO_C99_MATH *=.*$/DO_C99_MATH=y/' Config.tmp > Config
+	s/^DO_C99_MATH *=.*$/DO_C99_MATH=y/;
+	s/.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y/' Config.tmp > Config
 
 # note: defconfig and all must be run in separate make process because of macros
 for targ in defconfig all ; do
