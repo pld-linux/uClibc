@@ -83,4 +83,5 @@ rm -rf $RPM_BUILD_ROOT
 %files BOOT
 %defattr(644,root,root,755)
 %attr(755,root,root) /usr/lib/bootdisk/%{_libdir}/*.so*
-/usr/lib/bootdisk%{_libdir}/*.a
+/usr/lib/bootdisk%{_libdir}/libc.a
+/usr/lib/bootdisk%{_libdir}/crt0.o
