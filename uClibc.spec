@@ -92,8 +92,9 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 %{__make} install \
 	PREFIX=$RPM_BUILD_ROOT
 
-mv $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc%{_bindir} \
+mv $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc%{_bindir}/* \
 	$RPM_BUILD_ROOT%{_bindir}
+rm -rf $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc/usr
 
 find $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc/include -name CVS | xargs rm -rf
 
