@@ -9,7 +9,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.19
-Release:	0.3
+Release:	0.4
 Epoch:		1
 License:	LGPL
 Group:		Libraries
@@ -34,7 +34,7 @@ Summary(pl):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{version}
 Requires:	binutils
-Requires:	gcc
+%requires_eq	gcc
 
 %description devel
 Small libc for building embedded applications.
