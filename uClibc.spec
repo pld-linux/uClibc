@@ -46,7 +46,7 @@ Small libc for building embedded applications.
 
 %build
 perl -pi -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/g' Config
-%{__make} KERNEL_SOURCE=/usr/src/linux CPUFLAGS="-m386"
+%{__make} KERNEL_SOURCE=%{_kernelsrcdir} CPUFLAGS="-m386"
 
 %install
 rm -rf $RPM_BUILD_ROOT
