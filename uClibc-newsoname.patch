@@ -1,0 +1,31 @@
+diff -urN uClibc-0.9.20.org/libpthread/Makefile uClibc-0.9.20/libpthread/Makefile
+--- uClibc-0.9.20.org/libpthread/Makefile	2003-08-06 20:43:16.000000000 +0200
++++ uClibc-0.9.20/libpthread/Makefile	2003-08-06 20:50:55.000000000 +0200
+@@ -21,7 +21,8 @@
+ 
+ #Adjust the soname version to avoid namespace collisions with glibc's libpthread
+ LIBPTHREAD=libpthread.a
+-LIBPTHREAD_SHARED=libpthread.so
++LIBPTHREAD_SHARED_ORG=libpthread.so
++LIBPTHREAD_SHARED=libpthread-uclibc.so
+ LIBPTHREAD_SHARED_FULLNAME=libpthread-$(MAJOR_VERSION).$(MINOR_VERSION).$(SUBLEVEL).so
+ 
+ LIBTHREAD_DB=libthread_db.a
+@@ -90,6 +91,8 @@
+ 			$(LIBPTHREAD_SHARED)); \
+ 		(cd $(TOPDIR)lib && ln -sf $(LIBPTHREAD_SHARED_FULLNAME) \
+ 			$(LIBPTHREAD_SHARED).$(MAJOR_VERSION)); \
++		(cd $(TOPDIR)lib && ln -sf $(LIBPTHREAD_SHARED_FULLNAME) \
++			$(LIBPTHREAD_SHARED_ORG).$(MAJOR_VERSION)); \
+ 	fi;
+ 	if [ -f $(LIBTHREAD_DB) ] ; then \
+ 		set -e; \
+@@ -105,6 +108,8 @@
+ 			$(LIBTHREAD_DB_SHARED)); \
+ 		(cd $(TOPDIR)lib && ln -sf $(LIBTHREAD_DB_SHARED_FULLNAME) \
+ 			$(LIBTHREAD_DB_SHARED).1); \
++		(cd $(TOPDIR)lib && ln -sf $(LIBPTHREAD_SHARED_FULLNAME) \
++			$(LIBPTHREAD_SHARED_ORG).$(MAJOR_VERSION)); \
+ 	fi;
+ 
+ tags:
