@@ -82,6 +82,8 @@ mv -f Conf.in.tmp extra/Configs/Config.in
 
 grep -v 'HAVE_NO_SHARED\|ARCH_HAS_NO_LDSO' extra/Configs/Config.sparc > C.tmp
 mv -f C.tmp extra/Configs/Config.sparc
+grep -v 'HAS_NO_THREADS' extra/Configs/Config.alpha > C.tmp
+mv -f C.tmp extra/Configs/Config.alpha
 
 %ifarch sparc sparc64 sparcv9
 ln -sf /usr/include/asm-sparc include/asm-sparc
