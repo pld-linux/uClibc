@@ -11,7 +11,7 @@ Source0:	%{name}-%{version}.tar.gz
 #Patch0:		%{name}-install.patch
 URL:		http://cvs.uclinux.org/uClibc.html
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
+BuildRequires:	linux-devel-BOOT
 
 %description
 Small libc for building embedded applications.
