@@ -1,6 +1,53 @@
-diff -ur uClibc-0.9.9/libc/stdio/stdio.c uClibc-0.9.9-lfs/libc/stdio/stdio.c
---- uClibc-0.9.9/libc/stdio/stdio.c	Fri Mar 15 00:16:52 2002
-+++ uClibc-0.9.9-lfs/libc/stdio/stdio.c	Fri Mar 15 00:17:05 2002
+diff -ur uClibc-0.9.9/libc/misc/dirent/alphasort64.c uClibc-0.9.9-/libc/misc/dirent/alphasort64.c
+--- uClibc-0.9.9/libc/misc/dirent/alphasort64.c	Wed Nov 14 11:09:46 2001
++++ uClibc-0.9.9-/libc/misc/dirent/alphasort64.c	Sat Mar 16 11:20:45 2002
+@@ -1,5 +1,4 @@
+ #include <features.h>
+-#ifdef __UCLIBC_HAVE_LFS__
+ #define _FILE_OFFSET_BITS   64
+ #define __USE_LARGEFILE64
+ #define __USE_FILE_OFFSET64
+@@ -13,5 +12,3 @@
+     return strcmp ((*(const struct dirent64 **) a)->d_name,
+ 	    (*(const struct dirent64 **) b)->d_name);
+ }
+-#endif /* __UCLIBC_HAVE_LFS__ */
+-
+diff -ur uClibc-0.9.9/libc/misc/dirent/readdir64.c uClibc-0.9.9-/libc/misc/dirent/readdir64.c
+--- uClibc-0.9.9/libc/misc/dirent/readdir64.c	Wed Nov 14 11:09:46 2001
++++ uClibc-0.9.9-/libc/misc/dirent/readdir64.c	Sat Mar 16 11:19:48 2002
+@@ -1,5 +1,4 @@
+ #include <features.h>
+-#ifdef __UCLIBC_HAVE_LFS__
+ #define _FILE_OFFSET_BITS   64
+ #define __USE_LARGEFILE64
+ #define __USE_FILE_OFFSET64
+@@ -63,5 +62,3 @@
+ 
+ 	return de;
+ }
+-
+-#endif /* __UCLIBC_HAVE_LFS__ */
+diff -ur uClibc-0.9.9/libc/misc/dirent/scandir64.c uClibc-0.9.9-/libc/misc/dirent/scandir64.c
+--- uClibc-0.9.9/libc/misc/dirent/scandir64.c	Tue Jan  8 09:00:17 2002
++++ uClibc-0.9.9-/libc/misc/dirent/scandir64.c	Sat Mar 16 11:19:34 2002
+@@ -24,7 +24,6 @@
+ */
+ 
+ #include <features.h>
+-#ifdef __UCLIBC_HAVE_LFS__
+ #define _FILE_OFFSET_BITS   64
+ #define __USE_LARGEFILE64
+ #define __USE_FILE_OFFSET64
+@@ -90,5 +89,3 @@
+ 
+     return pos;
+ }
+-#endif /* __UCLIBC_HAVE_LFS__ */
+-
+diff -ur uClibc-0.9.9/libc/stdio/stdio.c uClibc-0.9.9-/libc/stdio/stdio.c
+--- uClibc-0.9.9/libc/stdio/stdio.c	Wed Nov 21 14:44:43 2001
++++ uClibc-0.9.9-/libc/stdio/stdio.c	Sat Mar 16 10:49:13 2002
 @@ -1097,7 +1097,6 @@
  #endif
  
@@ -16,9 +63,19 @@ diff -ur uClibc-0.9.9/libc/stdio/stdio.c uClibc-0.9.9-lfs/libc/stdio/stdio.c
 -#endif /* __UCLIBC_HAVE_LFS__ */
  #endif
  
-diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/open64.c uClibc-0.9.9-lfs/libc/sysdeps/linux/common/open64.c
+diff -ur uClibc-0.9.9/libc/stdio/tmpfile.c uClibc-0.9.9-/libc/stdio/tmpfile.c
+--- uClibc-0.9.9/libc/stdio/tmpfile.c	Sun Jan  6 09:13:00 2002
++++ uClibc-0.9.9-/libc/stdio/tmpfile.c	Sat Mar 16 11:18:29 2002
+@@ -49,6 +49,4 @@
+ 
+     return f;
+ }
+-#ifdef __UCLIBC_HAVE_LFS__
+ weak_alias(tmpfile, tmpfile64);
+-#endif
+diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/open64.c uClibc-0.9.9-/libc/sysdeps/linux/common/open64.c
 --- uClibc-0.9.9/libc/sysdeps/linux/common/open64.c	Wed Oct 17 01:10:28 2001
-+++ uClibc-0.9.9-lfs/libc/sysdeps/linux/common/open64.c	Fri Mar 15 00:14:16 2002
++++ uClibc-0.9.9-/libc/sysdeps/linux/common/open64.c	Sat Mar 16 10:49:13 2002
 @@ -25,8 +25,6 @@
  #define O_LARGEFILE	0100000
  #endif
@@ -35,9 +92,9 @@ diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/open64.c uClibc-0.9.9-lfs/libc/s
 -
 -#endif /* __UCLIBC_HAVE_LFS__ */
 -
-diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c uClibc-0.9.9-lfs/libc/sysdeps/linux/common/syscalls.c
+diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c uClibc-0.9.9-/libc/sysdeps/linux/common/syscalls.c
 --- uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c	Sat Feb  2 07:54:13 2002
-+++ uClibc-0.9.9-lfs/libc/sysdeps/linux/common/syscalls.c	Fri Mar 15 00:14:16 2002
++++ uClibc-0.9.9-/libc/sysdeps/linux/common/syscalls.c	Sat Mar 16 11:07:51 2002
 @@ -1093,10 +1093,8 @@
  
  	return ret ? (loff_t) ret : result;
@@ -49,7 +106,7 @@ diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c uClibc-0.9.9-lfs/libc
  
  //#define __NR_getdents         141
  #ifdef L_getdents
-@@ -1590,8 +1588,142 @@
+@@ -1590,8 +1588,192 @@
  	return _fcntl64(fd, command, arg);
  }
  #endif
@@ -107,8 +164,8 @@ diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c uClibc-0.9.9-lfs/libc
 +{
 +	return(__xstat64(0, file_name, buf));
 +}
- #endif
- 
++#endif
++
 +#ifdef L___lstat64
 +#include <unistd.h>
 +#define __USE_LARGEFILE64
@@ -187,6 +244,56 @@ diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c uClibc-0.9.9-lfs/libc
 +}
 +#endif
 +
++#ifdef L__fcntl64
++#include <stdarg.h>
++#define _FCNTL_H
++#define __USE_LARGEFILE64
++#include <bits/fcntl.h>
++extern int fcntl(int fd, int cmd, ...);
++
++int fcntl64(int fd, int command, ...)
++{
++	long arg;
++	va_list list;
++
++	va_start(list, command);
++	arg = va_arg(list, long);
++	va_end(list);
++
++	if (command == F_GETLK64) {
++		struct flock fl;
++		struct flock64 *fl64;
++		int r;
++
++		r = fcntl(fd, F_GETLK, &fl);
++		
++		if (r >= 0) {
++			fl64 = (void*)arg;
++			fl64->l_type = fl.l_type;
++			fl64->l_whence = fl.l_whence;
++			fl64->l_start = fl.l_start;
++			fl64->l_len = fl.l_len;
++			fl64->l_pid = fl.l_pid;
++		}
++
++		return r;
++	} else if (command == F_SETLKW64 || command == F_SETLK64) {
++		struct flock fl;
++		struct flock64 *fl64;
++
++		fl64 = (void*)arg;
++		fl.l_type = fl64->l_type;
++		fl.l_whence = fl64->l_whence;
++		fl.l_start = fl64->l_start;
++		fl.l_len = fl64->l_len;
++		fl.l_pid = fl64->l_pid;
++		
++		return fcntl(fd, command == F_SETLKW64 ? F_SETLKW : F_SETLK, &fl);
++	} else
++		return fcntl(fd, command, arg);
++}
+ #endif
+ 
 +#endif /* __UCLIBC_HAVE_LFS__ */
 +
  //#define __NR_security		223	/* syscall for security modules */
