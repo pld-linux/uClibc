@@ -5,13 +5,13 @@
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.21
-Release:	5
+Version:	0.9.26
+Release:	0.1
 Epoch:		2
 License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	d4ecdc8350b7c481e06cff830883b8ec
+# Source0-md5:	7212713c432dd0de6ec2140c2a6212e4
 Patch0:		%{name}-lfs.patch
 Patch1:		%{name}-no_bogus_gai.patch
 Patch2:		%{name}-targetcpu.patch
@@ -22,6 +22,7 @@ Patch6:		%{name}-use-kernel-headers.patch
 Patch7:		%{name}-alpha.patch
 Patch8:		%{name}-gmon.patch
 Patch9:		%{name}-sparc.patch
+Patch10:	%{name}-toolchain-wrapper.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -64,29 +65,31 @@ Biblioteki statyczne uClibc.
 %setup -q
 #%patch0 -p1  -- needs update
 #%patch1 -p1  -- causes compilation errors
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
+#%patch2 -p1
+# OBSOLETE
+#%patch3 -p1
+#%patch4 -p1
 %patch5 -p1
 %patch6 -p1
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
+#%patch7 -p1
+#%patch8 -p1
+#%patch9 -p1
+%patch10 -p1
 
 %ifarch %{ix86}
-ln -sf extra/Configs/Config.i386.default Config
+ln -sf extra/Configs/Config.i386 Config
 %endif
 %ifarch sparc sparc64
-cp -f extra/Configs/Config.{powerpc,sparc}.default
-ln -sf extra/Configs/Config.sparc.default Config
+cp -f extra/Configs/Config.{powerpc,sparc}
+ln -sf extra/Configs/Config.sparc Config
 %endif
 %ifarch alpha
 # it doesn't matter I guess
-cp -f extra/Configs/Config.{powerpc,alpha}.default
-ln -sf extra/Configs/Config.alpha.default Config
+cp -f extra/Configs/Config.{powerpc,alpha}
+ln -sf extra/Configs/Config.alpha Config
 %endif
 %ifarch ppc ppc64
-ln -sf extra/Configs/Config.powerpc.default Config
+ln -sf extra/Configs/Config.powerpc Config
 %endif
 
 %build
@@ -126,6 +129,7 @@ done
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
+TARGET_ARCH="%(echo %{_target_cpu} | sed -e 's/i.86\|athlon/i386/')"
 
 %{__make} install \
 	NATIVE_CC=%{__cc} \
@@ -140,29 +144,33 @@ ln -sf ppc-linux-uclibc $RPM_BUILD_ROOT/usr/powerpc-linux-uclibc
 %endif
 
 # these links are *needed* (by stuff in bin/)
-#for f in $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc%{_bindir}/* ; do
-#	mv $f $RPM_BUILD_ROOT%{_bindir}
-#	ln -sf ../../../bin/`basename $f` $f
-#done
+for f in $RPM_BUILD_ROOT/usr/${TARGET_ARCH}-linux-uclibc/bin/* ; do
+	mv -f $f $RPM_BUILD_ROOT%{_bindir}
+	ln -sf ../../bin/`basename $f` $f
+done
 
-find $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include \
-	-name CVS -o -name .cvsignore | xargs rm -rf
+# links for proper arch (like athlon->i386 on athlon)
+if [ "${TARGET_ARCH}" != "%{_target_cpu}" ]; then
+	for f in $RPM_BUILD_ROOT%{_bindir}/*; do
+		sf=$(basename "$f")
+		newsf=$(echo "$sf" | sed -e "s#${TARGET_ARCH}#%{_target_cpu}#g")
+		ln -s "$sf" $RPM_BUILD_ROOT%{_bindir}/${newsf}
+	done
+fi
 
-rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include/{linux,asm}
-ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include/asm
-ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include/linux
+rm -rf $RPM_BUILD_ROOT/usr/${TARGET_ARCH}-linux-uclibc/usr/include/{linux,asm}
+ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/${TARGET_ARCH}-linux-uclibc/usr/include/asm
+ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/${TARGET_ARCH}-linux-uclibc/usr/include/linux
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%dir %{_prefix}/%{_target_cpu}-linux-uclibc
-%dir %{_prefix}/%{_target_cpu}-linux-uclibc/lib
+%dir %{_prefix}/*-linux-uclibc
+%dir %{_prefix}/*-linux-uclibc/lib
 %ifarch %{ix86} ppc sparc sparc64
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/ld-*
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/lib*%{version}.so
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/lib*.so.0
+%attr(755,root,root) %{_prefix}/*-linux-uclibc/lib/*.so*
 %endif
 %ifarch ppc
 %{_prefix}/powerpc-linux-uclibc
@@ -172,20 +180,14 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc README TODO docs/threads.txt docs/uclibc.org/*.html
 %attr(755,root,root) %{_bindir}/*
-#%dir %{_prefix}/%{_target_cpu}-linux-uclibc/bin
-#%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/bin/*
-%{_prefix}/%{_target_cpu}-linux-uclibc/usr
-%{_prefix}/%{_target_cpu}-linux-uclibc/lib/crt*.o
+%{_prefix}/*-linux-uclibc/usr/lib/*.o
+%dir %{_prefix}/*-linux-uclibc/usr
+%dir %{_prefix}/*-linux-uclibc/usr/lib
 %ifarch %{ix86} ppc sparc sparc64
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libc.so
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libcrypt.so
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libdl.so
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libm.so
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libresolv.so
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libutil.so
+%attr(755,root,root) %{_prefix}/*-linux-uclibc/usr/lib/*.so
 %endif
-%{_prefix}/%{_target_cpu}-linux-uclibc/include
+%{_prefix}/*-linux-uclibc/usr/include
 
 %files static
 %defattr(644,root,root,755)
-%{_prefix}/%{_target_cpu}-linux-uclibc/lib/lib*.a
+%{_prefix}/*-linux-uclibc/usr/lib/lib*.a
