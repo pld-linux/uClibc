@@ -690,7 +690,7 @@ diff -urN uClibc-0.9.26.org/extra/gcc-uClibc/Makefile uClibc-0.9.26/extra/gcc-uC
 +	@echo "#define GCC_BIN " \"$(GCC_BIN)\" >> gcc-uClibc.h
 +	@echo "#define LIBGCC_DIR " \"$(LIBGCC_DIR)\" >> gcc-uClibc.h
 +	@echo "#define TARGET_ARCH " \"$(TARGET_ARCH)\" >> gcc-uClibc.h
-+	@echo "#define DYNAMIC_LINKER " \"$(DEVEL_PREFIX)/../lib/$(UCLIBC_LDSO)\" >> gcc-uClibc.h
++	@echo "#define DYNAMIC_LINKER " \"$(RUNTIME_PREFIX)lib/$(UCLIBC_LDSO)\" >> gcc-uClibc.h
 +	@echo "#define BUILD_DYNAMIC_LINKER " \"$(UCLIBC_DIR)/lib/$(UCLIBC_LDSO)\" >> gcc-uClibc.h
 +ifeq ($(strip $(HAVE_SHARED)),y)
 +	@echo "#define __UCLIBC_HAS_SHARED__ 1" >> gcc-uClibc.h
