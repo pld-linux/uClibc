@@ -108,6 +108,9 @@ sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
 	s/^.*DO_C99_MATH.*$/DO_C99_MATH=y/;
 	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set/
 	' .config.tmp > .config
+%{?debug:echo 'DODEBUG=y' >> .config}
+%{?debug:echo 'SUPPORT_LD_DEBUG=y' >> .config}
+
 # force regeneration after .config changes
 rm -f include/bits/uClibc_config.h
 
