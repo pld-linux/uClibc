@@ -6,7 +6,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.26
-Release:	1
+Release:	2
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -42,7 +42,7 @@ Ma³a libc do budowania aplikacji wbudowanych.
 Summary:	Development files for uClibc
 Summary(pl):	Pliki dla programistów uClibc
 Group:		Development/Libraries
-Requires:	%{name} = %{epoch}:%{version}
+Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	linux-libc-headers
 Requires:	binutils
 %requires_eq	gcc
@@ -57,7 +57,7 @@ Ma³a libc do budowania aplikacji wbudowanych.
 Summary:	Static uClibc libratries
 Summary(pl):	Biblioteki statyczne uClibc
 Group:		Development/Libraries
-Requires:	%{name}-devel = %{epoch}:%{version}
+Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
 Provides:	libc-static
 
 %description static
