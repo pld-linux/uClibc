@@ -145,4 +145,5 @@ rm -rf $RPM_BUILD_ROOT
 %{_prefix}/%{_arch}-linux-uclibc/include
 
 %files static
+%defattr(644,root,root,755)
 %{_prefix}/%{_arch}-linux-uclibc/lib/lib*.a
