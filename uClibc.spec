@@ -6,7 +6,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.21
-Release:	3
+Release:	4
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -19,6 +19,8 @@ Patch3:		%{name}-awk.patch
 Patch4:		%{name}-asmflags.patch
 Patch5:		%{name}-newsoname.patch
 Patch6:		%{name}-use-kernel-headers.patch
+Patch7:		%{name}-alpha.patch
+Patch8:		%{name}-gmon.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -65,12 +67,15 @@ Biblioteki statyczne uClibc.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
+%patch8 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386.default Config
 %endif
 %ifarch sparc sparc64
-ln -sf extra/Configs/Config.sparc.TODO Config
+cp -f extra/Configs/Config.{powerpc,sparc}.default
+ln -sf extra/Configs/Config.sparc.default Config
 %endif
 %ifarch alpha
 # it doesn't matter I guess
@@ -147,11 +152,13 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %dir %{_prefix}/%{_target_cpu}-linux-uclibc
 %dir %{_prefix}/%{_target_cpu}-linux-uclibc/lib
-%ifnarch sparc sparc64
+%ifarch %{ix86} ppc # sparc? should be
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/ld-*
 %endif
+%ifarch %{ix86} ppc sparc sparc64
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/lib*%{version}.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/lib*.so.0
+%endif
 %ifarch ppc
 %{_prefix}/powerpc-linux-uclibc
 %endif
@@ -164,14 +171,16 @@ rm -rf $RPM_BUILD_ROOT
 #%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/bin/*
 %{_prefix}/%{_target_cpu}-linux-uclibc/usr
 %{_prefix}/%{_target_cpu}-linux-uclibc/lib/crt*.o
+%ifarch %{ix86} ppc sparc sparc64
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libc.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libcrypt.so
-%ifnarch sparc sparc64
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libdl.so
-%endif
-%attr(2755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libm.so
+%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libm.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libresolv.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libutil.so
+%endif
+%ifarch %{ix86} ppc
+%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libdl.so
+%endif
 %{_prefix}/%{_target_cpu}-linux-uclibc/include
 
 %files static
