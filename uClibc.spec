@@ -37,7 +37,6 @@ Group(pl):	Programowanie/Biblioteki
 %description BOOT
 Small libc for building embedded applications.
 
-
 %prep
 %setup -q -n %{name}
 %patch0 -p1
@@ -66,7 +65,6 @@ find $RPM_BUILD_ROOT%{_libdir}/bootdisk -name "CVS" |xargs rm -fr
 # TODO normal package
 #install -d $RPM_BUILD_ROOT%{_libdir}
 #install crt0.o libc.a $RPM_BUILD_ROOT%{_libdir}
-
 
 #rm include/asm include/linux
 
