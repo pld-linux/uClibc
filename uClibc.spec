@@ -78,7 +78,11 @@ sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED = true/;
 	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/' Config.tmp > Config
 
 %{__make} \
+%ifarch ppc
+	TARGET_ARCH="powerpc" \
+%else
 	TARGET_ARCH="%{_arch}" \
+%endif
 	KERNEL_SOURCE=%{_kernelsrcdir} \
 	CC=%{__cc} \
 	OPTIMIZATION="%{rpmcflags} -Os"
