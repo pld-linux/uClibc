@@ -1,12 +1,16 @@
 Summary:	C library optimized for size
 Name:		uClibc
 Version:	20010826
-Release:	7
+Release:	8
 License:	LGPL
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
+Group(es):	Desarrollo/Bibliotecas
 Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
+Group(pt_BR):	Desenvolvimento/Bibliotecas
+Group(ru):	Разработка/Библиотеки
+Group(uk):	Розробка/Б╕бл╕отеки
 Source0:	%{name}-%{version}.tar.gz
 #Patch0:		%{name}-install.patch
 Patch0:		%{name}-setfsuid.patch
@@ -20,8 +24,12 @@ Small libc for building embedded applications.
 Summary:	Development files for uClibc
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
+Group(es):	Desarrollo/Bibliotecas
 Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
+Group(pt_BR):	Desenvolvimento/Bibliotecas
+Group(ru):	Разработка/Библиотеки
+Group(uk):	Розробка/Б╕бл╕отеки
 Requires:	%{name}-BOOT = %{version}
 
 %description devel-BOOT
@@ -31,8 +39,12 @@ Small libc for building embedded applications.
 Summary:	uClibc for bootdisk
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
+Group(es):	Desarrollo/Bibliotecas
 Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
+Group(pt_BR):	Desenvolvimento/Bibliotecas
+Group(ru):	Разработка/Библиотеки
+Group(uk):	Розробка/Б╕бл╕отеки
 
 %description BOOT
 Small libc for building embedded applications.
