@@ -3,16 +3,15 @@
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.9
-Release:	6
+Version:	0.9.12
+Release:	1
 Epoch:		1
 License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-Patch0:		%{name}-Makefile.patch
-Patch1:		%{name}-lfs.patch
-Patch2:		%{name}-no_bogus_gai.patch
-Patch3:		%{name}-no_hardcoded_gcc.patch
+Patch0:		%{name}-lfs.patch
+Patch1:		%{name}-no_bogus_gai.patch
+Patch2:		%{name}-no_hardcoded_gcc.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -55,7 +54,6 @@ Biblioteki statyczne uClibc.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386 Config
@@ -79,6 +77,7 @@ sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED = true/;
 %if %{?_with_lfs:1}%{!?_with_lfs:0}
 	s/^DOLFS *=.*$/DOLFS = true/;
 %endif
+	s/^HAS_SHADOW *=.*$/HAS_SHADOW = true/;
 	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/;
 	s/^DO_C99_MATH *=.*$/DO_C99_MATH = true/' Config.tmp > Config
 
