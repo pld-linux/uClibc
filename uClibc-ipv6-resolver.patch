@@ -1,0 +1,338 @@
+diff -ur uClibc/Config uClibc-v6/Config
+--- uClibc/Config	Thu May 17 22:27:31 2001
++++ uClibc-v6/Config	Mon Jun 18 18:23:58 2001
+@@ -58,6 +58,10 @@
+ # work at all.  You have been warned.
+ KERNEL_SOURCE=/usr/src/linux
+ 
++# Set this to `false' if don't want IPv6 resolver.
++# Set it to `true' otherwise.
++HAS_IPV6 = true
++
+ # Set this to `false' if your CPU doesn't have a memory management unit (MMU).
+ # Set it to `true' otherwise.
+ HAS_MMU = true
+diff -ur uClibc/Makefile uClibc-v6/Makefile
+--- uClibc/Makefile	Thu May 17 07:30:43 2001
++++ uClibc-v6/Makefile	Mon Jun 18 18:24:28 2001
+@@ -77,6 +77,11 @@
+ 	@echo "#endif" >> uClibc_config.h
+ 	@echo "#define linux 1" >> uClibc_config.h 
+ 	@echo "#define __linux__ 1" >> uClibc_config.h 
++	@if [ "$(HAS_IPV6)" = "true" ] ; then \
++	    echo "#define __UCLIBC_HAS_IPV6__ 1" >> uClibc_config.h ; \
++	else \
++	    echo "#undef __UCLIBC_HAS_IPV6__" >> uClibc_config.h ; \
++	fi
+ 	@if [ "$(HAS_MMU)" = "true" ] ; then \
+ 	    echo "#define __UCLIBC_HAS_MMU__ 1" >> uClibc_config.h ; \
+ 	else \
+diff -ur uClibc/libc/inet/Makefile uClibc-v6/libc/inet/Makefile
+--- uClibc/libc/inet/Makefile	Sat May 12 08:19:04 2001
++++ uClibc-v6/libc/inet/Makefile	Mon Jun 18 18:21:23 2001
+@@ -39,8 +39,8 @@
+ 	formquery.o dnslookup.o resolveaddress.o resolvemailbox.o \
+ 	opennameservers.o closenameservers.o resolvename.o gethostbyname.o\
+ 	res_init.o res_query.o gethostbyaddr.o \
+-	get_hosts_byname.o get_hosts_byaddr.o read_etc_hosts.o
+-
++	get_hosts_byname.o get_hosts_byaddr.o read_etc_hosts.o \
++	resolveaddress2.o gethostbyname2.o
+ 
+ MSRC3=socketcalls.c
+ MOBJ3= accept.o bind.o connect.o getpeername.o getsockname.o getsockopt.o \
+diff -ur uClibc/libc/inet/ntop.c uClibc-v6/libc/inet/ntop.c
+--- uClibc/libc/inet/ntop.c	Tue May  8 15:59:30 2001
++++ uClibc-v6/libc/inet/ntop.c	Mon Jun 18 18:28:14 2001
+@@ -27,6 +27,12 @@
+ #include <stdio.h>
+ #include <string.h>
+ 
++#ifdef __UCLIBC_HAS_IPV6__
++#define INET_IPV6
++#define SPRINTF(a) sprintf a
++#endif
++
++
+ /*
+  * WARNING: Don't even consider trying to compile this on a system where
+  * sizeof(int) < 4.  sizeof(int) > 4 is fine; all the world's not a VAX.
+diff -ur uClibc/libc/inet/resolv.c uClibc-v6/libc/inet/resolv.c
+--- uClibc/libc/inet/resolv.c	Mon Feb 26 04:48:52 2001
++++ uClibc-v6/libc/inet/resolv.c	Mon Jun 18 21:42:19 2001
+@@ -58,7 +58,13 @@
+ #define MAX_SERVERS 3
+ #define MAX_SEARCH 4
+ 
++#ifdef __UCLIBC_HAS_IPV6__
++#define INET_IPV6
++#endif
++
+ #undef DEBUG
++/*#define DEBUG*/
++
+ #ifdef DEBUG
+ #define DPRINTF(X,args...) fprintf(stderr, X, ##args)
+ #else
+@@ -458,6 +464,7 @@
+ 	int i, j, len, fd, pos;
+ 	static int ns = 0;
+ 	struct sockaddr_in sa;
++	struct sockaddr_in6 sa6;
+ 	int oldalarm;
+ 	__sighandler_t oldhandler;
+ 	struct resolv_header h;
+@@ -465,7 +472,7 @@
+ 	int retries = 0;
+ 	unsigned char * packet = malloc(PACKETSZ);
+ 	unsigned char * lookup = malloc(MAXDNAME);
+-	int variant = 0;
++	int variant = 0, v6;
+ 
+ 	fd = -1;
+ 
+@@ -477,11 +484,12 @@
+ 	ns %= nscount;
+ 
+ 	while (retries++ < MAX_RETRIES) {
+-
++		v6 = (inet_pton(AF_INET, nsip[ns], &sa6.sin6_addr) == 0);
++		
+ 		if (fd != -1)
+ 			close(fd);
+ 
+-		fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
++		fd = socket(v6 ? AF_INET6 : AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+ 
+ 		if (fd == -1)
+ 			goto fail;
+@@ -519,11 +527,18 @@
+ 		DPRINTF("On try %d, sending query to port %d of machine %s\n",
+ 				retries, NAMESERVER_PORT, nsip[ns]);
+ 
+-		sa.sin_family = AF_INET;
+-		sa.sin_port = htons(NAMESERVER_PORT);
+-		sa.sin_addr.s_addr = inet_addr(nsip[ns]);
++		if (v6) {
++			sa6.sin6_family = AF_INET6;
++			sa6.sin6_port = htons(NAMESERVER_PORT);
++			/* sa6.sin6_addr is already here */
++		} else {
++			sa.sin_family = AF_INET;
++			sa.sin_port = htons(NAMESERVER_PORT);
++			sa.sin_addr.s_addr = inet_addr(nsip[ns]);
++		}
+ 
+-		if (connect(fd, (struct sockaddr *) &sa, sizeof(sa)) == -1) {
++		if (connect(fd, (struct sockaddr *) (v6 ? &sa6 : &sa), 
++			    v6 ? sizeof(sa6) : sizeof(sa)) == -1) {
+ 			if (errno == ENETUNREACH) {
+ 				/* routing error, presume not transient */
+ 				goto tryall;
+@@ -647,25 +662,27 @@
+ }
+ #endif
+ 
+-#ifdef L_resolveaddress
++#ifdef L_resolveaddress2
+ 
+-int resolve_address(const char *address, int nscount, 
+-	const char **nsip, struct in_addr *in)
++int resolve_address2(const char *address, int nscount, 
++	const char **nsip, char **outbuf, int *outbuf_len)
+ {
+ 	unsigned char *packet;
+ 	struct resolv_answer a;
+ 	char temp[256];
+-	int i;
++	int i, len;
+ 	int nest = 0;
+ 
+-	if (!address || !in)
++	if (!address)
+ 		return -1;
+ 
+ 	strncpy(temp, address, sizeof(temp));
+ 
+ 	for (;;) {
++		i = dns_lookup(temp, T_AAAA, nscount, nsip, &packet, &a);
+ 
+-		i = dns_lookup(temp, T_A, nscount, nsip, &packet, &a);
++		if (i < 0)
++			i = dns_lookup(temp, T_A, nscount, nsip, &packet, &a);
+ 
+ 		if (i < 0)
+ 			return -1;
+@@ -682,7 +699,7 @@
+ 			if (++nest > MAX_RECURSE)
+ 				return -1;
+ 			continue;
+-		} else if (a.atype == T_A) {	/* ADDRESS */
++		} else if (a.atype == T_A || a.atype == T_AAAA) {	/* ADDRESS */
+ 			free(packet);
+ 			break;
+ 		} else {
+@@ -691,13 +708,41 @@
+ 		}
+ 	}
+ 
+-	if (in)
+-	    memcpy(in, a.rdata, INADDRSZ); /* IPv4 T_A */
++	len = a.atype == T_AAAA ?  sizeof(struct in6_addr) : sizeof(struct in_addr);
++	
++	if (outbuf) {
++		*outbuf = malloc(len);
++		memcpy(*outbuf, a.rdata, len);
++	}
++	if (outbuf_len)
++        	*outbuf_len = len;
+ 
+ 	return 0;
+ }
+ #endif
+ 
++#ifdef L_resolveaddress
++int resolve_address(const char *address, int nscount, 
++	const char **nsip, struct in_addr *in)
++{
++	int e, len = 0;
++	char *buf = NULL;
++
++	e = resolve_addres(address, nscount, nsip, &buf, &len);
++
++	if (e == 0 && buf && in) {
++		if (len == sizeof(*in))
++			memcpy(&in, buf, sizeof(*in));
++		else
++			e = -1;
++	}
++
++	free(buf);
++
++	return e;
++}
++#endif
++
+ #ifdef L_resolvemailbox
+ 
+ int resolve_mailbox(const char *address,
+@@ -951,6 +996,88 @@
+ }
+ #endif
+ 
++#ifdef L_gethostbyname2
++
++struct hostent *gethostbyname2(const char *name, int family)
++{
++	static struct hostent h;
++	static char namebuf[256];
++	static struct in6_addr in;
++	static struct in6_addr *addr_list[2];
++	struct hostent *hp;
++	unsigned char *packet;
++	struct resolv_answer a;
++	int i;
++	int nest = 0;
++
++	if (family == AF_INET)
++		return gethostbyname(name);
++		
++	if (family != AF_INET6)
++		return NULL;
++		
++	open_nameservers();
++
++	if (!name)
++		return 0;
++
++	if ((hp = get_hosts_byname(name))) /* do /etc/hosts first */
++		return(hp);
++
++	memset(&h, 0, sizeof(h));
++
++	addr_list[0] = &in;
++	addr_list[1] = 0;
++	
++	strncpy(namebuf, name, sizeof(namebuf));
++
++	/* First check if this is already an address */
++	if (inet_pton(AF_INET6, name, &in)) {
++	    h.h_name = namebuf;
++	    h.h_addrtype = AF_INET6;
++	    h.h_length = sizeof(in);
++	    h.h_addr_list = (char **) addr_list;
++	    return &h;
++	}
++
++	for (;;) {
++
++		i = dns_lookup(namebuf, T_AAAA, nameservers, nameserver, &packet, &a);
++
++		if (i < 0)
++			return 0;
++
++		strncpy(namebuf, a.dotted, sizeof(namebuf));
++		free(a.dotted);
++
++
++		if (a.atype == T_CNAME) {		/* CNAME */
++			DPRINTF("Got a CNAME in gethostbyname()\n");
++			i = decode_dotted(packet, a.rdoffset, namebuf, sizeof(namebuf));
++			free(packet);
++
++			if (i < 0)
++				return 0;
++			if (++nest > MAX_RECURSE)
++				return 0;
++			continue;
++		} else if (a.atype == T_AAAA) {	/* ADDRESS */
++			memcpy(&in, a.rdata, sizeof(in));
++			h.h_name = namebuf;
++			h.h_addrtype = AF_INET6;
++			h.h_length = sizeof(in);
++			h.h_addr_list = (char **) addr_list;
++			free(packet);
++			break;
++		} else {
++			free(packet);
++			return 0;
++		}
++	}
++
++	return &h;
++}
++#endif
+ 
+ #ifdef L_getnetbyname
+ 
+@@ -1093,6 +1220,8 @@
+ 	static struct hostent	h;
+ 	static struct in_addr	in;
+ 	static struct in_addr	*addr_list[2];
++	static struct in6_addr	in6;
++	static struct in6_addr	*addr_list6[2];
+ 	static char				line[80];
+ 	FILE					*fp;
+ 	char					*cp;
+@@ -1135,8 +1264,19 @@
+ 				continue;
+ 		}
+ 
+-		if (inet_aton(alias[0], &in) == 0)
+-			break; /* bad ip address */
++		if (inet_aton(alias[0], &in) == 0) {
++			if (inet_pton(AF_INET6, alias[0], &in6) == 0) {
++				addr_list6[0] = &in6;
++				addr_list6[1] = 0;
++				h.h_name = alias[1];
++				h.h_addrtype = AF_INET6;
++				h.h_length = sizeof(in);
++				h.h_addr_list = (char**) addr_list;
++				fclose(fp);
++				return(&h);
++			} else
++				break; /* bad ip address */
++		}
+ 
+ 		addr_list[0] = &in;
+ 		addr_list[1] = 0;
