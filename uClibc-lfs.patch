@@ -1,7 +1,6 @@
-diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/common/syscalls.c
---- uClibc/libc/sysdeps/linux/common/syscalls.c	Tue Jan 22 15:16:28 2002
-+++ uClibc-/libc/sysdeps/linux/common/syscalls.c	Tue Jan 22 15:16:06 2002
-@@ -1045,10 +1045,8 @@
+--- uClibc-0.9.9/libc/sysdeps/linux/commonsyscalls.c.orig	Sat Feb  2 08:54:13 2002
++++ uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c	Tue Feb  5 09:38:30 2002
+@@ -1093,10 +1093,8 @@
  
  	return ret ? (loff_t) ret : result;
  }
@@ -12,11 +11,10 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
  
  //#define __NR_getdents         141
  #ifdef L_getdents
-@@ -1354,7 +1352,138 @@
- //#define __NR_fcntl64            221
- 
- 
--#endif /* __UCLIBC_HAVE_LFS__ */
+@@ -1590,8 +1588,142 @@
+ 	return _fcntl64(fd, command, arg);
+ }
+ #endif
 +#else /* !__UCLIBC_HAVE_LFS__ */
 +
 +/* Link 32 bit versions then. */
@@ -47,7 +45,7 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +{
 +	struct stat stat32;
 +	int result = stat(file_name, &stat32);
- 
++  
 +	if (result == 0) { 
 +		stat64->st_dev = stat32.st_dev;
 +		stat64->st_ino = stat32.st_ino;
@@ -66,13 +64,13 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +	
 +	return result;
 +}
- 
++  
 +int stat64(const char *file_name, struct libc_stat64 *buf)
 +{
 +	return(__xstat64(0, file_name, buf));
 +}
-+#endif
-+
+ #endif
+ 
 +#ifdef L___lstat64
 +#include <unistd.h>
 +#define __USE_LARGEFILE64
@@ -81,7 +79,7 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +{
 +	struct stat stat32;
 +	int result = lstat(file_name, &stat32);
- 
++  
 +	if (result == 0) { 
 +		stat64->st_dev = stat32.st_dev;
 +		stat64->st_ino = stat32.st_ino;
@@ -152,3 +150,7 @@ diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/
 +#endif
 +
 +#endif /* __UCLIBC_HAVE_LFS__ */
++
+ //#define __NR_security		223	/* syscall for security modules */
+ //#define __NR_gettid		224
+ //#define __NR_readahead		225
