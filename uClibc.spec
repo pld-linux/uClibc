@@ -21,6 +21,7 @@ Patch5:		%{name}-newsoname.patch
 Patch6:		%{name}-use-kernel-headers.patch
 Patch7:		%{name}-alpha.patch
 Patch8:		%{name}-gmon.patch
+Patch9:		%{name}-sparc.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -69,6 +70,7 @@ Biblioteki statyczne uClibc.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386.default Config
@@ -152,10 +154,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %dir %{_prefix}/%{_target_cpu}-linux-uclibc
 %dir %{_prefix}/%{_target_cpu}-linux-uclibc/lib
-%ifarch %{ix86} ppc # sparc? should be
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/ld-*
-%endif
 %ifarch %{ix86} ppc sparc sparc64
+%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/ld-*
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/lib*%{version}.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/lib*.so.0
 %endif
@@ -174,12 +174,10 @@ rm -rf $RPM_BUILD_ROOT
 %ifarch %{ix86} ppc sparc sparc64
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libc.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libcrypt.so
+%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libdl.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libm.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libresolv.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libutil.so
-%endif
-%ifarch %{ix86} ppc
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libdl.so
 %endif
 %{_prefix}/%{_target_cpu}-linux-uclibc/include
 
