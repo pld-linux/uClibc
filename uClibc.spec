@@ -20,10 +20,6 @@ Patch4:		%{name}-sparc.patch
 Patch5:		%{name}-toolchain-wrapper.patch
 Patch6:		%{name}-targetcpu.patch
 Patch7:		%{name}-linux2.6.patch
-# obsolete (except forcing LFS versions, but it shouldn't be needed?)
-#Patch:		%{name}-lfs.patch
-# probably obsolete, caused only compilation errors
-#Patch:		%{name}-no_bogus_gai.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
 ExclusiveArch:	alpha %{ix86} ppc sparc sparc64
@@ -43,8 +39,8 @@ Summary:	Development files for uClibc
 Summary(pl):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}-%{release}
-Requires:	linux-libc-headers
 Requires:	binutils
+Requires:	linux-libc-headers
 %requires_eq	gcc
 
 %description devel
