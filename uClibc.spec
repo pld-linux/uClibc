@@ -102,6 +102,10 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 	TARGET_ARCH="%{_arch}" \
 	PREFIX=$RPM_BUILD_ROOT
 
+%ifarch ppc
+ln -sf ppc-linux-uclibc $RPM_BUILD_ROOT%{_libdir}/powerpc-linux-uclibc
+%endif
+
 # these links are *needed* (by stuff in bin/)
 for f in $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc%{_bindir}/* ; do
 	mv $f $RPM_BUILD_ROOT%{_bindir}
@@ -122,6 +126,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/ld-*
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/lib*%{version}.so
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/lib*.so.0
+%ifarch ppc
+%{_prefix}/powerpc-linux-uclibc
+%endif
 
 %files devel
 %defattr(644,root,root,755)
