@@ -77,8 +77,8 @@ ln -sf extra/Configs/Config.powerpc Config
 %endif
 
 %build
-perl -pi -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/g' Config
-perl -pi -e 's/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/g' Config
+cat Config > Config.tmp
+sed -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/; s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/' Config.tmp > Config
 %{__make} \
 	TARGET_ARCH="%{_arch}" \
 	KERNEL_SOURCE=%{_kernelsrcdir} \
@@ -112,7 +112,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel
 %defattr(644,root,root,755)
-%doc *.gz docs/*.gz
+%doc *.gz docs/*.gz docs/uclibc.org/*.html
 %attr(755,root,root) %{_bindir}/*
 %dir %{_prefix}/%{_arch}-linux-uclibc/bin
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/bin/*
