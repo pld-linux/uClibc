@@ -2,7 +2,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.27
-Release:	1
+Release:	1.1
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -106,7 +106,8 @@ ln -sf /usr/include/asm-sparc64 include/asm-sparc64
 mv -f .config .config.tmp
 sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
 	s/^.*DO_C99_MATH.*$/DO_C99_MATH=y/;
-	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set/
+	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set/;
+	s/^.*UCLIBC_HAS_SYS_SIGLIST.*$/UCLIBC_HAS_SYS_SIGLIST=y/
 	' .config.tmp > .config
 %{?debug:echo 'DODEBUG=y' >> .config}
 %{?debug:echo 'SUPPORT_LD_DEBUG=y' >> .config}
