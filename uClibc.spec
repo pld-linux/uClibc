@@ -142,6 +142,7 @@ done
 rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm
 ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/linux
+rm $RPM_BUILD_ROOT/%{_prefix}/*-linux-uclibc/usr/include/.cvsignore
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -160,7 +161,8 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/*
 %{_prefix}/*-linux-uclibc/usr/lib/*.o
 %dir %{_prefix}/*-linux-uclibc/usr
-%attr(755,root,root) %{_prefix}/*-linux-uclibc/%{_bindir}/*
+%dir %{_prefix}/*-linux-uclibc/usr/bin
+%attr(755,root,root) %{_prefix}/*-linux-uclibc/usr/bin/*
 %dir %{_prefix}/*-linux-uclibc/usr/lib
 %ifarch %{ix86} ppc sparc sparc64
 %attr(755,root,root) %{_prefix}/*-linux-uclibc/usr/lib/*.so
