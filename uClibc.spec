@@ -77,7 +77,8 @@ ln -sf extra/Configs/Config.sparc.TODO Config
 %endif
 %ifarch alpha
 # it doesn't matter I guess
-ln -sf extra/Configs/Config.powerpc.default Config
+cp -f extra/Configs/Config.{powerpc,alpha}.default
+ln -sf extra/Configs/Config.alpha.default Config
 %endif
 %ifarch ppc ppc64
 ln -sf extra/Configs/Config.powerpc.default Config
