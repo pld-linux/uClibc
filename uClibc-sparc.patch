@@ -9,7 +9,19 @@
  		  _dl_progname, reloc_type);
      _dl_exit(30);
    };
-@@ -154,20 +154,20 @@
+@@ -140,8 +140,10 @@
+ 	got_addr[2] = (char *) (0x81c06000 | ((unsigned int) new_addr & 0x3ff));
+ #endif
+ 
++#if defined (__SUPPORT_LD_DEBUG__)
++	if (_dl_debug_bindings)
+ 	_dl_dprintf(2, "Address = %x\n",new_addr);
+-	_dl_exit(32);
++#endif
+ 
+   return (unsigned int) new_addr;
+ }
+@@ -154,20 +156,20 @@
    int reloc_type;
    int symtab_index;
    Elf32_Sym * symtab;
@@ -36,7 +48,7 @@
  
      switch(reloc_type){
      case R_SPARC_NONE:
-@@ -194,22 +194,22 @@
+@@ -194,22 +196,22 @@
    int reloc_type;
    int goof = 0;
    Elf32_Sym * symtab;
@@ -65,7 +77,7 @@
      symbol_addr = 0;
  
      if(symtab_index) {
-@@ -229,33 +229,33 @@
+@@ -229,33 +231,33 @@
      case R_SPARC_NONE:
  	break;
      case R_SPARC_32:
