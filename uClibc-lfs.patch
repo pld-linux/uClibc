@@ -338,3 +338,30 @@ diff -ur uClibc-0.9.9/libc/sysdeps/linux/common/syscalls.c uClibc-0.9.9-/libc/sy
  //#define __NR_security		223	/* syscall for security modules */
  //#define __NR_gettid		224
  //#define __NR_readahead		225
+diff -ur uClibc-0.9.9-/include/sys/mman.h uClibc-0.9.9/include/sys/mman.h
+--- uClibc-0.9.9-/include/sys/mman.h	Mon Mar 18 10:25:13 2002
++++ uClibc-0.9.9/include/sys/mman.h	Mon Mar 18 10:25:35 2002
+@@ -54,23 +54,8 @@
+    for errors (in which case `errno' is set).  A successful `mmap' call
+    deallocates any previous mapping for the affected region.  */
+ 
+-#ifndef __USE_FILE_OFFSET64
+ extern void *mmap (void *__addr, size_t __len, int __prot,
+ 		   int __flags, int __fd, __off_t __offset) __THROW;
+-#else
+-# ifdef __REDIRECT
+-extern void * __REDIRECT (mmap,
+-			  (void *__addr, size_t __len, int __prot,
+-			   int __flags, int __fd, __off64_t __offset) __THROW,
+-			  mmap64);
+-# else
+-#  define mmap mmap64
+-# endif
+-#endif
+-#ifdef __USE_LARGEFILE64
+-extern void *mmap64 (void *__addr, size_t __len, int __prot,
+-		     int __flags, int __fd, __off64_t __offset) __THROW;
+-#endif
+ 
+ /* Deallocate any mapping for the region starting at ADDR and extending LEN
+    bytes.  Returns 0 if successful, -1 for errors (and sets errno).  */
