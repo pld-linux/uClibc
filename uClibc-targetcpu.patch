@@ -50,14 +50,36 @@
  SYSTEM_DEVEL_PREFIX="$(DEVEL_PREFIX)"
  DEVEL_TOOL_PREFIX="$(DEVEL_PREFIX)/usr"
  
---- uClibc-0.9.19/extra/gcc-uClibc/Makefile.orig	Wed Dec  4 23:40:16 2002
-+++ uClibc-0.9.19/extra/gcc-uClibc/Makefile	Wed Apr  2 23:48:42 2003
-@@ -41,36 +41,36 @@
+--- uClibc-0.9.19/ldso/util/Makefile.orig	Sat Mar  1 12:02:43 2003
++++ uClibc-0.9.19/ldso/util/Makefile	Wed Apr  2 23:42:31 2003
+@@ -22,7 +22,7 @@
+ 
+ TOPDIR=../../
+ include $(TOPDIR)Rules.mak
+-TARGET_CC = $(TOPDIR)extra/gcc-uClibc/$(TARGET_ARCH)-uclibc-gcc
++TARGET_CC = $(TOPDIR)extra/gcc-uClibc/$(TARGET_CPU)-uclibc-gcc
+ 
+ TARGETS = elf_header ldd
+ ifeq ($(OSTYPE),linux)
+--- uClibc-0.9.19/test/Rules.mak.orig	Thu Feb 27 18:04:22 2003
++++ uClibc-0.9.19/test/Rules.mak	Wed Apr  2 23:49:34 2003
+@@ -41,7 +41,7 @@
+ #        make CROSS=mipsel-linux-
+ # will build uClibc for 'mipsel'.
+ 
+-CROSS=../$(TESTDIR)extra/gcc-uClibc/$(TARGET_ARCH)-uclibc-
++CROSS=../$(TESTDIR)extra/gcc-uClibc/$(TARGET_CPU)-uclibc-
+ CC= $(CROSS)gcc
+ STRIPTOOL=strip
+ LDD=../$(TESTDIR)ldso/util/ldd
+--- uClibc-0.9.21/extra/gcc-uClibc/Makefile.orig	2003-09-01 21:25:55.000000000 +0200
++++ uClibc-0.9.21/extra/gcc-uClibc/Makefile	2003-09-13 06:40:32.000000000 +0200
+@@ -51,36 +51,36 @@
  endif
  
  gcc-uClibc: gcc-uClibc.h gcc-uClibc.c
--	$(HOSTCC) $(HOSTCFLAGS) -Wl,-s gcc-uClibc.c -o $(TARGET_ARCH)-uclibc-gcc
-+	$(HOSTCC) $(HOSTCFLAGS) -Wl,-s gcc-uClibc.c -o $(TARGET_CPU)-uclibc-gcc
+-	$(HOSTCC) $(HOSTCFLAGS) -s gcc-uClibc.c -o $(TARGET_ARCH)-uclibc-gcc
++	$(HOSTCC) $(HOSTCFLAGS) -s gcc-uClibc.c -o $(TARGET_CPU)-uclibc-gcc
  
  ld-uClibc:
 -	@echo "#!/bin/sh" > $(TARGET_ARCH)-uclibc-ld
@@ -105,25 +127,3 @@
  	  fi; \
  	done
  
---- uClibc-0.9.19/ldso/util/Makefile.orig	Sat Mar  1 12:02:43 2003
-+++ uClibc-0.9.19/ldso/util/Makefile	Wed Apr  2 23:42:31 2003
-@@ -22,7 +22,7 @@
- 
- TOPDIR=../../
- include $(TOPDIR)Rules.mak
--TARGET_CC = $(TOPDIR)extra/gcc-uClibc/$(TARGET_ARCH)-uclibc-gcc
-+TARGET_CC = $(TOPDIR)extra/gcc-uClibc/$(TARGET_CPU)-uclibc-gcc
- 
- TARGETS = elf_header ldd
- ifeq ($(OSTYPE),linux)
---- uClibc-0.9.19/test/Rules.mak.orig	Thu Feb 27 18:04:22 2003
-+++ uClibc-0.9.19/test/Rules.mak	Wed Apr  2 23:49:34 2003
-@@ -41,7 +41,7 @@
- #        make CROSS=mipsel-linux-
- # will build uClibc for 'mipsel'.
- 
--CROSS=../$(TESTDIR)extra/gcc-uClibc/$(TARGET_ARCH)-uclibc-
-+CROSS=../$(TESTDIR)extra/gcc-uClibc/$(TARGET_CPU)-uclibc-
- CC= $(CROSS)gcc
- STRIPTOOL=strip
- LDD=../$(TESTDIR)ldso/util/ldd
