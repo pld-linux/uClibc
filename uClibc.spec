@@ -1,7 +1,7 @@
 Summary:	C library optimized for size
 Name:		uClibc
 Version:	20010521
-Release:	2
+Release:	3
 License:	LGPL
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
@@ -45,6 +45,7 @@ Small libc for building embedded applications.
 
 
 %build
+perl -pi -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/g' Config
 %{__make} KERNEL_SOURCE=%{_libdir}/bootdisk%{_prefix}
 
 %install
