@@ -6,7 +6,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.21
-Release:	4
+Release:	5
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -37,6 +37,7 @@ Summary:	Development files for uClibc
 Summary(pl):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}
+Requires:	glibc-kernel-headers
 Requires:	binutils
 %requires_eq	gcc
 
@@ -146,6 +147,10 @@ ln -sf ppc-linux-uclibc $RPM_BUILD_ROOT/usr/powerpc-linux-uclibc
 
 find $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include \
 	-name CVS -o -name .cvsignore | xargs rm -rf
+
+rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include/{linux,asm}
+ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include/asm
+ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include/linux
 
 %clean
 rm -rf $RPM_BUILD_ROOT
