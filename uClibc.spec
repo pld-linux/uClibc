@@ -123,7 +123,9 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %dir %{_prefix}/%{_arch}-linux-uclibc
 %dir %{_prefix}/%{_arch}-linux-uclibc/lib
+%ifnarch sparc sparc64
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/ld-*
+%endif
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/lib*%{version}.so
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/lib*.so.0
 %ifarch ppc
@@ -140,8 +142,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_prefix}/%{_arch}-linux-uclibc/lib/crt0.o
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/libc.so
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/libcrypt.so
+%ifnarch sparc sparc64
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/libdl.so
-%attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/libm.so
+%endif
+%attr(2755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/libm.so
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/libresolv.so
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/libutil.so
 %{_prefix}/%{_arch}-linux-uclibc/include
