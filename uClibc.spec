@@ -58,7 +58,7 @@ install libuClibc.so.1 $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
 cp -a  include/ $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/
 rm -f $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/{asm,linux,bits}
 install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/bits
-cp -a include/bits/* $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/bits
+install include/bits/* $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/bits
 
 find $RPM_BUILD_ROOT%{_libdir}/bootdisk -name "CVS" |xargs rm -fr
 
