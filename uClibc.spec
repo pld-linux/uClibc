@@ -11,7 +11,7 @@ Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-setfsuid.patch
 Patch1:		%{name}-Makefile.patch
-Patch2:		%{name}-no_lfs.patch
+Patch2:		%{name}-lfs.patch
 URL:		http://uclibc.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
