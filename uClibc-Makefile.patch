@@ -1,0 +1,10 @@
+--- uClibc/Makefile~	Thu Jan  3 22:17:48 2002
++++ uClibc/Makefile	Thu Jan  3 22:17:48 2002
+@@ -179,7 +179,6 @@
+ 	tar -chO include | tar -xC $(PREFIX)$(DEVEL_PREFIX);
+ 	chmod 755 `find  $(PREFIX)$(DEVEL_PREFIX) -type d` 
+ 	chmod 644 `find  $(PREFIX)$(DEVEL_PREFIX)/include -name '*.h'` 
+-	(NAME=`whoami`; chown -R $$NAME.$$NAME $(PREFIX)$(DEVEL_PREFIX))
+ ifeq ($(strip $(HAVE_SHARED)),true)
+ 	find lib/ -type l -name '*.so' -exec cp -a {} $(PREFIX)$(DEVEL_PREFIX)/lib ';'
+ endif
