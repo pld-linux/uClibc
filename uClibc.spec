@@ -43,7 +43,7 @@ Summary:	Development files for uClibc
 Summary(pl):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}
-Requires:	glibc-kernel-headers
+Requires:	linux-libc-headers
 Requires:	binutils
 %requires_eq	gcc
 
