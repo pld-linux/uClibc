@@ -1,0 +1,148 @@
+diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c uClibc-/libc/sysdeps/linux/common/syscalls.c
+--- uClibc/libc/sysdeps/linux/common/syscalls.c	Tue Jan 22 15:16:28 2002
++++ uClibc-/libc/sysdeps/linux/common/syscalls.c	Tue Jan 22 15:16:06 2002
+@@ -1045,10 +1045,8 @@
+ 
+ 	return ret ? (loff_t) ret : result;
+ }
+-#ifdef __UCLIBC_HAVE_LFS__
+ weak_alias(llseek, lseek64);
+ #endif
+-#endif
+ 
+ //#define __NR_getdents         141
+ #ifdef L_getdents
+@@ -1354,7 +1352,132 @@
+ //#define __NR_fcntl64            221
+ 
+ 
+-#endif /* __UCLIBC_HAVE_LFS__ */
++#else /* !__UCLIBC_HAVE_LFS__ */
++
++/* Link 32 bit versions then. */
++
++#ifdef L_truncate64
++#include <unistd.h>
++int truncate64(const char *path, __off64_t length)
++{
++	return truncate(path, length);
++}
++#endif
++
++#ifdef L_ftruncate64
++#include <unistd.h>
++int ftruncate64(int fd, __off64_t length)
++{
++	return ftruncate(fd, length);
++}
++#endif
++
++#ifdef L___stat64
++#include <unistd.h>
++#include <sys/stat.h>
++int __xstat64(int version, const char * file_name, struct stat64 * stat64)
++{
++	struct stat stat32;
++	int result = stat(file_name, &stat32);
+ 
++	if (result == 0) { 
++		stat64->st_dev = stat32.st_dev;
++		stat64->st_ino = stat32.st_ino;
++		stat64->st_mode = stat32.st_mode;
++		stat64->st_nlink = stat32.st_nlink;
++		stat64->st_uid = stat32.st_uid;
++		stat64->st_gid = stat32.st_gid;
++		stat64->st_rdev = stat32.st_rdev;
++		stat64->st_size = stat32.st_size;
++		stat64->st_blksize = stat32.st_blksize;
++		stat64->st_blocks = stat32.st_blocks;
++		stat64->st_atime = stat32.st_atime;
++		stat64->st_mtime = stat32.st_mtime;
++		stat64->st_ctime = stat32.st_ctime;
++	}
++	
++	return result;
++}
+ 
++int stat64(const char *file_name, struct libc_stat64 *buf)
++{
++	return(__xstat64(0, file_name, buf));
++}
++#endif
++
++#ifdef L___lstat64
++#include <unistd.h>
++#include <sys/stat.h>
++int __lxstat64(int version, const char * file_name, struct stat64 * stat64)
++{
++	struct stat stat32;
++	int result = lstat(file_name, &stat32);
+ 
++	if (result == 0) { 
++		stat64->st_dev = stat32.st_dev;
++		stat64->st_ino = stat32.st_ino;
++		stat64->st_mode = stat32.st_mode;
++		stat64->st_nlink = stat32.st_nlink;
++		stat64->st_uid = stat32.st_uid;
++		stat64->st_gid = stat32.st_gid;
++		stat64->st_rdev = stat32.st_rdev;
++		stat64->st_size = stat32.st_size;
++		stat64->st_blksize = stat32.st_blksize;
++		stat64->st_blocks = stat32.st_blocks;
++		stat64->st_atime = stat32.st_atime;
++		stat64->st_mtime = stat32.st_mtime;
++		stat64->st_ctime = stat32.st_ctime;
++	}
++	
++	return result;
++}
++
++int lstat64(const char *file_name, struct libc_stat64 *buf)
++{
++	return(__lxstat64(0, file_name, buf));
++}
++#endif
++
++#ifdef L___fstat64
++#include <unistd.h>
++#include <sys/stat.h>
++int __fxstat64(int version, int fd, struct stat64 * stat64)
++{
++	struct stat stat32;
++	int result = fstat(fd, &stat32);
++
++	if (result == 0) { 
++		stat64->st_dev = stat32.st_dev;
++		stat64->st_ino = stat32.st_ino;
++		stat64->st_mode = stat32.st_mode;
++		stat64->st_nlink = stat32.st_nlink;
++		stat64->st_uid = stat32.st_uid;
++		stat64->st_gid = stat32.st_gid;
++		stat64->st_rdev = stat32.st_rdev;
++		stat64->st_size = stat32.st_size;
++		stat64->st_blksize = stat32.st_blksize;
++		stat64->st_blocks = stat32.st_blocks;
++		stat64->st_atime = stat32.st_atime;
++		stat64->st_mtime = stat32.st_mtime;
++		stat64->st_ctime = stat32.st_ctime;
++	}
++	
++	return result;
++}
++
++int fstat64(int filedes, struct libc_stat64 *buf)
++{
++	return(__fxstat64(0, filedes, buf));
++}
++#endif
++
++#ifdef L_getdents64
++#include <unistd.h>
++#include <dirent.h>
++int getdents64(int fd, char *dirp, size_t count)
++{
++	return getdents(fs, dirp, count);
++}
++#endif
++
++#endif /* __UCLIBC_HAVE_LFS__ */
