@@ -1,20 +1,22 @@
-# conditional build:
+# TODO:
+# - test on something more that 'hello world'
+# - check/update configuration
+#
+# Conditional build:
 # _with_lfs - enable LFS support (requires patched 2.2 or 2.4 kernel)
+#
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.12
-Release:	0.2
+Version:	0.9.19
+Release:	0.1
 Epoch:		1
 License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-lfs.patch
 Patch1:		%{name}-no_bogus_gai.patch
-Patch2:		%{name}-no_hardcoded_gcc.patch
-Patch3:		%{name}-targetcpu.patch
-Patch4:		%{name}-noinstalled.patch
-Patch5:		%{name}-__thread.patch
+Patch2:		%{name}-targetcpu.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -57,37 +59,37 @@ Biblioteki statyczne uClibc.
 #%patch0 -p1  -- needs update
 #%patch1 -p1  -- causes compilation errors
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
 
 %ifarch %{ix86}
-ln -sf extra/Configs/Config.i386 Config
+ln -sf extra/Configs/Config.i386.default Config
 %endif
 %ifarch sparc sparc64
-ln -sf extra/Configs/Config.sparc Config
+ln -sf extra/Configs/Config.sparc.TODO Config
 %endif
 %ifarch alpha
-ln -sf extra/Configs/Config.alpha Config
+ln -sf extra/Configs/Config.alpha.TODO Config
 %endif
 %ifarch ppc ppc64
-ln -sf extra/Configs/Config.powerpc Config
+ln -sf extra/Configs/Config.powerpc.default Config
 %endif
 
 %build
 cat Config > Config.tmp
 
-sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED = true/;
-	s/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/;
-	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX = \$\(DEVEL_PREFIX\)\/usr/;
+#	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX=\$\(DEVEL_PREFIX\)\/usr/;
+sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED=y/;
+	s/^INCLUDE_RPC *=.*$/INCLUDE_RPC=y/;
+	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX="\/usr"/;
 %if %{?_with_lfs:1}%{!?_with_lfs:0}
-	s/^DOLFS *=.*$/DOLFS = true/;
+	s/^DOLFS *=.*$/DOLFS=y/;
 %endif
-	s/^HAS_SHADOW *=.*$/HAS_SHADOW = true/;
-	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/;
-	s/^DO_C99_MATH *=.*$/DO_C99_MATH = true/' Config.tmp > Config
+	s/^HAS_SHADOW *=.*$/HAS_SHADOW=y/;
+	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6=y/;
+	s/^DO_C99_MATH *=.*$/DO_C99_MATH=y/' Config.tmp > Config
 
-%{__make} all util \
+# note: defconfig and all must be run in separate make process because of macros
+for targ in defconfig all ; do
+%{__make} ${targ} \
 %ifarch ppc
 	TARGET_ARCH="powerpc" \
 	TARGET_CPU="powerpc" \
@@ -96,10 +98,11 @@ sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED = true/;
 	TARGET_CPU="%{_target_cpu}" \
 %endif
 	KERNEL_SOURCE=%{_kernelsrcdir} \
-	NATIVE_CC=%{__cc} \
-	NATIVE_CFLAGS="%{rpmcflags} %{rpmldflags}" \
+	HOSTCC=%{__cc} \
+	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os" \
 	CC="%{__cc}"
+done
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -118,12 +121,13 @@ ln -sf ppc-linux-uclibc $RPM_BUILD_ROOT/usr/powerpc-linux-uclibc
 %endif
 
 # these links are *needed* (by stuff in bin/)
-for f in $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc%{_bindir}/* ; do
-	mv $f $RPM_BUILD_ROOT%{_bindir}
-	ln -sf ../../../bin/`basename $f` $f
-done
+#for f in $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc%{_bindir}/* ; do
+#	mv $f $RPM_BUILD_ROOT%{_bindir}
+#	ln -sf ../../../bin/`basename $f` $f
+#done
 
-find $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include -name CVS | xargs rm -rf
+find $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/include \
+	-name CVS -o -name .cvsignore | xargs rm -rf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -145,8 +149,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc README TODO docs/threads.txt docs/uclibc.org/*.html
 %attr(755,root,root) %{_bindir}/*
-%dir %{_prefix}/%{_target_cpu}-linux-uclibc/bin
-%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/bin/*
+#%dir %{_prefix}/%{_target_cpu}-linux-uclibc/bin
+#%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/bin/*
 %{_prefix}/%{_target_cpu}-linux-uclibc/usr
 %{_prefix}/%{_target_cpu}-linux-uclibc/lib/crt*.o
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libc.so
