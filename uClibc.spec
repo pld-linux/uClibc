@@ -4,7 +4,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.9
-Release:	2
+Release:	3
 Epoch:		1
 License:	LGPL
 Group:		Libraries
@@ -75,7 +75,8 @@ sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED = true/;
 %if %{?_with_lfs:1}%{!?_with_lfs:0}
 	s/^DOLFS *=.*$/DOLFS = true/;
 %endif
-	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/' Config.tmp > Config
+	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/;
+	s/^DO_C99_MATH *=.*$/DO_C99_MATH = true/' Config.tmp > Config
 
 %{__make} \
 %ifarch ppc
