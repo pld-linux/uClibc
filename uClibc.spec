@@ -1,12 +1,8 @@
-# TODO:
-# - test on something more that 'hello world'
-# - check/update configuration
-#
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.26
-Release:	4
+Release:	5
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -22,6 +18,7 @@ Patch6:		%{name}-targetcpu.patch
 Patch7:		%{name}-linux2.6.patch
 Patch8:		%{name}-gcc34.patch
 Patch9:		%{name}-libgcc.patch
+Patch10:	%{name}-return.patch
 URL:		http://uclibc.org/
 BuildRequires:	gcc >= 3.0
 BuildRequires:	sed >= 4.0
@@ -78,6 +75,7 @@ Biblioteki statyczne uClibc.
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
 
 sed -e '
 %ifarch sparc sparc64
