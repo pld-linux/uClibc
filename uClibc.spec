@@ -78,6 +78,7 @@ ln -sf extra/Configs/Config.powerpc Config
 
 %build
 perl -pi -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/g' Config
+perl -pi -e 's/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/g' Config
 %{__make} \
 	TARGET_ARCH="%{_arch}" \
 	KERNEL_SOURCE=%{_kernelsrcdir} \
