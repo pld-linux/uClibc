@@ -16,7 +16,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 Small libc for building embedded applications.
 
-%package devel
+%package devel-BOOT
 Summary:	Development files for uClibc
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
@@ -24,7 +24,7 @@ Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
 Requires:	%{name} = %{version}
 
-%description devel
+%description devel-BOOT
 Small libc for building embedded applications.
 
 %package BOOT
@@ -76,7 +76,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 
-%files devel
+%files devel-BOOT
 %defattr(644,root,root,755)
 /usr/lib/bootdisk%{_includedir}/*
 
