@@ -19,6 +19,7 @@ Patch0:		%{name}-lfs.patch
 Patch1:		%{name}-no_bogus_gai.patch
 Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-awk.patch
+Patch4:		%{name}-asmflags.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -62,6 +63,7 @@ Biblioteki statyczne uClibc.
 #%patch1 -p1  -- causes compilation errors
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386.default Config
@@ -103,7 +105,7 @@ for targ in defconfig all ; do
 	KERNEL_SOURCE=%{_kernelsrcdir} \
 	HOSTCC=%{__cc} \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
-	OPTIMIZATION="-Os" \
+	OPTIMIZATION="%{rpmcflags} -Os" \
 	CC="%{__cc}"
 done
 
