@@ -9,6 +9,7 @@ Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
 Source0:	%{name}-%{version}.tar.gz
 #Patch0:	%{name}-install.patch
+Patch0:		%{name}-setfsuid.patch
 URL:		http://cvs.uclinux.org/uClibc.html
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	linux-devel-BOOT
@@ -40,7 +41,7 @@ Small libc for building embedded applications.
 
 %prep
 %setup -q -n %{name}
-#%patch -p1
+%patch0 -p1
 
 
 %build
