@@ -22,7 +22,7 @@ Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
 Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
-Requires:	%{name} = %{version}
+Requires:	%{name}-BOOT = %{version}
 
 %description devel-BOOT
 Small libc for building embedded applications.
