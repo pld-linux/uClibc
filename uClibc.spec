@@ -21,6 +21,7 @@ Patch5:		%{name}-toolchain-wrapper.patch
 Patch6:		%{name}-targetcpu.patch
 Patch7:		%{name}-linux2.6.patch
 URL:		http://uclibc.org/
+BuildRequires:	sed >= 4.0
 BuildRequires:	which
 ExclusiveArch:	alpha %{ix86} ppc sparc sparc64
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
