@@ -83,7 +83,7 @@ ln -sf extra/Configs/Config.powerpc Config
 %build
 cat Config > Config.tmp
 
-%if %{!?_with_lfs:1}%{?_with_lfs:0}
+%if %{?_with_lfs:1}%{!?_with_lfs:0}
 sed -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/;
 	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/;
 	s/^DOLFS *=.*$/DOLFS = true/' Config.tmp > Config
