@@ -4,7 +4,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.9
-Release:	3
+Release:	4
 Epoch:		1
 License:	LGPL
 Group:		Libraries
@@ -12,6 +12,7 @@ Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-Makefile.patch
 Patch1:		%{name}-lfs.patch
 Patch2:		%{name}-no_bogus_gai.patch
+Patch3:		%{name}-no_hardcoded_gcc.patch
 URL:		http://uclibc.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -52,6 +53,7 @@ Biblioteki statyczne uClibc.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386 Config
@@ -85,7 +87,8 @@ sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED = true/;
 	TARGET_ARCH="%{_arch}" \
 %endif
 	KERNEL_SOURCE=%{_kernelsrcdir} \
-	CC=%{__cc} \
+	NATIVE_CC=%{__cc} \
+	NATIVE_CFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os"
 
 %install
@@ -93,6 +96,8 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 
 %{__make} install \
+	NATIVE_CC=%{__cc} \
+	NATIVE_CFLAGS="%{rpmcflags} %{rpmldflags}" \
 	TARGET_ARCH="%{_arch}" \
 	PREFIX=$RPM_BUILD_ROOT
 
