@@ -8,13 +8,13 @@
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.19
-Release:	0.4
+Version:	0.9.20
+Release:	0.1
 Epoch:		1
 License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	b042ade24576937621b013795c226cf7
+# Source0-md5:	ea78e9fbff9377996a31d54832aec3b8
 Patch0:		%{name}-lfs.patch
 Patch1:		%{name}-no_bogus_gai.patch
 Patch2:		%{name}-targetcpu.patch
@@ -103,7 +103,7 @@ for targ in defconfig all ; do
 	KERNEL_SOURCE=%{_kernelsrcdir} \
 	HOSTCC=%{__cc} \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
-	OPTIMIZATION="%{rpmcflags} -Os" \
+	OPTIMIZATION="-Os" \
 	CC="%{__cc}"
 done
 
