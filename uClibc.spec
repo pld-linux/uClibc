@@ -2,23 +2,27 @@
 # - test on something more that 'hello world'
 # - check/update configuration
 #
-# Conditional build:
-# _with_lfs	- enable LFS support (requires patched 2.2 or 2.4 kernel)
-#
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.19
+Version:	0.9.21
 Release:	1
 Epoch:		1
 License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	b042ade24576937621b013795c226cf7
+# Source0-md5:	d4ecdc8350b7c481e06cff830883b8ec
 Patch0:		%{name}-lfs.patch
 Patch1:		%{name}-no_bogus_gai.patch
 Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-awk.patch
+Patch4:		%{name}-asmflags.patch
+Patch5:		%{name}-newsoname.patch
+Patch6:		%{name}-use-kernel-headers.patch
+Patch7:		%{name}-alpha.patch
+Patch8:		%{name}-gmon.patch
+Patch9:		%{name}-sparc.patch
+Patch10:	%{name}-fcntl64_fix.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -62,15 +66,25 @@ Biblioteki statyczne uClibc.
 #%patch1 -p1  -- causes compilation errors
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386.default Config
 %endif
 %ifarch sparc sparc64
-ln -sf extra/Configs/Config.sparc.TODO Config
+cp -f extra/Configs/Config.{powerpc,sparc}.default
+ln -sf extra/Configs/Config.sparc.default Config
 %endif
 %ifarch alpha
-ln -sf extra/Configs/Config.alpha.TODO Config
+# it doesn't matter I guess
+cp -f extra/Configs/Config.{powerpc,alpha}.default
+ln -sf extra/Configs/Config.alpha.default Config
 %endif
 %ifarch ppc ppc64
 ln -sf extra/Configs/Config.powerpc.default Config
@@ -80,11 +94,14 @@ ln -sf extra/Configs/Config.powerpc.default Config
 cat Config > Config.tmp
 
 #	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX=\$\(DEVEL_PREFIX\)\/usr/;
-sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED=y/;
-	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX="\/usr"/;
-%if %{?_with_lfs:1}%{!?_with_lfs:0}
-	s/^DOLFS *=.*$/DOLFS=y/;
+sed -e '
+%ifarch alpha
+	s/^HAVE_SHARED *=.*$/HAVE_SHARED=n/;
+%else
+	s/^HAVE_SHARED *=.*$/HAVE_SHARED=y/;
 %endif
+	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX="\/usr"/;
+	s/^DOLFS *=.*$/DOLFS=y/;
 	s/^HAS_SHADOW *=.*$/HAS_SHADOW=y/;
 	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6=y/;
 	s/^DO_C99_MATH *=.*$/DO_C99_MATH=y/;
@@ -100,7 +117,7 @@ for targ in defconfig all ; do
 	TARGET_ARCH="%(echo %{_target_cpu} | sed -e 's/i.86\|athlon/i386/')" \
 	TARGET_CPU="%{_target_cpu}" \
 %endif
-	KERNEL_SOURCE=%{_kernelsrcdir} \
+	KERNEL_SOURCE=%{_prefix} \
 	HOSTCC=%{__cc} \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os" \
@@ -139,11 +156,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %dir %{_prefix}/%{_target_cpu}-linux-uclibc
 %dir %{_prefix}/%{_target_cpu}-linux-uclibc/lib
-%ifnarch sparc sparc64
+%ifarch %{ix86} ppc sparc sparc64
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/ld-*
-%endif
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/lib*%{version}.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/lib*.so.0
+%endif
 %ifarch ppc
 %{_prefix}/powerpc-linux-uclibc
 %endif
@@ -156,14 +173,14 @@ rm -rf $RPM_BUILD_ROOT
 #%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/bin/*
 %{_prefix}/%{_target_cpu}-linux-uclibc/usr
 %{_prefix}/%{_target_cpu}-linux-uclibc/lib/crt*.o
+%ifarch %{ix86} ppc sparc sparc64
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libc.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libcrypt.so
-%ifnarch sparc sparc64
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libdl.so
-%endif
-%attr(2755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libm.so
+%attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libm.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libresolv.so
 %attr(755,root,root) %{_prefix}/%{_target_cpu}-linux-uclibc/lib/libutil.so
+%endif
 %{_prefix}/%{_target_cpu}-linux-uclibc/include
 
 %files static
