@@ -14,6 +14,7 @@ Patch2:		%{name}-toolchain-wrapper.patch
 Patch3:		%{name}-targetcpu.patch
 Patch4:		%{name}-O_DIRECT.patch
 Patch5:		%{name}-sparc.patch
+Patch6:		%{name}-gcc4.patch
 URL:		http://uclibc.org/
 BuildRequires:	gcc >= 3.0
 BuildRequires:	sed >= 4.0
@@ -66,6 +67,7 @@ Biblioteki statyczne uClibc.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 sed -e '
 %ifarch sparc sparc64 sparcv9
