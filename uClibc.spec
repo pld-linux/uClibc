@@ -2,9 +2,6 @@
 # - test on something more that 'hello world'
 # - check/update configuration
 #
-# Conditional build:
-# _with_lfs - enable LFS support (requires patched 2.2 or 2.4 kernel)
-#
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
@@ -95,9 +92,7 @@ sed -e '
 	s/^HAVE_SHARED *=.*$/HAVE_SHARED=y/;
 %endif
 	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX="\/usr"/;
-%if %{?_with_lfs:1}%{!?_with_lfs:0}
 	s/^DOLFS *=.*$/DOLFS=y/;
-%endif
 	s/^HAS_SHADOW *=.*$/HAS_SHADOW=y/;
 	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6=y/;
 	s/^DO_C99_MATH *=.*$/DO_C99_MATH=y/;
