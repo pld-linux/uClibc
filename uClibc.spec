@@ -55,6 +55,8 @@ install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
 install crt0.o libc.a $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
 install libuClibc.so.1 $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
 
+find -name CVS | xargs rm -fr
+
 cp -a  include/ $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/
 rm -f $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/{asm,linux,bits}
 install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/bits
