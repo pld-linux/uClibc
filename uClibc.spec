@@ -2,7 +2,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.8
-Release:	2
+Release:	3
 Epoch:		1
 License:	LGPL
 Group:		Libraries
@@ -83,7 +83,7 @@ sed -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/; s/^INCLUDE_IPV6 *=.*$/INCLUDE_
 	TARGET_ARCH="%{_arch}" \
 	KERNEL_SOURCE=%{_kernelsrcdir} \
 	CC=%{__cc} \
-	OPTIMIZATION="%{rpmcflags}"
+	OPTIMIZATION="%{rpmcflags} -Os"
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -92,9 +92,11 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 %{__make} install \
 	PREFIX=$RPM_BUILD_ROOT
 
-mv $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc%{_bindir}/* \
-	$RPM_BUILD_ROOT%{_bindir}
-rm -rf $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc/usr
+# these links are *needed* (by stuff in bin/)
+for f in $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc%{_bindir}/* ; do
+	mv $f $RPM_BUILD_ROOT%{_bindir}
+	ln -sf ../../../bin/`basename $f` $f
+done
 
 find $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc/include -name CVS | xargs rm -rf
 
@@ -117,6 +119,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/*
 %dir %{_prefix}/%{_arch}-linux-uclibc/bin
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/bin/*
+%{_prefix}/%{_arch}-linux-uclibc/usr
 %{_prefix}/%{_arch}-linux-uclibc/lib/crt0.o
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/libc.so
 %attr(755,root,root) %{_prefix}/%{_arch}-linux-uclibc/lib/libcrypt.so
