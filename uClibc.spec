@@ -4,7 +4,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.9
-Release:	5
+Release:	6
 Epoch:		1
 License:	LGPL
 Group:		Libraries
@@ -42,6 +42,7 @@ Summary:	Static uClibc libratries
 Summary(pl):	Biblioteki statyczne uClibc
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}
+Provides:	libc-static
 
 %description static
 Static uClibc libratries.
