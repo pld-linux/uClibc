@@ -8,7 +8,7 @@ Group(de):	Entwicklung/Libraries
 Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
 Source0:	%{name}-%{version}.tar.gz
-#Patch0:		%{name}-install.patch
+#Patch0:	%{name}-install.patch
 URL:		http://cvs.uclinux.org/uClibc.html
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 BuildRequires:	linux-devel-BOOT
@@ -44,21 +44,21 @@ Small libc for building embedded applications.
 
 
 %build
-make KERNEL_SOURCE=/usr/lib/bootdisk/usr
+%{__make} KERNEL_SOURCE=%{_libdir}/bootdisk%{_prefix}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 # BOOT
-install -d $RPM_BUILD_ROOT/usr/lib/bootdisk%{_libdir}
-install crt0.o libc.a $RPM_BUILD_ROOT/usr/lib/bootdisk%{_libdir}
-install libuClibc.so.1 $RPM_BUILD_ROOT/usr/lib/bootdisk%{_libdir}
+install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
+install crt0.o libc.a $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
+install libuClibc.so.1 $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
 
-cp -a  include/ $RPM_BUILD_ROOT/usr/lib/bootdisk%{_includedir}
-rm $RPM_BUILD_ROOT/usr/lib/bootdisk%{_includedir}/{asm,linux,bits}
-cp -pr include/bits $RPM_BUILD_ROOT/usr/lib/bootdisk%{_includedir}
+cp -a  include/ $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}
+rm $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/{asm,linux,bits}
+cp -pr include/bits $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}
 
-find $RPM_BUILD_ROOT/usr/lib/bootdisk -name "CVS" |xargs rm -fr
+find $RPM_BUILD_ROOT%{_libdir}/bootdisk -name "CVS" |xargs rm -fr
 
 # TODO normal package
 #install -d $RPM_BUILD_ROOT%{_libdir}
@@ -78,10 +78,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %files devel-BOOT
 %defattr(644,root,root,755)
-/usr/lib/bootdisk%{_includedir}/*
+%{_libdir}/bootdisk%{_includedir}/*
 
 %files BOOT
 %defattr(644,root,root,755)
-%attr(755,root,root) /usr/lib/bootdisk/%{_libdir}/*.so*
-/usr/lib/bootdisk%{_libdir}/libc.a
-/usr/lib/bootdisk%{_libdir}/crt0.o
+%attr(755,root,root) %{_libdir}/bootdisk/%{_libdir}/*.so*
+%{_libdir}/bootdisk%{_libdir}/libc.a
+%{_libdir}/bootdisk%{_libdir}/crt0.o
