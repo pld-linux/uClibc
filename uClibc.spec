@@ -1,6 +1,6 @@
 Summary:	C library optimized for size
 Name:		uClibc
-Version:	20010521
+Version:	20010826
 Release:	7
 License:	LGPL
 Group:		Development/Libraries
@@ -8,9 +8,8 @@ Group(de):	Entwicklung/Libraries
 Group(fr):	Development/Librairies
 Group(pl):	Programowanie/Biblioteki
 Source0:	%{name}-%{version}.tar.gz
-#Patch0:	%{name}-install.patch
+#Patch0:		%{name}-install.patch
 Patch0:		%{name}-setfsuid.patch
-Patch1:		%{name}-ipv6-resolver.patch
 URL:		http://cvs.uclinux.org/uClibc.html
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -41,8 +40,8 @@ Small libc for building embedded applications.
 %prep
 %setup -q -n %{name}
 %patch0 -p1
-%patch1 -p1
 
+cp extra/Configs/Config.i386 Config
 
 %build
 perl -pi -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/g' Config
