@@ -103,7 +103,7 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 	PREFIX=$RPM_BUILD_ROOT
 
 %ifarch ppc
-ln -sf ppc-linux-uclibc $RPM_BUILD_ROOT%{_libdir}/powerpc-linux-uclibc
+ln -sf ppc-linux-uclibc $RPM_BUILD_ROOT/usr/powerpc-linux-uclibc
 %endif
 
 # these links are *needed* (by stuff in bin/)
