@@ -9,7 +9,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.19
-Release:	0.1
+Release:	0.2
 Epoch:		1
 License:	LGPL
 Group:		Libraries
@@ -17,6 +17,7 @@ Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-lfs.patch
 Patch1:		%{name}-no_bogus_gai.patch
 Patch2:		%{name}-targetcpu.patch
+Patch3:		%{name}-awk.patch
 URL:		http://uclibc.org/
 BuildRequires:	which
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -59,6 +60,7 @@ Biblioteki statyczne uClibc.
 #%patch0 -p1  -- needs update
 #%patch1 -p1  -- causes compilation errors
 %patch2 -p1
+%patch3 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386.default Config
