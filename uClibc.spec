@@ -1,7 +1,7 @@
 Summary:	C library optimized for size
 Name:		uClibc
 Version:	20010521
-Release:	4
+Release:	5
 License:	LGPL
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
@@ -51,11 +51,13 @@ rm -rf $RPM_BUILD_ROOT
 
 # BOOT
 install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
-install lib/* $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
+cp -a lib/* $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
+# forgotten by maintainers
+install ldso/libdl/libdl.a $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
 
 find -name CVS | xargs rm -fr
 
-cp -a  include/ $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/
+cp -a include/ $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/
 rm -f $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/{asm,linux,bits}
 install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/bits
 install include/bits/* $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/bits
@@ -82,9 +84,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/bootdisk%{_includedir}/*
 %{_libdir}/bootdisk%{_libdir}/*.a
 %{_libdir}/bootdisk%{_libdir}/crt0.o
-%{_libdir}/bootdisk/%{_libdir}/*.so
 
 %files BOOT
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/bootdisk/%{_libdir}/*-*.so
-%attr(755,root,root) %{_libdir}/bootdisk/%{_libdir}/*.so.*
+%attr(755,root,root) %{_libdir}/bootdisk/%{_libdir}/*.so
