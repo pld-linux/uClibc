@@ -1,0 +1,120 @@
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/alpha/crti.S uClibc-0.9.26/libc/sysdeps/linux/alpha/crti.S
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/alpha/crti.S	Mon Feb  7 17:44:21 2005
++++ uClibc-0.9.26/libc/sysdeps/linux/alpha/crti.S	Mon Feb  7 20:10:33 2005
+@@ -1,43 +1,59 @@
+ 	.set noat
+ 	.set noreorder
+-	.set nomacro
+-	.set	macro
++	
++	
++	.align 5
++	.ent call_gmon_start
++call_gmon_start:
++	.frame $30,16,$26,0
++	.mask 0x4000000,-16
++	ldgp $29,0($27)
++$call_gmon_start..ng:
++	lda $30,-16($30)
++	lda $27,__gmon_start__
++	stq $26,0($30)
++	.prologue 1
++	beq $27,$L5
++	jsr $26,($27),0
++	ldgp $29,0($26)
++$L5:
++	ldq $26,0($30)
++	lda $30,16($30)
++	ret $31,($26),1
++	.end call_gmon_start
+ 	
+ 	.section .init
+-	.set	nomacro
+-	.align 2
++	.align 5
+ 	.globl _init
+ 	.ent _init
+ _init:
+-	.frame $30,0,$26,0
+-	.mask 0x4000000,0
+-	ldah $29,0($27)		!gpdisp!3
+-	lda $29,0($29)		!gpdisp!3
++	.frame $30,16,$26,0
++	.mask 0x4000000,-16
++	ldgp $29,0($27)
+ $_init..ng:
+ 	lda $30,-16($30)
+ 	stq $26,0($30)
+ 	.prologue 1
+-	.set	macro
+ 	
+-	.align 2
++	bsr $26,$call_gmon_start..ng
++	
++	.align 5
+ 	.end _init
+ 	
+ 	.section .fini
+-	.set	nomacro
+-	.align 2
++	.align 5
+ 	.globl _fini
+ 	.ent _fini
+ _fini:
+-	.frame $30,0,$26,0
+-	.mask 0x4000000,0
+-	ldah $29,0($27)		!gpdisp!6
+-	lda $29,0($29)		!gpdisp!6
++	.frame $30,16,$26,0
++	.mask 0x4000000,-16
++	ldgp $29,0($27)
+ $_fini..ng:
+ 	lda $30,-16($30)
+ 	stq $26,0($30)
+ 	.prologue 1
+-	.set	macro
+-	.align 2
++	.align 5
+ 	.end _fini
+ 	
+-	.ident	"GCC: (GNU) 3.3.2"
++	.weak	__gmon_start__
++	.ident	"GCC: (GNU) 2.95.4 20010319 (prerelease)"
+diff -ur uClibc-0.9.26.orig/libc/sysdeps/linux/alpha/crtn.S uClibc-0.9.26/libc/sysdeps/linux/alpha/crtn.S
+--- uClibc-0.9.26.orig/libc/sysdeps/linux/alpha/crtn.S	Mon Feb  7 17:44:21 2005
++++ uClibc-0.9.26/libc/sysdeps/linux/alpha/crtn.S	Mon Feb  7 20:10:11 2005
+@@ -1,30 +1,23 @@
+ 	.set noat
+ 	.set noreorder
+-	.set nomacro
+-	.set	macro
++	
+ 	
+ 	.section .init
+-	.set	nomacro
+-	.align 2
++	.align 5
+ 	.globl _init
+ 	.ent _init
+-	.set	nomacro
+ 	ldq $26,0($30)
+ 	lda $30,16($30)
+ 	ret $31,($26),1
+ 	.end _init
+-	.set	macro
+ 	
+ 	.section .fini
+-	.set	nomacro
+-	.align 2
++	.align 5
+ 	.globl _fini
+ 	.ent _fini
+-	.set	nomacro
+ 	ldq $26,0($30)
+ 	lda $30,16($30)
+ 	ret $31,($26),1
+ 	.end _fini
+-	.set	macro
+ 	
+-	.ident	"GCC: (GNU) 3.3.2"
++	.ident	"GCC: (GNU) 2.95.4 20010319 (prerelease)"
