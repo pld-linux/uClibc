@@ -97,7 +97,7 @@ sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED = true/;
 	s/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/;
 	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX = \$\(DEVEL_PREFIX\)\/usr/;
 %if %{?_with_lfs:1}%{!?_with_lfs:0}
-	s/^DOLFS *=.*$/DOLFS = true/';
+	s/^DOLFS *=.*$/DOLFS = true/;
 %endif
 	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/' Config.tmp > Config
 
