@@ -1,0 +1,43 @@
+diff -ur uClibc-0.9.12-/include/pthread.h uClibc-0.9.12/include/pthread.h
+--- uClibc-0.9.12-/include/pthread.h	Thu Mar 27 22:44:15 2003
++++ uClibc-0.9.12/include/pthread.h	Wed Nov 14 07:46:50 2001
+@@ -160,7 +160,7 @@
+ /* Create a thread with given attributes ATTR (or default attributes
+    if ATTR is NULL), and call function START_ROUTINE with given
+    arguments ARG.  */
+-extern int pthread_create (pthread_t *__restrict __thread,
++extern int pthread_create (pthread_t *__restrict __threadp,
+ 			   __const pthread_attr_t *__restrict __attr,
+ 			   void *(*__start_routine) (void *),
+ 			   void *__restrict __arg) __THROW;
+@@ -588,7 +588,7 @@
+ extern int pthread_setcanceltype (int __type, int *__oldtype) __THROW;
+ 
+ /* Cancel THREAD immediately or at the next possibility.  */
+-extern int pthread_cancel (pthread_t __thread) __THROW;
++extern int pthread_cancel (pthread_t __threadp) __THROW;
+ 
+ /* Test for pending cancellation for the current thread and terminate
+    the thread as per pthread_exit(PTHREAD_CANCELED) if it has been
+diff -ur uClibc-0.9.12-/libc/sysdeps/linux/common/bits/sigthread.h uClibc-0.9.12/libc/sysdeps/linux/common/bits/sigthread.h
+--- uClibc-0.9.12-/libc/sysdeps/linux/common/bits/sigthread.h	Thu Mar 27 22:43:59 2003
++++ uClibc-0.9.12/libc/sysdeps/linux/common/bits/sigthread.h	Fri Mar  1 21:46:02 2002
+@@ -33,6 +33,6 @@
+ 			    __sigset_t *__restrict __oldmask)__THROW;
+ 
+ /* Send signal SIGNO to the given thread. */
+-extern int pthread_kill (pthread_t __thread, int __signo) __THROW;
++extern int pthread_kill (pthread_t __threadp, int __signo) __THROW;
+ 
+ #endif	/* bits/sigthread.h */
+diff -ur uClibc-0.9.12-/libpthread/linuxthreads/sysdeps/unix/sysv/linux/bits/sigthread.h uClibc-0.9.12/libpthread/linuxthreads/sysdeps/unix/sysv/linux/bits/sigthread.h
+--- uClibc-0.9.12-/libpthread/linuxthreads/sysdeps/unix/sysv/linux/bits/sigthread.h	Thu Mar 27 22:45:03 2003
++++ uClibc-0.9.12/libpthread/linuxthreads/sysdeps/unix/sysv/linux/bits/sigthread.h	Wed Feb 20 10:18:50 2002
+@@ -32,6 +32,6 @@
+ 				 __sigset_t *__oldmask));
+ 
+ /* Send signal SIGNO to the given thread. */
+-extern int pthread_kill __P ((pthread_t __thread, int __signo));
++extern int pthread_kill __P ((pthread_t __threadp, int __signo));
+ 
+ #endif	/* bits/sigthread.h */
