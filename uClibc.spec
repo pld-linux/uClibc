@@ -93,14 +93,13 @@ ln -sf extra/Configs/Config.powerpc Config
 %build
 cat Config > Config.tmp
 
+sed -e 's/^HAVE_SHARED *=.*$/HAVE_SHARED = true/;
+	s/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/;
+	s/^SYSTEM_DEVEL_PREFIX *=.*$/SYSTEM_DEVEL_PREFIX = \$\(DEVEL_PREFIX\)\/usr/;
 %if %{?_with_lfs:1}%{!?_with_lfs:0}
-sed -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/;
-	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/;
-	s/^DOLFS *=.*$/DOLFS = true/' Config.tmp > Config
-%else
-sed -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/;
-	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/' Config.tmp > Config
+	s/^DOLFS *=.*$/DOLFS = true/';
 %endif
+	s/^INCLUDE_IPV6 *=.*$/INCLUDE_IPV6 = true/' Config.tmp > Config
 
 %{__make} \
 	TARGET_ARCH="%{_arch}" \
