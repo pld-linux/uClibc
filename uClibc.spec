@@ -1,4 +1,5 @@
 Summary:	C library optimized for size
+Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	20010826
 Release:	8
@@ -20,8 +21,12 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 Small libc for building embedded applications.
 
+%description -l pl
+Ma≥a libc do budowania aplikacji wbudowanych.
+
 %package devel-BOOT
 Summary:	Development files for uClibc
+Summary(pl):	Pliki dla programistÛw uClibc
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
 Group(es):	Desarrollo/Bibliotecas
@@ -35,8 +40,12 @@ Requires:	%{name}-BOOT = %{version}
 %description devel-BOOT
 Small libc for building embedded applications.
 
+%description devel-BOOT -l pl
+Ma≥a libc do budowania aplikacji wbudowanych.
+
 %package BOOT
 Summary:	uClibc for bootdisk
+Summary(pl):	uClibc dla bootkietki
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
 Group(es):	Desarrollo/Bibliotecas
@@ -49,11 +58,14 @@ Group(uk):	Úœ⁄“œ¬À¡/‚¶¬Ã¶œ‘≈À…
 %description BOOT
 Small libc for building embedded applications.
 
+%description BOOT -l pl
+Ma≥a libc do budowania aplikacji wbudowanych.
+
 %prep
 %setup -q -n %{name}
 %patch0 -p1
 
-cp extra/Configs/Config.i386 Config
+cp -f extra/Configs/Config.i386 Config
 
 %build
 perl -pi -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/g' Config
@@ -77,7 +89,7 @@ install ldso/libdl/libdl.a $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
 
 find -name CVS | xargs rm -fr
 
-cp -a include/ $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/
+cp -a include $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}
 rm -f $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/{asm,linux,bits}
 install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/bits
 install include/bits/* $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_includedir}/bits
@@ -104,7 +116,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/bootdisk%{_includedir}/*
 %{_libdir}/bootdisk%{_libdir}/*.a
 %{_libdir}/bootdisk%{_libdir}/crt0.o
-
 
 %files BOOT
 %defattr(644,root,root,755)
