@@ -16,7 +16,7 @@ diff -urN uClibc-0.9.26.org/libpthread/Makefile uClibc-0.9.26/libpthread/Makefil
  		$(LN) -sf $(LIBPTHREAD_SHARED_FULLNAME) \
  			$(TOPDIR)lib/$(LIBPTHREAD_SHARED).$(MAJOR_VERSION); \
 +		$(LN) -sf $(LIBPTHREAD_SHARED_FULLNAME) \
-+			$(LIBPTHREAD_SHARED_ORG).$(MAJOR_VERSION); \
++			$(TOPDIR)lib/$(LIBPTHREAD_SHARED_ORG).$(MAJOR_VERSION); \
  	fi;
  	if [ -f $(LIBTHREAD_DB) ] ; then \
  		set -e; \
