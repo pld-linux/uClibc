@@ -22,6 +22,7 @@ Patch10:	%{name}-return.patch
 Patch11:	%{name}-sparc-ldso.patch
 Patch12:	%{name}-g.patch
 Patch13:	%{name}-O_DIRECT.patch
+Patch14:	%{name}-i686_fix.patch
 URL:		http://uclibc.org/
 BuildRequires:	sed >= 4.0
 BuildRequires:	which
@@ -80,6 +81,7 @@ Biblioteki statyczne uClibc.
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
+%patch14 -p1
 
 sed -e '
 %ifarch sparc sparc64 sparcv9
