@@ -45,7 +45,11 @@ cp extra/Configs/Config.i386 Config
 
 %build
 perl -pi -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/g' Config
-%{__make} KERNEL_SOURCE=%{_kernelsrcdir} CPUFLAGS="-m386"
+%{__make} \
+%ifarch %{ix86}
+	CPUFLAGS="-m386" \
+%endif
+	KERNEL_SOURCE=%{_kernelsrcdir}
 
 %install
 rm -rf $RPM_BUILD_ROOT
