@@ -1,6 +1,6 @@
 Summary:	C library optimized for size
 Name:		uClibc
-Version:	20010413
+Version:	20010521
 Release:	2
 License:	LGPL
 Group:		Development/Libraries
@@ -52,8 +52,7 @@ rm -rf $RPM_BUILD_ROOT
 
 # BOOT
 install -d $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
-install crt0.o libc.a $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
-install libuClibc.so.1 $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
+install lib/* $RPM_BUILD_ROOT%{_libdir}/bootdisk%{_libdir}
 
 find -name CVS | xargs rm -fr
 
@@ -83,9 +82,11 @@ rm -rf $RPM_BUILD_ROOT
 %files devel-BOOT
 %defattr(644,root,root,755)
 %{_libdir}/bootdisk%{_includedir}/*
+%{_libdir}/bootdisk%{_libdir}/*.a
+%{_libdir}/bootdisk%{_libdir}/crt0.o
+%{_libdir}/bootdisk/%{_libdir}/*.so
 
 %files BOOT
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/bootdisk/%{_libdir}/*.so*
-%{_libdir}/bootdisk%{_libdir}/libc.a
-%{_libdir}/bootdisk%{_libdir}/crt0.o
+%attr(755,root,root) %{_libdir}/bootdisk/%{_libdir}/*-*.so
+%attr(755,root,root) %{_libdir}/bootdisk/%{_libdir}/*.so.*
