@@ -20,12 +20,13 @@
  	  environment will be installed.   The result will look something
 --- uClibc-0.9.26/extra/gcc-uClibc/Makefile.orig	2004-01-31 17:41:23.190969928 +0100
 +++ uClibc-0.9.26/extra/gcc-uClibc/Makefile	2004-01-31 17:51:11.132589216 +0100
-@@ -51,36 +51,36 @@
+@@ -51,38 +51,38 @@
  endif
  
  gcc-uClibc: gcc-uClibc.h gcc-uClibc.c
 -	$(HOSTCC) $(HOSTCFLAGS) -s gcc-uClibc.c -o $(TARGET_ARCH)-uclibc-gcc
 +	$(HOSTCC) $(HOSTCFLAGS) -s gcc-uClibc.c -o $(TARGET_CPU)-uclibc-gcc
+ 	touch gcc-uClibc
  
  ld-uClibc:
 -	@echo "#!/bin/sh" > $(TARGET_ARCH)-uclibc-ld
@@ -37,6 +38,7 @@
 -	chmod a+x $(TARGET_ARCH)-uclibc-ld
 +		"-L$(UCLIBC_DIR)" >> $(TARGET_CPU)-uclibc-ld
 +	chmod a+x $(TARGET_CPU)-uclibc-ld
+ 	touch ld-uClibc
  
  install: all
  	install -d $(PREFIX)$(DEVEL_PREFIX)/bin;
