@@ -1,7 +1,7 @@
 Summary:	C library optimized for size
 Name:		uClibc
 Version:	20010521
-Release:	3
+Release:	4
 License:	LGPL
 Group:		Development/Libraries
 Group(de):	Entwicklung/Libraries
@@ -12,7 +12,6 @@ Source0:	%{name}-%{version}.tar.gz
 Patch0:		%{name}-setfsuid.patch
 URL:		http://cvs.uclinux.org/uClibc.html
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-BuildRequires:	linux-devel-BOOT
 
 %description
 Small libc for building embedded applications.
@@ -46,7 +45,7 @@ Small libc for building embedded applications.
 
 %build
 perl -pi -e 's/^INCLUDE_RPC *=.*$/INCLUDE_RPC = true/g' Config
-%{__make} KERNEL_SOURCE=%{_libdir}/bootdisk%{_prefix} CPUFLAGS="-m386"
+%{__make} KERNEL_SOURCE=/usr/src/linux CPUFLAGS="-m386"
 
 %install
 rm -rf $RPM_BUILD_ROOT
