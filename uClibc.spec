@@ -6,7 +6,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.21
-Release:	1
+Release:	2
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -64,7 +64,7 @@ Biblioteki statyczne uClibc.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-#%patch6 -p1
+%patch6 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386.default Config
@@ -108,7 +108,7 @@ for targ in defconfig all ; do
 	TARGET_ARCH="%(echo %{_target_cpu} | sed -e 's/i.86\|athlon/i386/')" \
 	TARGET_CPU="%{_target_cpu}" \
 %endif
-	KERNEL_SOURCE=%{_kernelsrcdir} \
+	KERNEL_SOURCE=%{_prefix} \
 	HOSTCC=%{__cc} \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os" \
