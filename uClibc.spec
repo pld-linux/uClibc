@@ -12,6 +12,7 @@ Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-setfsuid.patch
 Patch1:		%{name}-Makefile.patch
 Patch2:		%{name}-lfs.patch
+Patch3:		%{name}-no_bogus_gai.patch
 URL:		http://uclibc.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -66,6 +67,7 @@ Biblioteki statyczne uClibc.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386 Config
