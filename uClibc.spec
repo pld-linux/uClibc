@@ -2,7 +2,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.26
-Release:	8
+Release:	9
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -25,7 +25,7 @@ URL:		http://uclibc.org/
 BuildRequires:	gcc >= 3.0
 BuildRequires:	sed >= 4.0
 BuildRequires:	which
-ExclusiveArch:	alpha %{ix86} ppc sparc sparc64
+ExclusiveArch:	alpha %{ix86} ppc sparc sparc64 sparcv9
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # note: the 2nd '\' is needed (some shell expansions?)
@@ -82,7 +82,7 @@ Biblioteki statyczne uClibc.
 %patch12 -p1
 
 sed -e '
-%ifarch sparc sparc64
+%ifarch sparc sparc64 sparcv9
 	s/default TARGET_i386/default TARGET_sparc/
 %endif
 %ifarch alpha
@@ -96,6 +96,12 @@ mv -f Conf.in.tmp extra/Configs/Config.in
 
 grep -v 'HAVE_NO_SHARED\|ARCH_HAS_NO_LDSO' extra/Configs/Config.sparc > C.tmp
 mv -f C.tmp extra/Configs/Config.sparc
+
+%ifarch sparc sparc64 sparcv9
+ln -sf /usr/include/asm-sparc include/asm-sparc
+ln -sf /usr/include/asm-sparc64 include/asm-sparc64
+%{__perl} -pi -e 's/^(rm.*asm)\*/$1/' extra/scripts/fix_includes.sh
+%endif
 
 %build
 %{__make} defconfig \
@@ -151,8 +157,12 @@ for f in c++ cc g++ gcc ld; do
 		$RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/bin/$f
 done
 
-rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm}
+rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm*}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm
+%ifarch sparc sparc64 sparcv9
+ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc
+ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc64
+%endif
 ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/linux
 rm $RPM_BUILD_ROOT/%{_prefix}/*-linux-uclibc/usr/include/.cvsignore
 
@@ -162,7 +172,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %dir %{_prefix}/*-linux-uclibc
-%ifarch %{ix86} ppc sparc sparc64
+%ifarch %{ix86} ppc sparc sparc64 sparcv9
 %dir %{_prefix}/*-linux-uclibc/lib
 %attr(755,root,root) %{_prefix}/*-linux-uclibc/lib/*.so*
 %endif
@@ -176,7 +186,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_prefix}/*-linux-uclibc/usr/bin
 %attr(755,root,root) %{_prefix}/*-linux-uclibc/usr/bin/*
 %dir %{_prefix}/*-linux-uclibc/usr/lib
-%ifarch %{ix86} ppc sparc sparc64
+%ifarch %{ix86} ppc sparc sparc64 sparcv9
 %attr(755,root,root) %{_prefix}/*-linux-uclibc/usr/lib/*.so
 %endif
 %{_prefix}/*-linux-uclibc/usr/include
