@@ -1,6 +1,6 @@
-Only in uClibc-setfsuid/include: asm
-diff -ur uClibc/sysdeps/linux/common/syscalls.c uClibc-setfsuid/sysdeps/linux/common/syscalls.c
---- uClibc/sysdeps/linux/common/syscalls.c	Fri Apr  6 22:28:45 2001
+diff -ur uClibc/libc/sysdeps/linux/common/syscalls.c
+uClibc-setfsuid/sysdeps/linux/common/syscalls.c
+--- uClibc/libc/sysdeps/linux/common/syscalls.c	Fri Apr  6 22:28:45 2001
 +++ uClibc-setfsuid/sysdeps/linux/common/syscalls.c	Wed May 16 11:14:56 2001
 @@ -938,8 +938,16 @@
  //#define __NR_afs_syscall      137
