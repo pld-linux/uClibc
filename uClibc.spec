@@ -8,14 +8,6 @@ Release:	1
 Epoch:		1
 License:	LGPL
 Group:		Libraries
-Group(de):	Bibliotheken
-Group(es):	Bibliotecas
-Group(fr):	Librairies
-Group(pl):	Biblioteki
-Group(pt):	Bibliotecas
-Group(pt_BR):	Bibliotecas
-Group(ru):	Библиотеки
-Group(uk):	Б╕бл╕отеки
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-Makefile.patch
 Patch1:		%{name}-lfs.patch
@@ -33,14 +25,6 @@ MaЁa libc do budowania aplikacji wbudowanych.
 Summary:	Development files for uClibc
 Summary(pl):	Pliki dla programistСw uClibc
 Group:		Development/Libraries
-Group(de):	Entwicklung/Bibliotheken
-Group(es):	Desarrollo/Bibliotecas
-Group(fr):	Development/Librairies
-Group(pl):	Programowanie/Biblioteki
-Group(pt_BR):	Desenvolvimento/Bibliotecas
-Group(pt):	Desenvolvimento/Bibliotecas
-Group(ru):	Разработка/Библиотеки
-Group(uk):	Розробка/Б╕бл╕отеки
 Requires:	%{name} = %{version}
 Requires:	binutils
 Requires:	gcc
@@ -55,14 +39,6 @@ MaЁa libc do budowania aplikacji wbudowanych.
 Summary:	Static uClibc libratries
 Summary(pl):	Biblioteki statyczne uClibc
 Group:		Development/Libraries
-Group(de):	Entwicklung/Bibliotheken
-Group(es):	Desarrollo/Bibliotecas
-Group(fr):	Development/Librairies
-Group(pl):	Programowanie/Biblioteki
-Group(pt_BR):	Desenvolvimento/Bibliotecas
-Group(pt):	Desenvolvimento/Bibliotecas
-Group(ru):	Разработка/Библиотеки
-Group(uk):	Розробка/Б╕бл╕отеки
 Requires:	%{name}-devel = %{version}
 
 %description static
