@@ -4,7 +4,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.9
-Release:	1
+Release:	2
 Epoch:		1
 License:	LGPL
 Group:		Libraries
@@ -88,6 +88,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 
 %{__make} install \
+	TARGET_ARCH="%{_arch}" \
 	PREFIX=$RPM_BUILD_ROOT
 
 # these links are *needed* (by stuff in bin/)
@@ -96,7 +97,7 @@ for f in $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc%{_bindir}/* ; do
 	ln -sf ../../../bin/`basename $f` $f
 done
 
-find $RPM_BUILD_ROOT/usr/%{_arch}-linux-uclibc/include -name CVS | xargs rm -rf
+find $RPM_BUILD_ROOT/usr/%{_taget_arch}-linux-uclibc/include -name CVS | xargs rm -rf
 
 gzip -9nf README TODO docs/threads.txt
 
