@@ -29,7 +29,7 @@ ExclusiveArch:	alpha %{ix86} ppc sparc sparc64
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # note: the 2nd '\' is needed (some shell expansions?)
-%define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium3/i386/;s/ppc/powerpc/')
+%define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium./i386/;s/ppc/powerpc/')
 
 %description
 Small libc for building embedded applications.
