@@ -109,59 +109,14 @@
 +# define MADV_DONTNEED_COMPAT 4	/* Old version?  */
 +# define MADV_SPACEAVAIL 5	/* Ensure resources are available.  */
 +#endif
---- uClibc-0.9.26/libc/sysdeps/linux/alpha/brk.S.orig	2003-05-30 04:47:43.000000000 +0000
-+++ uClibc-0.9.26/libc/sysdeps/linux/alpha/brk.S	2004-04-25 11:07:41.000000000 +0000
-@@ -24,16 +24,18 @@
- #include <features.h>
+--- uClibc-0.9.27/libc/sysdeps/linux/alpha/brk.S.orig	2005-01-12 08:59:21.000000000 +0100
++++ uClibc-0.9.27/libc/sysdeps/linux/alpha/brk.S	2005-01-15 20:42:48.845898024 +0100
+@@ -25,6 +25,8 @@
  #define _ERRNO_H
  #include <bits/errno.h>
+ #include <sys/syscall.h>
 +/* from linux/asm-alpha/unistd.h */
 +#define __NR_brk 17
  
  #ifdef __PIC__
  .section .bss
- 	.align 3
--	.globl __curbrk
--__curbrk: .skip 8
--	.type __curbrk,@object
--	.size __curbrk,8
-+	.globl ___brk_addr
-+___brk_addr: .skip 8
-+	.type ___brk_addr,@object
-+	.size ___brk_addr,8
- #else
--.comm __curbrk, 8
-+.comm ___brk_addr, 8
- #endif
- 
- 	.text
-@@ -70,9 +72,9 @@
- 	xor	$16, $0, $1
- 	bne	$1, $err0
- 
--	/* Update __curbrk and return cleanly.  */
-+	/* Update ___brk_addr and return cleanly.  */
- 	mov	$31, $0
--$ok:	stq	$16, __curbrk
-+$ok:	stq	$16, ___brk_addr
- 	addq	$30, 8, $30
- 	ret
- 
---- uClibc-0.9.26/libc/sysdeps/linux/common/llseek.c.orig	2002-10-31 18:19:49.000000000 +0000
-+++ uClibc-0.9.26/libc/sysdeps/linux/common/llseek.c	2004-04-25 12:08:50.000000000 +0000
-@@ -55,9 +55,13 @@
- extern __off_t __libc_lseek(int fildes, off_t offset, int whence);
- loff_t __libc_lseek64(int fd, loff_t offset, int whence)
- {
-+#ifdef __alpha__
-+	return(loff_t)(__libc_lseek(fd, (off_t) offset, whence));
-+#else
- 	return(loff_t)(__libc_lseek(fd, (off_t) (offset & 0xffffffff), whence));
-+#endif
- }
--weak_alias(__libc_lseek, llseek)
--weak_alias(__libc_lseek, lseek64)
-+weak_alias(__libc_lseek64, llseek)
-+weak_alias(__libc_lseek64, lseek64)
- #endif
- 

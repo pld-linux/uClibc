@@ -770,19 +770,18 @@ diff -urN uClibc-0.9.26.org/extra/Makefile uClibc-0.9.26/extra/Makefile
  EXTRA_DIRS_TO_CLEAN = config
  
  all: subdirs
-diff -urN uClibc-0.9.26.org/Makefile uClibc-0.9.26/Makefile
---- uClibc-0.9.26.org/Makefile	2004-01-25 15:20:32.825077096 +0100
-+++ uClibc-0.9.26/Makefile	2004-01-25 16:45:25.616652058 +0100
+--- uClibc-0.9.27/Makefile.orig	2005-01-12 08:59:21.000000000 +0100
++++ uClibc-0.9.27/Makefile	2005-01-15 20:49:24.817701160 +0100
 @@ -28,7 +28,7 @@
  TOPDIR=./
  include Rules.mak
  
--DIRS = ldso libc libcrypt libresolv libnsl libutil libm libpthread
-+DIRS = extra ldso libc libcrypt libresolv libnsl libutil libm libpthread
+-DIRS = ldso libc libcrypt libresolv libnsl libutil libm libpthread librt
++DIRS = extra ldso libc libcrypt libresolv libnsl libutil libm libpthread librt
  ifeq ($(strip $(UCLIBC_HAS_GETTEXT_AWARENESS)),y)
  	DIRS += libintl
  endif
-@@ -183,7 +183,7 @@
+@@ -137,7 +137,7 @@
  tags:
  	ctags -R
  
@@ -790,8 +789,8 @@ diff -urN uClibc-0.9.26.org/Makefile uClibc-0.9.26/Makefile
 +install: install_runtime install_dev install_toolchain finished2
  
  
- # Installs header files and development library links.
-@@ -302,6 +302,9 @@
+ RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB=$(shell extra/scripts/relative_path.sh $(DEVEL_PREFIX)lib $(RUNTIME_PREFIX)lib)
+@@ -257,6 +257,9 @@
  #	$(INSTALL) -m 755 libc/misc/wchar/iconv.target $(PREFIX)$(RUNTIME_PREFIX)/usr/bin/iconv
  #endif
  
