@@ -139,16 +139,21 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 	PREFIX=$RPM_BUILD_ROOT
 
 # these links are *needed* (by stuff in bin/)
-for f in $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/bin/* ; do
+for f in $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/bin/*; do
 	mv -f $f $RPM_BUILD_ROOT%{_bindir}
 	ln -sf ../../bin/`basename $f` $f
+done
+
+for f in c++ cc g++ gcc ld; do
+	ln -sf /usr/bin/%{_target_cpu}-uclibc-$f \
+		$RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/bin/$f
 done
 
 rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm
 ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/linux
 rm $RPM_BUILD_ROOT/%{_prefix}/*-linux-uclibc/usr/include/.cvsignore
-
+exit1
 %clean
 rm -rf $RPM_BUILD_ROOT
 
