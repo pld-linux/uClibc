@@ -1,0 +1,43 @@
+===================================================================
+RCS file: /uClibc/libc/sysdeps/linux/common/syscalls.c,v
+retrieving revision 1.114
+retrieving revision 1.115
+diff -u -r1.114 -r1.115
+--- uClibc/libc/sysdeps/linux/common/syscalls.c	2003/09/09 09:42:40	1.114
++++ uClibc/libc/sysdeps/linux/common/syscalls.c	2003/09/17 10:37:37	1.115
+@@ -1970,7 +1970,7 @@
+ 
+ //#define __NR_stat64             195
+ #ifdef L___syscall_stat64
+-#if defined __NR_stat64 && defined __UCLIBC_HAS_LFS__
++#if defined __UCLIBC_HAS_LFS__ && defined __NR_stat64
+ #define __NR___syscall_stat64 __NR_stat64
+ #include <unistd.h>
+ #include <sys/stat.h>
+@@ -1992,7 +1992,7 @@
+ 
+ //#define __NR_lstat64            196
+ #ifdef L___syscall_lstat64
+-#if defined __NR_lstat64 && defined __UCLIBC_HAS_LFS__
++#if defined __UCLIBC_HAS_LFS__ && defined __NR_lstat64
+ #define __NR___syscall_lstat64 __NR_lstat64
+ #include <unistd.h>
+ #include <sys/stat.h>
+@@ -2014,7 +2014,7 @@
+ 
+ //#define __NR_fstat64            197
+ #ifdef L___syscall_fstat64
+-#if defined __NR_fstat64 && defined __UCLIBC_HAS_LFS__
++#if defined __UCLIBC_HAS_LFS__ && defined __NR_fstat64
+ #define __NR___syscall_fstat64 __NR_fstat64
+ #include <unistd.h>
+ #include <sys/stat.h>
+@@ -2078,7 +2078,7 @@
+ #ifdef L___syscall_fcntl64
+ #include <stdarg.h>
+ #include <fcntl.h>
+-#ifdef __UCLIBC_HAS_LFS__
++#if defined __UCLIBC_HAS_LFS__ && defined __NR_fcntl64
+ #define __NR___syscall_fcntl64 __NR_fcntl64
+ static inline
+ _syscall3(int, __syscall_fcntl64, int, fd, int, cmd, long, arg);
