@@ -1,0 +1,208 @@
+--- uClibc-0.9.26/ldso/include/ld_string.h.orig	2003-09-29 21:46:00.000000000 +0000
++++ uClibc-0.9.26/ldso/include/ld_string.h	2004-05-27 20:47:48.000000000 +0000
+@@ -215,11 +215,13 @@
+ static inline char *_dl_simple_ltoa(char * local, unsigned long i)
+ {
+ 	/* 21 digits plus null terminator, good for 64-bit or smaller ints */
+-	char *p = &local[22];
++	char *p = &local[21];
+ 	*p-- = '\0';
+ 	do {
+-		*p-- = '0' + i % 10;
+-		i /= 10;
++		char temp;
++		do_rem(temp, i, 10);
++		*p-- = '0' + temp;
++		i /= 10; /* XXX: .udiv() on sparc! */
+ 	} while (i > 0);
+ 	return p + 1;
+ }
+@@ -227,15 +229,15 @@
+ static inline char *_dl_simple_ltoahex(char * local, unsigned long i)
+ {
+ 	/* 21 digits plus null terminator, good for 64-bit or smaller ints */
+-	char *p = &local[22];
++	char *p = &local[21];
+ 	*p-- = '\0';
+ 	do {
+-		char temp = i % 0x10;
++		char temp = i & 0xf; /* % 0x10, to be sure .urem is not used */
+ 		if (temp <= 0x09)
+ 		    *p-- = '0' + temp;
+ 		else
+ 		    *p-- = 'a' - 0x0a + temp;
+-		i /= 0x10;
++		i >>= 4; /* /= 0x10, to be sure .udiv is not used */
+ 	} while (i > 0);
+ 	*p-- = 'x';
+ 	*p-- = '0';
+--- uClibc-0.9.26/ldso/include/ld_syscall.h.orig	2003-08-19 06:05:30.000000000 +0000
++++ uClibc-0.9.26/ldso/include/ld_syscall.h	2004-05-25 22:20:36.000000000 +0000
+@@ -50,7 +50,7 @@
+ static inline _syscall1(int, _dl_close, int, fd);
+ 
+ 
+-#if defined(__powerpc__) || defined(__mips__) || defined(__sh__)
++#if defined(__powerpc__) || defined(__mips__) || defined(__sh__) || defined(__sparc__)
+ /* PowerPC, MIPS and SuperH have a different calling convention for mmap(). */
+ #define __NR__dl_mmap __NR_mmap
+ static inline _syscall6(void *, _dl_mmap, void *, start, size_t, length,
+--- uClibc-0.9.26/ldso/ldso/sparc/ld_syscalls.h.orig	2004-05-25 19:03:47.000000000 +0000
++++ uClibc-0.9.26/ldso/ldso/sparc/ld_syscalls.h	2004-05-25 22:41:08.000000000 +0000
+@@ -154,3 +154,29 @@
+ /*errno = -__res; */\
+ return -1; \
+ }
++
++#define _syscall6(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
++	  type5,arg5,type6,arg6) \
++type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,type6 arg6) \
++{ \
++long __res; \
++register long __g1 __asm__ ("g1") = __NR_##name; \
++register long __o0 __asm__ ("o0") = (long)(arg1); \
++register long __o1 __asm__ ("o1") = (long)(arg2); \
++register long __o2 __asm__ ("o2") = (long)(arg3); \
++register long __o3 __asm__ ("o3") = (long)(arg4); \
++register long __o4 __asm__ ("o4") = (long)(arg5); \
++register long __o5 __asm__ ("o5") = (long)(arg6); \
++__asm__ __volatile__ ("t 0x10\n\t" \
++		      "bcc 1f\n\t" \
++		      "mov %%o0, %0\n\t" \
++		      "sub %%g0, %%o0, %0\n\t" \
++		      "1:\n\t" \
++		      : "=r" (__res), "=&r" (__o0) \
++		      : "1" (__o0), "r" (__o1), "r" (__o2), "r" (__o3), "r" (__o4), "r" (__o5), "r" (__g1) \
++		      : "cc"); \
++if (__res < -255 || __res>=0) \
++	return (type) __res; \
++/*errno = -__res; */\
++return -1; \
++}
+--- uClibc-0.9.26/ldso/ldso/sparc/ld_sysdep.h.orig	2003-12-17 08:05:44.000000000 +0000
++++ uClibc-0.9.26/ldso/ldso/sparc/ld_sysdep.h	2004-05-27 19:41:50.000000000 +0000
+@@ -95,9 +95,51 @@
+ /*
+  * Define this if you want a dynamic loader that works on Solaris.
+  */
++#ifndef __linux__
+ #define SOLARIS_COMPATIBLE
++#endif
++
++#ifndef COMPILE_ASM
++/* Cheap modulo implementation, taken from arm/ld_sysdep.h. */
++static inline unsigned long
++sparc_mod(unsigned long m, unsigned long p)
++{
++	unsigned long i, t, inc;
++
++	i = p;
++	t = 0;
++
++	while (!(i & (1 << 31))) {
++		i <<= 1;
++		t++;
++	}
++
++	t--;
++
++	for (inc = t; inc > 2; inc--) {
++		i = p << inc;
++
++		if (i & (1 << 31))
++			break;
++
++		while (m >= i) {
++			m -= i;
++			i <<= 1;
++			if (i & (1 << 31))
++				break;
++			if (i < p)
++				break;
++		}
++	}
++
++	while (m >= p)
++		m -= p;
++
++	return m;
++}
+ 
+-#define do_rem(result, n, base)	    result = (n % base)
++#define do_rem(result, n, base) result = sparc_mod(n, base);
++#endif
+ 
+ /*
+  * dbx wants the binder to have a specific name.  Mustn't disappoint it.
+@@ -107,6 +149,7 @@
+ #endif
+ 
+ /* 4096 bytes alignment */
+-#define PAGE_ALIGN 0xfffff000
+-#define ADDR_ALIGN 0xfff
+-#define OFFS_ALIGN 0x7ffff000
++/* ...but 8192 is required for mmap() on sparc64 kernel */
++#define PAGE_ALIGN 0xffffe000
++#define ADDR_ALIGN 0x1fff
++#define OFFS_ALIGN 0x7fffe000
+--- uClibc-0.9.26/ldso/ldso/sparc/elfinterp.c.orig	2004-05-25 19:03:47.000000000 +0000
++++ uClibc-0.9.26/ldso/ldso/sparc/elfinterp.c	2004-05-27 19:16:15.000000000 +0000
+@@ -72,7 +72,7 @@
+   /*
+    * Generate the correct relocation index into the .rela.plt section.
+    */
+-  reloc_entry = (reloc_entry >> 12) - 0xc;
++  reloc_entry = (reloc_entry >> 10) - 0xc;
+ 
+   this_reloc = (Elf32_Rela *) ((char *) rel_addr + reloc_entry);
+ 
+@@ -82,10 +82,14 @@
+   symtab =  (Elf32_Sym *) (tpnt->dynamic_info[DT_SYMTAB] + tpnt->loadaddr);
+   strtab = (char *) (tpnt->dynamic_info[DT_STRTAB] + tpnt->loadaddr);
+ 
++#ifdef __SUPPORT_LD_DEBUG__
++  if (_dl_debug_symbols) {
+   _dl_dprintf(2, "tpnt = %x\n", tpnt);
+   _dl_dprintf(2, "reloc = %x\n", this_reloc);
+   _dl_dprintf(2, "symtab = %x\n", symtab);
+   _dl_dprintf(2, "strtab = %x\n", strtab);
++  }
++#endif
+ 
+ 
+   if (reloc_type != R_SPARC_JMP_SLOT) {
+@@ -98,10 +102,10 @@
+   instr_addr  = ((int)this_reloc->r_offset  + (int)tpnt->loadaddr);
+   got_addr = (char **) instr_addr;
+ 
+-  _dl_dprintf(2, "symtab_index %d\n", symtab_index);
+-
+ #ifdef __SUPPORT_LD_DEBUG__
+   if (_dl_debug_symbols) {
++  _dl_dprintf(2, "symtab_index %x\n", symtab_index);
++
+ 	  _dl_dprintf(2, "Resolving symbol %s\n",
+ 			  strtab + symtab[symtab_index].st_name);
+   }
+--- uClibc-0.9.26/ldso/ldso/ldso.c.orig	2004-05-25 19:03:47.000000000 +0000
++++ uClibc-0.9.26/ldso/ldso/ldso.c	2004-05-25 21:27:59.000000000 +0000
+@@ -253,7 +253,7 @@
+ 	/* Check the ELF header to make sure everything looks ok.  */
+ 	if (!header || header->e_ident[EI_CLASS] != ELFCLASS32 ||
+ 		header->e_ident[EI_VERSION] != EV_CURRENT
+-#if !defined(__powerpc__) && !defined(__mips__) && !defined(__sh__)
++#if !defined(__powerpc__) && !defined(__mips__) && !defined(__sh__) && !defined(__sparc__)
+ 		|| _dl_strncmp((void *) header, ELFMAGIC, SELFMAG) != 0
+ #else
+ 	        || header->e_ident[EI_MAG0] != ELFMAG0
+--- uClibc-0.9.26/ldso/ldso/readelflib1.c.orig	2003-12-17 18:34:15.000000000 +0000
++++ uClibc-0.9.26/ldso/ldso/readelflib1.c	2004-05-27 20:41:34.000000000 +0000
+@@ -725,7 +725,7 @@
+ 		_dl_dprintf(2, "\n\tfile='%s';  generating link map\n", libname);
+ 		_dl_dprintf(2, "\t\tdynamic: %x  base: %x   size: %x\n", 
+ 				dynamic_addr, libaddr, dynamic_size);
+-		_dl_dprintf(2, "\t\t  entry: %x  phdr: %x  phnum: %d\n\n", 
++		_dl_dprintf(2, "\t\t  entry: %x  phdr: %x  phnum: %x\n\n", 
+ 				epnt->e_entry + libaddr, tpnt->ppnt, tpnt->n_phent);
+ 
+ 	}

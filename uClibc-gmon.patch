@@ -1,0 +1,11 @@
+--- uClibc-0.9.21/extra/scripts/initfini.awk.orig	2003-03-05 10:52:44.000000000 +0000
++++ uClibc-0.9.21/extra/scripts/initfini.awk	2003-11-23 18:42:33.000000000 +0000
+@@ -67,7 +67,7 @@
+ /GMON_STUFF_BEGINS/{omitcrtn=1;getline}
+ /GMON_STUFF_PAUSES/{omitcrtn=0;getline}
+ /GMON_STUFF_UNPAUSES/{omitcrtn=1;getline}
+-/GMON_STUFF_ENDS/{omitcrtn=0;getline}
++/GMON_STUFF_ENDS/{omitcrti=0;getline} # crti, not crtn (equivalent of PROLOG_UNPAUSES)
+ 
+ /_GLOBAL_OFFSET_TABLE_/||/gmon_start/ \
+ {

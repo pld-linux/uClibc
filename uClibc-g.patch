@@ -1,0 +1,22 @@
+--- uClibc-0.9.26/libc/sysdeps/linux/i386/Makefile.orig	2004-06-20 16:02:33.000000000 +0000
++++ uClibc-0.9.26/libc/sysdeps/linux/i386/Makefile	2004-06-20 16:24:52.444039273 +0000
+@@ -70,7 +70,7 @@
+ 
+ ifeq ($(strip $(UCLIBC_PROFILING)),y)
+ gmon-start.S: ../common/gmon-start.c
+-	$(CC) $(CFLAGS) -c $< -S -o $*.S
++	$(CC) $(CFLAGS) -c $< -S -o $*.S -g0
+ gcrt1.o: $(CRT0_DEPS)
+ endif
+ 
+--- uClibc-0.9.26/libc/sysdeps/linux/powerpc/Makefile.orig	2004-06-20 16:24:35.857226425 +0000
++++ uClibc-0.9.26/libc/sysdeps/linux/powerpc/Makefile	2004-06-20 16:23:37.234884557 +0000
+@@ -59,7 +59,7 @@
+ 
+ ifeq ($(strip $(UCLIBC_PROFILING)),y)
+ gmon-start.S: ../common/gmon-start.c
+-	$(CC) $(CFLAGS) -c $< -S -o $*.S
++	$(CC) $(CFLAGS) -c $< -S -o $*.S -g0
+ gcrt1.o: $(CRT0_DEPS)
+ endif
+ 
