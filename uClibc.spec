@@ -19,6 +19,7 @@ Patch3:		%{name}-alpha.patch
 Patch4:		%{name}-sparc.patch
 Patch5:		%{name}-toolchain-wrapper.patch
 Patch6:		%{name}-targetcpu.patch
+Patch7:		%{name}-linux2.6.patch
 # obsolete (except forcing LFS versions, but it shouldn't be needed?)
 #Patch:		%{name}-lfs.patch
 # probably obsolete, caused only compilation errors
@@ -74,6 +75,7 @@ Biblioteki statyczne uClibc.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 
 sed -e '
 %ifarch sparc sparc64
