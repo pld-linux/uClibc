@@ -8,6 +8,7 @@ License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-setfsuid.patch
+Patch1:		%{name}-Makefile.patch
 URL:		http://uclibc.org/
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -58,6 +59,7 @@ Biblioteki statyczne uClibc.
 %prep
 %setup -q -n %{name}
 %patch0 -p1
+%patch1 -p1
 
 %ifarch %{ix86}
 ln -sf extra/Configs/Config.i386 Config
