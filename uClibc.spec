@@ -14,6 +14,7 @@ Patch1:		%{name}-lfs.patch
 Patch2:		%{name}-no_bogus_gai.patch
 Patch3:		%{name}-no_hardcoded_gcc.patch
 URL:		http://uclibc.org/
+BuildRequires:	which
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
