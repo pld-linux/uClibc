@@ -109,7 +109,7 @@ sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
 	s/^.*DO_C99_MATH.*$/DO_C99_MATH=y/;
 	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set/;
 	s/^.*UCLIBC_HAS_SYS_SIGLIST.*$/UCLIBC_HAS_SYS_SIGLIST=y/;
-	s/^SHARED_LIB_LOADER_PREFIX=.*/SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)lib"/
+	s,^SHARED_LIB_LOADER_PREFIX=.*,SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib",
 	' .config.tmp > .config
 %{?debug:echo 'DODEBUG=y' >> .config}
 %{?debug:echo 'SUPPORT_LD_DEBUG=y' >> .config}
