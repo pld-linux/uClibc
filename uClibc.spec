@@ -14,6 +14,7 @@ Patch2:		%{name}-toolchain-wrapper.patch
 Patch3:		%{name}-targetcpu.patch
 Patch4:		%{name}-O_DIRECT.patch
 Patch5:		%{name}-sparc.patch
+Patch6:		%{name}-x86_64.patch
 URL:		http://uclibc.org/
 BuildRequires:	gcc >= 3.0
 BuildRequires:	sed >= 4.0
@@ -22,7 +23,7 @@ ExclusiveArch:	alpha %{ix86} ppc sparc sparc64 sparcv9 %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # note: the 2nd '\' is needed (some shell expansions?)
-%define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium./i386/;s/ppc/powerpc/')
+%define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium./i386/;s/ppc/powerpc/;s/amd64\\|ia32e/x86_64/')
 
 %description
 Small libc for building embedded applications.
@@ -66,8 +67,9 @@ Biblioteki statyczne uClibc.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
-sed -e '
+sed -i -e '
 %ifarch sparc sparc64 sparcv9
 	s/default TARGET_i386/default TARGET_sparc/
 %endif
@@ -80,13 +82,12 @@ sed -e '
 %ifarch %{x8664}
 	s/default TARGET_i386/default TARGET_x86_64/
 %endif
-	' extra/Configs/Config.in > Conf.in.tmp
-mv -f Conf.in.tmp extra/Configs/Config.in
+	' extra/Configs/Config.in
 
-grep -v 'HAVE_NO_SHARED\|ARCH_HAS_NO_LDSO' extra/Configs/Config.sparc > C.tmp
-mv -f C.tmp extra/Configs/Config.sparc
-grep -v 'HAS_NO_THREADS' extra/Configs/Config.alpha > C.tmp
-mv -f C.tmp extra/Configs/Config.alpha
+# ldso on x86_64 not ready yet (missing resolve.S)
+sed -i -e '/HAS_NO_THREADS/a\\n\tselect HAVE_NO_SHARED\n\tselect ARCH_HAS_NO_LDSO' \
+	extra/Configs/Config.x86_64
+sed -i -e '/HAS_NO_THREADS/d' extra/Configs/Config.alpha
 
 %ifarch sparc sparc64 sparcv9
 ln -sf /usr/include/asm-sparc include/asm-sparc
@@ -163,22 +164,23 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
+%doc Changelog* DEDICATION.mjn3 MAINTAINERS README TODO docs/threads.txt
 %dir %{_prefix}/*-linux-uclibc
-%ifarch %{ix86} ppc sparc sparc64 sparcv9 %{x8664}
+%ifarch %{ix86} ppc sparc sparc64 sparcv9
 %dir %{_prefix}/*-linux-uclibc/lib
 %attr(755,root,root) %{_prefix}/*-linux-uclibc/lib/*.so*
 %endif
 
 %files devel
 %defattr(644,root,root,755)
-%doc README TODO docs/threads.txt docs/uclibc.org/*.html
+%doc docs/uclibc.org/*
 %attr(755,root,root) %{_bindir}/*
 %{_prefix}/*-linux-uclibc/usr/lib/*.o
 %dir %{_prefix}/*-linux-uclibc/usr
 %dir %{_prefix}/*-linux-uclibc/usr/bin
 %attr(755,root,root) %{_prefix}/*-linux-uclibc/usr/bin/*
 %dir %{_prefix}/*-linux-uclibc/usr/lib
-%ifarch %{ix86} ppc sparc sparc64 sparcv9 %{x8664}
+%ifarch %{ix86} ppc sparc sparc64 sparcv9
 %attr(755,root,root) %{_prefix}/*-linux-uclibc/usr/lib/*.so
 %endif
 %{_prefix}/*-linux-uclibc/usr/include
