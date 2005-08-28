@@ -1,0 +1,21 @@
+--- uClibc-0.9.28/libpthread/Makefile.orig	2005-08-18 00:49:49.000000000 +0200
++++ uClibc-0.9.28/libpthread/Makefile	2005-08-28 00:04:19.595072696 +0200
+@@ -21,7 +21,8 @@
+ 
+ #Adjust the soname version to avoid namespace collisions with glibc's libpthread
+ LIBPTHREAD=libpthread.a
+-LIBPTHREAD_SHARED=libpthread.so
++LIBPTHREAD_SHARED=libpthread-uclibc.so
++LIBPTHREAD_SHARED_ORG=libpthread.so
+ LIBPTHREAD_SHARED_FULLNAME=libpthread-$(MAJOR_VERSION).$(MINOR_VERSION).$(SUBLEVEL).so
+ 
+ LIBTHREAD_DB=libthread_db.a
+@@ -84,6 +85,8 @@
+ 		$(TOPDIR)lib/$(LIBPTHREAD_SHARED)
+ 	$(LN) -sf $(LIBPTHREAD_SHARED_FULLNAME) \
+ 		$(TOPDIR)lib/$(LIBPTHREAD_SHARED).$(MAJOR_VERSION)
++	$(LN) -sf $(LIBPTHREAD_SHARED_FULLNAME) \
++		$(TOPDIR)lib/$(LIBPTHREAD_SHARED_ORG).$(MAJOR_VERSION)
+ endif
+ ifeq ($(strip $(PTHREADS_DEBUG_SUPPORT)),y)
+ 	$(LD) $(LIBTHREAD_DB_LDFLAGS) --warn-unresolved-symbols -soname=$(LIBTHREAD_DB_SHARED).1 \
