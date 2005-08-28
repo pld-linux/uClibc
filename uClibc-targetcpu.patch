@@ -5,7 +5,7 @@
  config RUNTIME_PREFIX
  	string "uClibc runtime library directory"
 -	default "/usr/$(TARGET_ARCH)-linux-uclibc/"
-+	default "/usr/$(TARGET_CPU)-linux-uclibc/"
++	default "/usr/$(TARGET_CPU)-linux-uclibc"
  	help
  	  RUNTIME_PREFIX is the directory into which the uClibc runtime
  	  libraries will be installed.   The result will look something
@@ -14,7 +14,7 @@
  config DEVEL_PREFIX
  	string "uClibc development environment directory"
 -	default "/usr/$(TARGET_ARCH)-linux-uclibc/usr/"
-+	default "/usr/$(TARGET_CPU)-linux-uclibc/usr/"
++	default "/usr/$(TARGET_CPU)-linux-uclibc/usr"
  	help
  	  DEVEL_PREFIX is the directory into which the uClibc development
  	  environment will be installed.   The result will look something
