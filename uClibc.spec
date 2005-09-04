@@ -2,7 +2,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.28
-Release:	0.1
+Release:	0.2
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -153,6 +153,9 @@ done
 
 rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm*}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm
+if [ -d "/usr/include/asm-%{TARGET_ARCH}" ]; then
+	ln -sf /usr/include/asm-%{TARGET_ARCH} $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-%{TARGET_ARCH}
+fi
 %ifarch sparc sparc64 sparcv9
 ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc
 ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc64
