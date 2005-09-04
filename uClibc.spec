@@ -153,9 +153,9 @@ done
 
 rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm*}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm
-if [ -d "/usr/include/asm-%{TARGET_ARCH}" ]; then
+%ifarch %{x8664}
 	ln -sf /usr/include/asm-%{TARGET_ARCH} $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-%{TARGET_ARCH}
-fi
+%endif
 %ifarch sparc sparc64 sparcv9
 ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc
 ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc64
