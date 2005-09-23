@@ -1,0 +1,63 @@
+--- uClibc-0.9.28/ldso/ldso/sparc/elfinterp.c.orig	2005-08-18 00:49:41.000000000 +0200
++++ uClibc-0.9.28/ldso/ldso/sparc/elfinterp.c	2005-08-28 00:19:02.940783736 +0200
+@@ -81,7 +81,7 @@
+ 
+ 
+   if (unlikely(reloc_type != R_SPARC_JMP_SLOT)) {
+-    _dl_dprintf(2, "%s: incorrect relocation type in jump relocations (%d)\n",
++    _dl_dprintf(2, "%s: incorrect relocation type in jump relocations (%x)\n",
+ 		  _dl_progname, reloc_type);
+     _dl_exit(30);
+   };
+@@ -128,8 +128,10 @@
+ 	got_addr[2] = (char *) (0x81c06000 | ((unsigned int) new_addr & 0x3ff));
+ #endif
+ 
++#if defined (__SUPPORT_LD_DEBUG__)
++  if (_dl_debug_bindings)
+ 	_dl_dprintf(2, "Address = %x\n",new_addr);
+-	_dl_exit(32);
++#endif
+ 
+   return (unsigned int) new_addr;
+ }
+--- uClibc-0.9.28/ldso/ldso/ldso.c.orig	2005-08-18 00:49:41.000000000 +0200
++++ uClibc-0.9.28/ldso/ldso/ldso.c	2005-08-28 00:19:31.295473168 +0200
+@@ -597,7 +597,7 @@
+ 			for (; runp; runp = runp->next) {
+ 				if (runp->tpnt == tcurr) {
+ 					struct elf_resolve *here = init_fini_list[k];
+-					_dl_if_debug_dprint("Move %s from pos %d to %d in INIT/FINI list\n", here->libname, k, j);
++					_dl_if_debug_dprint("Move %s from pos %x to %x in INIT/FINI list\n", here->libname, k, j);
+ 					for (i = (k - j); i; --i)
+ 						init_fini_list[i+j] = init_fini_list[i+j-1];
+ 					init_fini_list[j] = here;
+@@ -837,7 +837,7 @@
+ 	void *retval;
+ 
+ #if 0
+-	_dl_debug_early("request for %d bytes\n", size);
++	_dl_debug_early("request for %x bytes\n", size);
+ #endif
+ 
+ 	if (_dl_malloc_function)
+--- uClibc-0.9.28/ldso/ldso/dl-elf.c.orig	2005-08-18 00:49:41.000000000 +0200
++++ uClibc-0.9.28/ldso/ldso/dl-elf.c	2005-08-28 00:20:16.525597144 +0200
+@@ -813,7 +813,8 @@
+ 					else
+ 						_dl_write(fd, string, _dl_strlen(string));
+ 					break;
+-
++#ifndef __sparc__
++				/* _dl_simple_ltoa() uses undefined .udiv */
+ 				case 'i':
+ 				case 'd':
+ 					{
+@@ -824,6 +825,7 @@
+ 						_dl_write(fd, string, _dl_strlen(string));
+ 						break;
+ 					}
++#endif
+ 				case 'x':
+ 				case 'X':
+ 					{
