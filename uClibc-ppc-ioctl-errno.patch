@@ -1,0 +1,14 @@
+This patch solves easily an error in the ioctl code for the PPC
+because it uses the "errno" variable without including "errno.h".
+
+diff -urP uClibc-0.9.28/libc/sysdeps/linux/powerpc/ioctl.c uClibc-0.9.28-ioctl-errno/libc/sysdeps/linux/powerpc/ioctl.c
+--- uClibc-0.9.28/libc/sysdeps/linux/powerpc/ioctl.c	2005-08-18 00:49:42.000000000 +0200
++++ uClibc-0.9.28-ioctl-errno/libc/sysdeps/linux/powerpc/ioctl.c	2005-08-23 10:46:34.000000000 +0200
+@@ -21,6 +21,7 @@
+ #include <unistd.h>
+ #include <sys/ioctl.h>
+ #include <sys/syscall.h>
++#include <errno.h>
+ 
+ /* The user-visible size of struct termios has changed.  Catch ioctl calls
+    using the new-style struct termios, and translate them to old-style.  */

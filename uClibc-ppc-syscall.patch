@@ -1,0 +1,125 @@
+This patch modifies the syscall code for the powerpc, and leaves it like it was previosly
+(older version of the uclibc repository). It uses the syscall code from the kernel.
+
+This way it compiles properly with gcc-4. The problem was that the previous code defined the
+functions in assembly code, so that the compiler didn't think the functions had a definition
+so that the next weak aliases to those functions didn't work because they were not defined.
+(Previous version of gcc compilers work when definin weak aliases to undefined functions).
+
+Maybe the syscall code could be reworked again, but meanwhile I left with the kernel
+default syscall code, that was the original aproach of uclibc.
+
+
+diff -urP uClibc-0.9.28/libc/sysdeps/linux/powerpc/bits/syscalls.h uClibc-0.9.28-syscall/libc/sysdeps/linux/powerpc/bits/syscalls.h
+--- uClibc-0.9.28/libc/sysdeps/linux/powerpc/bits/syscalls.h	2005-08-18 00:49:41.000000000 +0200
++++ uClibc-0.9.28-syscall/libc/sysdeps/linux/powerpc/bits/syscalls.h	2005-08-23 10:14:53.000000000 +0200
+@@ -5,67 +5,55 @@
+ # error "Never use <bits/syscalls.h> directly; include <sys/syscall.h> instead."
+ #endif
+ 
++#include <features.h>
++
++/* Do something very evil for now.  Until we create our own syscall
++ * macros, short circuit bits/sysnum.h  and use asm/unistd.h instead */
++#include <asm/unistd.h>
++
+ /* This includes the `__NR_<name>' syscall numbers taken from the Linux kernel
+  * header files.  It also defines the traditional `SYS_<name>' macros for older
+  * programs.  */
+ #include <bits/sysnum.h>
+ 
+-
+-#define __STRINGIFY(s) __STRINGIFY2 (s)
+-#define __STRINGIFY2(s) #s
+-
+-#undef JUMPTARGET
+-#ifdef __PIC__
+-#define __MAKE_SYSCALL	__STRINGIFY(__uClibc_syscall@plt)
+-#else
+-#define __MAKE_SYSCALL	__STRINGIFY(__uClibc_syscall)
+-#endif
+-
+-#define unified_syscall_body(name)			\
+-	__asm__ (					\
+-	".section \".text\"\n\t"			\
+-	".align 2\n\t"					\
+-	".globl " __STRINGIFY(name) "\n\t"		\
+-	".type " __STRINGIFY(name) ",@function\n\t"	\
+-	#name":\tli 0," __STRINGIFY(__NR_##name) "\n\t"	\
+-	"b " __MAKE_SYSCALL "\n\t"		\
+-	".size\t" __STRINGIFY(name) ",.""-" __STRINGIFY(name) "\n"	\
+-	)
+-
+-#undef _syscall0
+-#define _syscall0(type,name)				\
+-type name(void);					\
+-unified_syscall_body(name)
+-
+-#undef _syscall1
+-#define _syscall1(type,name,type1,arg1) \
+-type name(type1 arg1);  \
+-unified_syscall_body(name)
+-
+-#undef _syscall2
+-#define _syscall2(type,name,type1,arg1,type2,arg2) \
+-type name(type1 arg1, type2 arg2);      \
+-unified_syscall_body(name)
+-
+-#undef _syscall3
+-#define _syscall3(type,name,type1,arg1,type2,arg2,type3,arg3) \
+-type name(type1 arg1, type2 arg2, type3 arg3);  \
+-unified_syscall_body(name)
+-
+-#undef _syscall4
+-#define _syscall4(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
+-type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4);      \
+-unified_syscall_body(name)
+-
+-#undef _syscall5
+-#define _syscall5(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5) \
+-type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5);  \
+-unified_syscall_body(name)
+-
++/* The kernel includes don't provide _syscall6, so provide our own */
+ #undef _syscall6
+ #define _syscall6(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5,type6,arg6) \
+-type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6);      \
+-unified_syscall_body(name)
++type name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5, type6 arg6)	\
++{									\
++	unsigned long __sc_ret, __sc_err;				\
++	{								\
++		register unsigned long __sc_0 __asm__ ("r0");		\
++		register unsigned long __sc_3 __asm__ ("r3");		\
++		register unsigned long __sc_4 __asm__ ("r4");		\
++		register unsigned long __sc_5 __asm__ ("r5");		\
++		register unsigned long __sc_6 __asm__ ("r6");		\
++		register unsigned long __sc_7 __asm__ ("r7");		\
++		register unsigned long __sc_8 __asm__ ("r8");		\
++									\
++		__sc_3 = (unsigned long) (arg1);			\
++		__sc_4 = (unsigned long) (arg2);			\
++		__sc_5 = (unsigned long) (arg3);			\
++		__sc_6 = (unsigned long) (arg4);			\
++		__sc_7 = (unsigned long) (arg5);			\
++		__sc_8 = (unsigned long) (arg6);			\
++		__sc_0 = __NR_##name;					\
++		__asm__ __volatile__					\
++			("sc           \n\t"				\
++			 "mfcr %1      "				\
++			: "=&r" (__sc_3), "=&r" (__sc_0)		\
++			: "0"   (__sc_3), "1"   (__sc_0),		\
++			  "r"   (__sc_4),				\
++			  "r"   (__sc_5),				\
++			  "r"   (__sc_6),				\
++			  "r"   (__sc_7),				\
++			  "r"   (__sc_8)				\
++			: __syscall_clobbers);				\
++		__sc_ret = __sc_3;					\
++		__sc_err = __sc_0;					\
++	}								\
++	__syscall_return (type);					\
++}
+ 
+ #endif /* _BITS_SYSCALLS_H */
+ 
