@@ -114,11 +114,11 @@ diff -urP uClibc-0.9.28/libc/sysdeps/linux/powerpc/bits/syscalls.h uClibc-0.9.28
 +			  "r"   (__sc_6),				\
 +			  "r"   (__sc_7),				\
 +			  "r"   (__sc_8)				\
-+			: __syscall_clobbers);				\
++			: "r9", "r10", "r11", "r12");			\
 +		__sc_ret = __sc_3;					\
 +		__sc_err = __sc_0;					\
 +	}								\
-+	__syscall_return (type);					\
++	return (__sc_err & 0x10000000 ? __set_errno(__sc_ret), __sc_ret = -1 : 0), (type)__sc_ret;	\
 +}
  
  #endif /* _BITS_SYSCALLS_H */
