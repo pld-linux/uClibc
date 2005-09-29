@@ -51,14 +51,14 @@ Small libc for building embedded applications.
 Ma³a libc do budowania aplikacji wbudowanych.
 
 %package static
-Summary:	Static uClibc libratries
+Summary:	Static uClibc libraries
 Summary(pl):	Biblioteki statyczne uClibc
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
 Provides:	libc-static
 
 %description static
-Static uClibc libratries.
+Static uClibc libraries.
 
 %description static -l pl
 Biblioteki statyczne uClibc.
