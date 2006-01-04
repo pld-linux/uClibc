@@ -671,7 +671,7 @@ diff -urN uClibc-0.9.26.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.26/extra/gc
 diff -urN uClibc-0.9.26.org/extra/gcc-uClibc/Makefile uClibc-0.9.26/extra/gcc-uClibc/Makefile
 --- uClibc-0.9.26.org/extra/gcc-uClibc/Makefile	1970-01-01 01:00:00.000000000 +0100
 +++ uClibc-0.9.26/extra/gcc-uClibc/Makefile	2004-01-25 16:06:22.372828491 +0100
-@@ -0,0 +1,93 @@
+@@ -0,0 +1,94 @@
 +# Makefile for building a fake gcc/binutils toolchain
 +# that simply spoofs the location of the C library
 +#
@@ -680,6 +680,7 @@ diff -urN uClibc-0.9.26.org/extra/gcc-uClibc/Makefile uClibc-0.9.26/extra/gcc-uC
 +
 +TOPDIR = ../../
 +include $(TOPDIR)Rules.mak
++include $(TOPDIR)/.config
 +
 +UCLIBC_DIR = $(shell (cd ../.. ; /bin/pwd))
 +GCC_BIN = $(shell which $(CC))
