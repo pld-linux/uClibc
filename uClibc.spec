@@ -204,3 +204,4 @@ rm -rf $RPM_BUILD_ROOT
 %files static
 %defattr(644,root,root,755)
 %{_prefix}/*-linux-uclibc/usr/lib/lib*.a
+%{_prefix}/*-linux-uclibc/usr/lib/uclibc_nonshared.a
