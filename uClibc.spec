@@ -4,7 +4,7 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.28
-Release:	1.%{_snap}.0.1
+Release:	1.%{_snap}.0.2
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -14,13 +14,9 @@ Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-alpha.patch
 Patch2:		%{name}-toolchain-wrapper.patch
 Patch3:		%{name}-targetcpu.patch
-#Patch4:		%{name}-O_DIRECT.patch
-Patch5:		%{name}-sparc.patch
-#Patch6:		%{name}-x86_64.patch
-Patch7:		%{name}-ppc-ioctl-errno.patch
-#Patch8:		%{name}-ppc-syscall.patch
-#Patch9:		%{name}-ppc-uint128.patch
-Patch10:	%{name}-syscallerror.patch
+Patch4:		%{name}-sparc.patch
+Patch5:		%{name}-ppc-ioctl-errno.patch
+Patch6:		%{name}-syscallerror.patch
 URL:		http://uclibc.org/
 BuildRequires:	gcc >= 3.0
 BuildRequires:	sed >= 4.0
@@ -71,13 +67,9 @@ Biblioteki statyczne uClibc.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-#%%patch4 -p1	APPLIED
+%patch4 -p1
 %patch5 -p1
-#%%patch6 -p1	UNNEEDED
-%patch7 -p1
-#%%patch8 -p1	NOT NEEDED (I HOPE)
-#%%patch9 -p1	APPLIED
-%patch10 -p1
+%patch6 -p1
 
 find -name .svn | xargs rm -rf
 
