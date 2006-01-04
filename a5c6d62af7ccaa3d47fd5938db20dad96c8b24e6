@@ -1,0 +1,4 @@
+- people from uclibc said it should work on ppc with current kernel,
+  last versions makes statically linked application segfault at exit time
+- patches needs update: Makefile ideology has changed totally
+- everything i've done today, i'm so weak :(
