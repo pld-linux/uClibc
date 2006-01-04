@@ -1,23 +1,25 @@
+%define	_snap	20060103
+
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.28
-Release:	1.2
+Release:	1.%{_snap}.0.1
 Epoch:		2
 License:	LGPL
 Group:		Libraries
-Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	1ada58d919a82561061e4741fb6abd29
+Source0:	http://www.uclibc.org/downloads/snapshots/%{name}-%{_snap}.tar.bz2
+# Source0-md5:	5d6167a44737a509672914e80c6fd4fd
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-alpha.patch
 Patch2:		%{name}-toolchain-wrapper.patch
 Patch3:		%{name}-targetcpu.patch
-Patch4:		%{name}-O_DIRECT.patch
+#Patch4:		%{name}-O_DIRECT.patch
 Patch5:		%{name}-sparc.patch
-Patch6:		%{name}-x86_64.patch
+#Patch6:		%{name}-x86_64.patch
 Patch7:		%{name}-ppc-ioctl-errno.patch
-Patch8:		%{name}-ppc-syscall.patch
-Patch9:		%{name}-ppc-uint128.patch
+#Patch8:		%{name}-ppc-syscall.patch
+#Patch9:		%{name}-ppc-uint128.patch
 Patch10:	%{name}-syscallerror.patch
 URL:		http://uclibc.org/
 BuildRequires:	gcc >= 3.0
@@ -64,17 +66,17 @@ Static uClibc libraries.
 Biblioteki statyczne uClibc.
 
 %prep
-%setup -q
-%patch0 -p1
+%setup -q -n %{name}
+#%%patch0 -p1	NEADS UPDATE
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
+#%%patch2 -p1	NEADS UPDATE
+#%%patch3 -p1	NEADS UPDATE
+#%%patch4 -p1	APPLIED
 %patch5 -p1
-%patch6 -p1
+#%%patch6 -p1	UNNEADED
 %patch7 -p1
-%patch8 -p1
-%patch9 -p1
+#%%patch8 -p1	NOT NEADED (I HOPE)
+#%%patch9 -p1	APPLIED
 %patch10 -p1
 
 sed -i -e '
@@ -116,7 +118,7 @@ ln -sf /usr/include/asm-sparc64 include/asm-sparc64
 mv -f .config .config.tmp
 sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
 	s/^.*DO_C99_MATH.*$/DO_C99_MATH=y/;
-	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set/;
+	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set\n# UCLIBC_HAS_REENTRANT_RPC is not set/;
 	s/^.*UCLIBC_HAS_SYS_SIGLIST.*$/UCLIBC_HAS_SYS_SIGLIST=y/;
 	s,^SHARED_LIB_LOADER_PREFIX=.*,SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib",
 	s/^.*UCLIBC_HAS_PRINTF_M_SPEC.*$/UCLIBC_HAS_PRINTF_M_SPEC=y/;
