@@ -67,10 +67,10 @@ Biblioteki statyczne uClibc.
 
 %prep
 %setup -q -n %{name}
-#%%patch0 -p1	NEEDS UPDATE
+%patch0 -p1
 %patch1 -p1
-#%%patch2 -p1	NEEDS UPDATE
-#%%patch3 -p1	NEEDS UPDATE
+%patch2 -p1
+%patch3 -p1
 #%%patch4 -p1	APPLIED
 %patch5 -p1
 #%%patch6 -p1	UNNEEDED
@@ -78,6 +78,8 @@ Biblioteki statyczne uClibc.
 #%%patch8 -p1	NOT NEEDED (I HOPE)
 #%%patch9 -p1	APPLIED
 %patch10 -p1
+
+find -name .svn | xargs rm -rf
 
 sed -i -e '
 %ifarch sparc sparc64 sparcv9
