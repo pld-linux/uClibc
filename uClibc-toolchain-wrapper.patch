@@ -765,45 +765,37 @@ diff -urN uClibc-0.9.26.org/extra/gcc-uClibc/Makefile uClibc-0.9.26/extra/gcc-uC
 +	rm -f gcc-uClibc.h *-uclibc-gcc *-uclibc-ld core
 +
 +
-diff -urN uClibc-0.9.26.org/extra/Makefile uClibc-0.9.26/extra/Makefile
---- uClibc-0.9.26.org/extra/Makefile	2004-01-25 15:20:33.050030242 +0100
-+++ uClibc-0.9.26/extra/Makefile	2004-01-25 16:02:02.133944484 +0100
-@@ -26,7 +26,7 @@
- LIBC=$(TOPDIR)libc.a
+diff -ur uClibc/Makefile.in uClibc.toolchain/Makefile.in
+--- uClibc/Makefile.in	2006-01-03 09:12:11.000000000 +0100
++++ uClibc.toolchain/Makefile.in	2006-01-04 18:44:00.000000000 +0100
+@@ -16,7 +16,7 @@
+ 
+ ifeq ($(HAVE_DOT_CONFIG),y)
+ 
+-all: pregen libs
++all: pregen libs toolchain
+ 
+ # In this section, we need .config
+ -include .config.cmd
+@@ -99,7 +99,7 @@
+ 
+ pregen: headers
+ 
+-install: install_runtime install_dev
++install: install_runtime install_dev install_toolchain
  
  
--DIRS = 
-+DIRS = gcc-uClibc
- EXTRA_DIRS_TO_CLEAN = config
- 
- all: subdirs
---- uClibc-0.9.27/Makefile.orig	2005-01-12 08:59:21.000000000 +0100
-+++ uClibc-0.9.27/Makefile	2005-01-15 20:49:24.817701160 +0100
-@@ -28,7 +28,7 @@
- TOPDIR=./
- include Rules.mak
- 
--DIRS = ldso libc libcrypt libresolv libnsl libutil libm libpthread librt
-+DIRS = extra ldso libc libcrypt libresolv libnsl libutil libm libpthread librt
- ifeq ($(strip $(UCLIBC_HAS_GETTEXT_AWARENESS)),y)
- 	DIRS += libintl
+ RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB=$(shell $(top_srcdir)extra/scripts/relative_path.sh $(DEVEL_PREFIX)lib $(RUNTIME_PREFIX)lib)
+@@ -236,6 +236,12 @@
+ 	fi
  endif
-@@ -137,7 +137,7 @@
- tags:
- 	ctags -R
  
--install: install_runtime install_dev finished2
-+install: install_runtime install_dev install_toolchain finished2
- 
- 
- RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB=$(shell extra/scripts/relative_path.sh $(DEVEL_PREFIX)lib $(RUNTIME_PREFIX)lib)
-@@ -257,6 +257,9 @@
- #	$(INSTALL) -m 755 libc/misc/wchar/iconv.target $(PREFIX)$(RUNTIME_PREFIX)/usr/bin/iconv
- #endif
- 
-+install_toolchain:
-+	$(MAKE) -C extra/gcc-uClibc install
++toolchain:
++	$(MAKE) CROSS="$(CROSS)" CC="$(CC)" -C extra/gcc-uClibc
 +
- finished2:
- 	@echo
- 	@echo Finished installing...
++install_toolchain: toolchain
++	$(MAKE) CROSS="$(CROSS)" CC="$(CC)" -C extra/gcc-uClibc install
++
+ utils:
+ 	$(MAKE) CROSS="$(CROSS)" CC="$(CC)" -C utils
+ 
