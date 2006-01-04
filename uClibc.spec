@@ -67,15 +67,15 @@ Biblioteki statyczne uClibc.
 
 %prep
 %setup -q -n %{name}
-#%%patch0 -p1	NEADS UPDATE
+#%%patch0 -p1	NEEDS UPDATE
 %patch1 -p1
-#%%patch2 -p1	NEADS UPDATE
-#%%patch3 -p1	NEADS UPDATE
+#%%patch2 -p1	NEEDS UPDATE
+#%%patch3 -p1	NEEDS UPDATE
 #%%patch4 -p1	APPLIED
 %patch5 -p1
-#%%patch6 -p1	UNNEADED
+#%%patch6 -p1	UNNEEDED
 %patch7 -p1
-#%%patch8 -p1	NOT NEADED (I HOPE)
+#%%patch8 -p1	NOT NEEDED (I HOPE)
 #%%patch9 -p1	APPLIED
 %patch10 -p1
 
