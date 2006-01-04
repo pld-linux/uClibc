@@ -1,0 +1,2 @@
+- package uclibc_nonshared.a
+- builds on ppc, but toolchain needs to be fixed - tries to link crt0.o
