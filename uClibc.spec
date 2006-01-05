@@ -21,7 +21,7 @@ URL:		http://uclibc.org/
 BuildRequires:	gcc >= 3.0
 BuildRequires:	sed >= 4.0
 BuildRequires:	which
-ExclusiveArch:	alpha %{ix86} ppc sparc sparc64 sparcv9 %{x8664}
+ExclusiveArch:	alpha %{ix86} ppc sparc sparc64 sparcv9
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # note: the 2nd '\' is needed (some shell expansions?)
