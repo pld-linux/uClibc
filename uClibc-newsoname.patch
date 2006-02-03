@@ -1,28 +1,31 @@
-diff -ru uClibc/libpthread/linuxthreads.old/Makefile.in uClibc.newsoname/libpthread/linuxthreads.old/Makefile.in
---- uClibc/libpthread/linuxthreads.old/Makefile.in	2006-01-03 09:12:10.000000000 +0100
-+++ uClibc.newsoname/libpthread/linuxthreads.old/Makefile.in	2006-01-04 17:36:29.000000000 +0100
+--- uClibc/libpthread/linuxthreads.old/Makefile.in.orig	2006-02-03 09:11:29.000000000 +0100
++++ uClibc/libpthread/linuxthreads.old/Makefile.in	2006-02-03 23:42:12.000000000 +0100
 @@ -21,7 +21,7 @@
  LDFLAGS-libpthread.so := $(LDFLAGS)
  endif
  
--LIBS-libpthread.so := $(LIBS)
-+LIBS-libpthread-uclibc.so := $(LIBS)
+-LIBS-libpthread.so := $(LIBS) $(ldso)
++LIBS-libpthread-uclibc.so := $(LIBS) $(ldso)
  
  START_FILE-libpthread.so := $(SHARED_START_FILES)
  END_FILE-libpthread.so := $(SHARED_END_FILES)
-@@ -71,9 +71,14 @@
- headers-$(UCLIBC_HAS_THREADS) += linuxthreads_headers
+@@ -80,13 +80,17 @@
  headers_clean-y += linuxthreads_headers_clean
  
+ ifeq ($(DOMULTI),n)
 -$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc)
 +$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread_so.a $(libc)
-+	@# link.so takes info about soname from $@
  	$(call link.so,$(libpthread_FULL_NAME),$(MAJOR_VERSION))
+ else
+-$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread.oS $(libc)
++$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread.oS $(libc)
+ 	$(call linkm.so,$(libpthread_FULL_NAME),$(MAJOR_VERSION))
+ endif
  
 +$(top_builddir)lib/libpthread.so: $(top_builddir)lib/libpthread-uclibc.so
 +	$(LN) -sf $(firstword $^) $@.$(MAJOR_VERSION)
 +	$(LN) -sf $(firstword $^) $@
-+	
++
  $(libpthread_OUT)/libpthread_so.a: $(libpthread-so-y)
  	$(Q)$(RM) $@
  ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
