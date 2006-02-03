@@ -1,15 +1,15 @@
-%define	_snap	20060103
+%define	_snap	20060203
 
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.28
-Release:	1.%{_snap}.0.2
+Release:	1.%{_snap}.0.1
 Epoch:		2
 License:	LGPL
 Group:		Libraries
 Source0:	http://www.uclibc.org/downloads/snapshots/%{name}-%{_snap}.tar.bz2
-# Source0-md5:	5d6167a44737a509672914e80c6fd4fd
+# Source0-md5:	60b7c8cd8cfe9d9ab512fe3472d4be38
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-alpha.patch
 Patch2:		%{name}-toolchain-wrapper.patch
@@ -69,7 +69,7 @@ Biblioteki statyczne uClibc.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
+#%%patch6 -p1 # what should be done ?
 
 find -name .svn | xargs rm -rf
 
