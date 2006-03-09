@@ -108,7 +108,7 @@ ln -sf /usr/include/asm-sparc64 include/asm-sparc64
 	TARGET_ARCH="%{TARGET_ARCH}" \
 	TARGET_CPU="%{_target_cpu}" \
 	KERNEL_SOURCE=%{_prefix} \
-	HOSTCC=%{__cc} \
+	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os" \
 	CC="%{__cc}"
