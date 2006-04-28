@@ -1,4 +1,4 @@
-%define	_snap	20060310
+%define	_snap	20060428
 
 Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
@@ -9,7 +9,7 @@ Epoch:		2
 License:	LGPL
 Group:		Libraries
 Source0:	http://www.uclibc.org/downloads/snapshots/%{name}-%{_snap}.tar.bz2
-# Source0-md5:	10baf50a98d7c913e63c9a6b06b2348d
+# Source0-md5:	b2f0142a866cddea641bfd61cd5f84a0
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-alpha.patch
 Patch2:		%{name}-toolchain-wrapper.patch
