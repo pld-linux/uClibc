@@ -20,7 +20,8 @@ Patch8:		%{name}-ppc-syscall.patch
 Patch9:		%{name}-ppc-uint128.patch
 Patch10:	%{name}-syscallerror.patch
 URL:		http://uclibc.org/
-BuildRequires:	gcc >= 3.0
+BuildRequires:	binutils-gasp
+BuildRequires:	gcc >= 5:3.0
 BuildRequires:	sed >= 4.0
 BuildRequires:	which
 ExclusiveArch:	alpha %{ix86} ppc sparc sparc64 sparcv9 %{x8664}
@@ -132,7 +133,7 @@ rm -f include/bits/uClibc_config.h
 	TARGET_ARCH="%{TARGET_ARCH}" \
 	TARGET_CPU="%{_target_cpu}" \
 	KERNEL_SOURCE=%{_prefix} \
-	HOSTCC=%{__cc} \
+	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os" \
 	CC="%{__cc}"
@@ -142,7 +143,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 
 %{__make} install \
-	NATIVE_CC=%{__cc} \
+	NATIVE_CC="%{__cc}" \
 	NATIVE_CFLAGS="%{rpmcflags} %{rpmldflags}" \
 	TARGET_ARCH="%{TARGET_ARCH}" \
 	TARGET_CPU="%{_target_cpu}" \
