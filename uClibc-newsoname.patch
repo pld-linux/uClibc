@@ -22,8 +22,8 @@
  #endif
  
 +$(top_builddir)lib/libpthread.so: $(top_builddir)lib/libpthread-uclibc.so
-+	$(LN) -sf $(firstword $^) $@.$(MAJOR_VERSION)
-+	$(LN) -sf $(firstword $^) $@
++	$(LN) -sf $(notdir $(firstword $^)).$(MAJOR_VERSION) $@.$(MAJOR_VERSION)
++	$(LN) -sf $(notdir $(firstword $^)) $@
 +
  $(libpthread_OUT)/libpthread_so.a: $(libpthread-so-y)
  	$(Q)$(RM) $@
