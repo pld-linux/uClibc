@@ -26,6 +26,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # note: the 2nd '\' is needed (some shell expansions?)
 %define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium./i386/;s/ppc/powerpc/;s/amd64\\|ia32e/x86_64/')
 
+# FIXME: build fails if CC contains spaces
+%undefine	with_ccache
+
 %description
 Small libc for building embedded applications.
 
