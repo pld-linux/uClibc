@@ -2,13 +2,13 @@ Summary:	C library optimized for size
 Summary(pl):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.29
-%define		_snap	20060717
+%define		_snap	20061105
 Release:	0.%{_snap}.0.1
 Epoch:		2
 License:	LGPL
 Group:		Libraries
 Source0:	http://www.uclibc.org/downloads/snapshots/%{name}-%{_snap}.tar.bz2
-# Source0-md5:	68d6c7dba93714bc81e56ce0be8173f6
+# Source0-md5:	1e8a84ae049378224446f5ad476cc2d2
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-alpha.patch
 Patch2:		%{name}-toolchain-wrapper.patch
@@ -24,10 +24,16 @@ ExclusiveArch:	alpha %{ix86} %{x8664} ppc sparc sparc64 sparcv9
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 # note: the 2nd '\' is needed (some shell expansions?)
-%define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium./i386/;s/ppc/powerpc/;s/amd64\\|ia32e/x86_64/')
+%define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium./i386/;s/ppc/powerpc/;s/amd64\\|ia32e/x86_64/;s/sparc64/sparc/')
 
-# FIXME: build fails if CC contains spaces
-%undefine	with_ccache
+%define		MakeOpts	\\\
+	TARGET_ARCH="%{TARGET_ARCH}" \\\
+	TARGET_CPU="%{_target_cpu}" \\\
+	KERNEL_SOURCE="%{_prefix}" \\\
+	HOSTCC="%{__cc}" \\\
+	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \\\
+	OPTIMIZATION="%{rpmcflags} -Os" \\\
+	CC="%{__cc}"
 
 %description
 Small libc for building embedded applications.
@@ -89,6 +95,10 @@ sed -i -e '
 	s/default TARGET_i386/default TARGET_x86_64/
 %endif
 	' extra/Configs/Config.in
+%ifarch sparc64
+sed -i -e 's/default CONFIG_SPARC_V8/default CONFIG_SPARC_V9B/' \
+	extra/Configs/Config.sparc
+%endif
 
 sed -i -e '/HAS_NO_THREADS/d' extra/Configs/Config.alpha
 
@@ -100,13 +110,7 @@ ln -sf /usr/include/asm-sparc64 include/asm-sparc64
 
 %build
 %{__make} defconfig \
-	TARGET_ARCH="%{TARGET_ARCH}" \
-	TARGET_CPU="%{_target_cpu}" \
-	KERNEL_SOURCE=%{_prefix} \
-	HOSTCC=%{__cc} \
-	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
-	OPTIMIZATION="%{rpmcflags} -Os" \
-	CC="%{__cc}"
+	%{MakeOpts}
 
 mv -f .config .config.tmp
 sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
@@ -124,24 +128,14 @@ rm -f include/bits/uClibc_config.h
 
 # note: defconfig and all must be run in separate make process because of macros
 %{__make} \
-	TARGET_ARCH="%{TARGET_ARCH}" \
-	TARGET_CPU="%{_target_cpu}" \
-	KERNEL_SOURCE=%{_prefix} \
-	HOSTCC=%{__cc} \
-	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
-	OPTIMIZATION="%{rpmcflags} -Os" \
-	CC="%{__cc}"
+	%{MakeOpts}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 
 %{__make} install \
-	NATIVE_CC=%{__cc} \
-	NATIVE_CFLAGS="%{rpmcflags} %{rpmldflags}" \
-	TARGET_ARCH="%{TARGET_ARCH}" \
-	TARGET_CPU="%{_target_cpu}" \
-	CC="%{__cc}" \
+	%{MakeOpts} \
 	PREFIX=$RPM_BUILD_ROOT
 
 # these links are *needed* (by stuff in bin/)
