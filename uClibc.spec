@@ -129,7 +129,7 @@ rm -f include/bits/uClibc_config.h
 # note: defconfig and all must be run in separate make process because of macros
 %{__make} \
 	%{MakeOpts} \
-	GCC_BIN="%{_target_cpu}-pld-linux-gcc" \
+	GCC_BIN="%{_bindir}/%{_target_cpu}-pld-linux-gcc" \
 	LD_BIN="ld"
 
 %install
