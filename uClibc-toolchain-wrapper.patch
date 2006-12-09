@@ -1,7 +1,7 @@
 diff -urN uClibc-0.9.26.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.26/extra/gcc-uClibc/gcc-uClibc.c
 --- uClibc-0.9.26.org/extra/gcc-uClibc/gcc-uClibc.c	1970-01-01 01:00:00.000000000 +0100
 +++ uClibc-0.9.26/extra/gcc-uClibc/gcc-uClibc.c	2003-08-28 07:51:04.000000000 +0200
-@@ -0,0 +1,666 @@
+@@ -0,0 +1,667 @@
 +/* vi: set sw=4 ts=4: */
 +/*
 + * Copyright (C) 2000 Manuel Novoa III
@@ -502,6 +502,7 @@ diff -urN uClibc-0.9.26.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.26/extra/gc
 +				if (status < 0) {
 +					goto crash_n_burn;
 +				}
++				buf[(status == sizeof(buf)) ? status-1 : status] = 0;
 +				dir = dirname(buf);
 +				xstrcat(&(crtbegin_path[0]), dir, "/crtbegin.o", NULL);
 +				xstrcat(&(crtbegin_path[1]), dir, "/crtbeginS.o", NULL);
