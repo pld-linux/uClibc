@@ -1,0 +1,30 @@
+--- uClibc/libpthread/linuxthreads.old/Makefile.in.orig	2006-02-03 09:11:29.000000000 +0100
++++ uClibc/libpthread/linuxthreads.old/Makefile.in	2006-02-03 23:42:12.000000000 +0100
+@@ -22,7 +22,7 @@
+ LDFLAGS-libpthread.so := $(LDFLAGS)
+ endif
+ 
+-LIBS-libpthread.so := $(LIBS) $(ldso)
++LIBS-libpthread-uclibc.so := $(LIBS) $(ldso)
+ 
+ START_FILE-libpthread.so := $(SHARED_START_FILES)
+ END_FILE-libpthread.so := $(SHARED_END_FILES)
+@@ -81,13 +81,17 @@
+ headers_clean-y += linuxthreads_headers_clean
+ 
+ #ifeq ($(DOMULTI),n)
+-$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc)
++$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread_so.a $(libc)
+ 	$(call link.so,$(libpthread_FULL_NAME),$(MAJOR_VERSION))
+ #else
+ #$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread.oS | $(libc)
+ #	$(call linkm.so,$(libpthread_FULL_NAME),$(MAJOR_VERSION))
+ #endif
+ 
++$(top_builddir)lib/libpthread.so: $(top_builddir)lib/libpthread-uclibc.so
++	$(LN) -sf $(notdir $(firstword $^)).$(MAJOR_VERSION) $@.$(MAJOR_VERSION)
++	$(LN) -sf $(notdir $(firstword $^)) $@
++
+ $(libpthread_OUT)/libpthread_so.a: $(libpthread-so-y)
+ 	$(Q)$(RM) $@
+ ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
