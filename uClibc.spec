@@ -1,5 +1,5 @@
 Summary:	C library optimized for size
-Summary(pl.UTF-8):   Biblioteka C zoptymalizowana na rozmiar
+Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.28.1
 Release:	1
@@ -38,7 +38,7 @@ Mała libc do budowania aplikacji wbudowanych.
 
 %package devel
 Summary:	Development files for uClibc
-Summary(pl.UTF-8):   Pliki dla programistów uClibc
+Summary(pl.UTF-8):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	binutils
@@ -53,7 +53,7 @@ Mała libc do budowania aplikacji wbudowanych.
 
 %package static
 Summary:	Static uClibc libraries
-Summary(pl.UTF-8):   Biblioteki statyczne uClibc
+Summary(pl.UTF-8):	Biblioteki statyczne uClibc
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{epoch}:%{version}-%{release}
 Provides:	libc-static
