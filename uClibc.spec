@@ -16,9 +16,7 @@ Patch4:		%{name}-O_DIRECT.patch
 Patch5:		%{name}-sparc.patch
 Patch6:		%{name}-x86_64.patch
 Patch7:		%{name}-ppc-ioctl-errno.patch
-Patch8:		%{name}-ppc-syscall.patch
-Patch9:		%{name}-ppc-uint128.patch
-Patch10:	%{name}-syscallerror.patch
+Patch8:		%{name}-syscallerror.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	gcc >= 5:3.0
@@ -74,9 +72,7 @@ Biblioteki statyczne uClibc.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
-#%patch8 -p1
-#%patch9 -p1
-%patch10 -p1
+%patch8 -p1
 
 sed -i -e '
 %ifarch sparc sparc64 sparcv9
