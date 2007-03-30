@@ -3,7 +3,7 @@ Summary(pl.UTF-8):   Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.29
 %define		_snap	20061105
-Release:	0.%{_snap}.0.4
+Release:	0.%{_snap}.0.5
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -47,7 +47,7 @@ Summary(pl.UTF-8):   Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	binutils
-Requires:	linux-libc-headers
+Requires:	kernel-libc-headers
 %requires_eq	gcc
 
 %description devel
@@ -153,6 +153,7 @@ done
 
 rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm*}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm
+ln -sf /usr/include/asm-generic $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-generic
 %ifarch %{x8664}
 	ln -sf /usr/include/asm-%{TARGET_ARCH} $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-%{TARGET_ARCH}
 %endif
