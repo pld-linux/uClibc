@@ -3,7 +3,7 @@ Summary(pl.UTF-8):   Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.29
 %define		_snap	20061105
-Release:	0.%{_snap}.0.5
+Release:	0.%{_snap}.0.6
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -47,7 +47,7 @@ Summary(pl.UTF-8):   Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	binutils
-Requires:	kernel-libc-headers
+Requires:	linux-libc-headers
 %requires_eq	gcc
 
 %description devel
