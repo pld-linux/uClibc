@@ -1,13 +1,13 @@
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.28.1
+Version:	0.9.28.3
 Release:	1
 Epoch:		2
 License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	aa85e790c565ad3096d8c3782dfb0197
+# Source0-md5:	428405a36b4662980d9343b32089b5a6
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-alpha.patch
 Patch2:		%{name}-toolchain-wrapper.patch
@@ -20,6 +20,7 @@ Patch8:		%{name}-syscallerror.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	gcc >= 5:3.0
+BuildRequires:	linux-libc-headers >= 7:2.6.20
 BuildRequires:	sed >= 4.0
 BuildRequires:	which
 ExclusiveArch:	alpha %{ix86} ppc sparc sparc64 sparcv9 %{x8664}
@@ -40,7 +41,7 @@ Summary(pl.UTF-8):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	binutils
-Requires:	linux-libc-headers
+Requires:	linux-libc-headers >= 7:2.6.20
 %requires_eq	gcc
 
 %description devel
@@ -94,7 +95,7 @@ sed -i -e '/HAS_NO_THREADS/a\\n\tselect HAVE_NO_SHARED\n\tselect ARCH_HAS_NO_LDS
 	extra/Configs/Config.x86_64
 sed -i -e '/HAS_NO_THREADS/d' extra/Configs/Config.alpha
 
-%ifarch sparc sparc64 sparcv9
+%ifarch sparc64
 ln -sf /usr/include/asm-sparc include/asm-sparc
 ln -sf /usr/include/asm-sparc64 include/asm-sparc64
 %{__perl} -pi -e 's/^(rm.*asm)\*/$1/' extra/scripts/fix_includes.sh
@@ -159,10 +160,12 @@ done
 
 rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm*}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm
+ln -sf /usr/include/asm-generic $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-generic
 %ifarch %{x8664}
-	ln -sf /usr/include/asm-%{TARGET_ARCH} $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-%{TARGET_ARCH}
+	ln -sf /usr/include/asm-i386 $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-i386
+	ln -sf /usr/include/asm-x86_64 $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-x86_64
 %endif
-%ifarch sparc sparc64 sparcv9
+%ifarch sparc64
 ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc
 ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc64
 %endif
