@@ -11,9 +11,10 @@ Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-toolchain-wrapper.patch
 Patch2:		%{name}-targetcpu.patch
-Patch3:		%{name}-sparc.patch
-Patch4:		%{name}-ppc-ioctl-errno.patch
-Patch5:		%{name}-syscallerror.patch
+Patch3:		%{name}-debug.patch
+Patch4:		%{name}-sparc.patch
+Patch5:		%{name}-ppc-ioctl-errno.patch
+Patch6:		%{name}-syscallerror.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	gcc >= 5:3.0
@@ -66,11 +67,12 @@ Biblioteki statyczne uClibc.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 # this one obsolete, add do_div_10 from ldso/arm/dl-sysdep.h to ldso/sparc/dl-sysdep.h if needed
-#%patch3 -p1
-# shouldn't be needed now
 #%patch4 -p1
+# shouldn't be needed now
 #%patch5 -p1
+#%patch6 -p1
 
 sed -i -e '
 %ifarch sparc sparc64 sparcv9
@@ -110,9 +112,8 @@ sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
 	s/^.*UCLIBC_HAS_SYS_SIGLIST.*$/UCLIBC_HAS_SYS_SIGLIST=y/;
 	s,^SHARED_LIB_LOADER_PREFIX=.*,SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib",
 	s/^.*UCLIBC_HAS_PRINTF_M_SPEC.*$/UCLIBC_HAS_PRINTF_M_SPEC=y/;
+%{?debug:s/^.*\<DODEBUG\>.*$/DODEBUG=y/;s/^.*SUPPORT_LD_DEBUG\>.*$/SUPPORT_LD_DEBUG=y/;s/^.*SUPPORT_LD_DEBUG_EARLY.*$/SUPPORT_LD_DEBUG_EARLY=y/;s/^.*\<DOSTRIP\>.*$/# DOSTRIP is not set/;}
 	' .config.tmp > .config
-%{?debug:echo 'DODEBUG=y' >> .config}
-%{?debug:echo 'SUPPORT_LD_DEBUG=y' >> .config}
 
 # force regeneration after .config changes
 rm -f include/bits/uClibc_config.h
