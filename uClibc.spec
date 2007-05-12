@@ -68,7 +68,7 @@ Biblioteki statyczne uClibc.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-# this one obsolete, add do_div_10 from ldso/arm/dl-sysdep.h to ldso/sparc/dl-sysdep.h if needed
+# check if it's needed now... ldso is broken on sparc anyway
 #%patch4 -p1
 # shouldn't be needed now
 #%patch5 -p1
