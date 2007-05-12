@@ -87,11 +87,6 @@ sed -i -e '
 %endif
 	' extra/Configs/Config.in
 
-# ldso on x86_64 not ready yet (missing resolve.S)
-#sed -i -e '/HAS_NO_THREADS/a\\n\tselect HAVE_NO_SHARED\n\tselect ARCH_HAS_NO_LDSO' \
-#	extra/Configs/Config.x86_64
-#sed -i -e '/HAS_NO_THREADS/d' extra/Configs/Config.alpha
-
 %ifarch sparc64
 ln -sf /usr/include/asm-sparc include/asm-sparc
 ln -sf /usr/include/asm-sparc64 include/asm-sparc64
@@ -178,7 +173,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc Changelog* DEDICATION.mjn3 MAINTAINERS README TODO
 %dir %{uclibc_root}
-%ifarch %{ix86} ppc sparc sparc64 sparcv9
+%ifarch %{ix86} %{x8664} ppc sparc sparc64 sparcv9
 %dir %{uclibc_root}/lib
 %attr(755,root,root) %{uclibc_root}/lib/*.so*
 %endif
@@ -193,7 +188,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{uclibc_root}/usr/bin/*
 %dir %{uclibc_root}/usr/lib
 %{uclibc_root}/usr/lib/uclibc_nonshared.a
-%ifarch %{ix86} ppc sparc sparc64 sparcv9
+%ifarch %{ix86} %{x8664} ppc sparc sparc64 sparcv9
 %attr(755,root,root) %{uclibc_root}/usr/lib/*.so
 %endif
 %{uclibc_root}/usr/include
