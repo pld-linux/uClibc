@@ -21,7 +21,7 @@ BuildRequires:	gcc >= 5:3.0
 BuildRequires:	linux-libc-headers >= 7:2.6.20
 BuildRequires:	sed >= 4.0
 BuildRequires:	which
-ExclusiveArch:	alpha %{ix86} ppc sparc sparc64 sparcv9 %{x8664}
+ExclusiveArch:	alpha %{ix86} ppc sparc sparcv9 %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		uclibc_root	/usr/%{_target_cpu}-linux-uclibc
@@ -75,7 +75,7 @@ Biblioteki statyczne uClibc.
 #%patch6 -p1
 
 sed -i -e '
-%ifarch sparc sparc64 sparcv9
+%ifarch sparc sparcv9
 	s/default TARGET_i386/default TARGET_sparc/
 %endif
 %ifarch alpha
@@ -88,12 +88,6 @@ sed -i -e '
 	s/default TARGET_i386/default TARGET_x86_64/
 %endif
 	' extra/Configs/Config.in
-
-%ifarch sparc64
-ln -sf /usr/include/asm-sparc include/asm-sparc
-ln -sf /usr/include/asm-sparc64 include/asm-sparc64
-%{__perl} -pi -e 's/^(rm.*asm)\*/$1/' extra/scripts/fix_includes.sh
-%endif
 
 %build
 %{__make} defconfig \
@@ -158,9 +152,10 @@ rm -rf $RPM_BUILD_ROOT%{uclibc_root}/usr/include/{linux,asm*}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm
 ln -sf /usr/include/asm-generic $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-generic
 %ifarch %{x8664}
-	ln -sf /usr/include/asm-i386 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-i386
-	ln -sf /usr/include/asm-x86_64 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-x86_64
+ln -sf /usr/include/asm-i386 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-i386
+ln -sf /usr/include/asm-x86_64 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-x86_64
 %endif
+# for future use
 %ifarch sparc64
 ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc
 ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc64
@@ -174,7 +169,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc Changelog* DEDICATION.mjn3 MAINTAINERS README TODO
 %dir %{uclibc_root}
-%ifarch %{ix86} %{x8664} ppc sparc sparc64 sparcv9
+%ifarch %{ix86} %{x8664} ppc sparc sparcv9
 %dir %{uclibc_root}/lib
 %attr(755,root,root) %{uclibc_root}/lib/*.so*
 %endif
@@ -189,7 +184,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{uclibc_root}/usr/bin/*
 %dir %{uclibc_root}/usr/lib
 %{uclibc_root}/usr/lib/uclibc_nonshared.a
-%ifarch %{ix86} %{x8664} ppc sparc sparc64 sparcv9
+%ifarch %{ix86} %{x8664} ppc sparc sparcv9
 %attr(755,root,root) %{uclibc_root}/usr/lib/*.so
 %endif
 %{uclibc_root}/usr/include
