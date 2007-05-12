@@ -1,22 +1,19 @@
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.28.3
-Release:	1
+Version:	0.9.29
+Release:	0.1
 Epoch:		2
 License:	LGPL
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	428405a36b4662980d9343b32089b5a6
+# Source0-md5:	61dc55f43b17a38a074f347e74095b20
 Patch0:		%{name}-newsoname.patch
-Patch1:		%{name}-alpha.patch
-Patch2:		%{name}-toolchain-wrapper.patch
-Patch3:		%{name}-targetcpu.patch
-Patch4:		%{name}-O_DIRECT.patch
-Patch5:		%{name}-sparc.patch
-Patch6:		%{name}-x86_64.patch
-Patch7:		%{name}-ppc-ioctl-errno.patch
-Patch8:		%{name}-syscallerror.patch
+Patch1:		%{name}-toolchain-wrapper.patch
+Patch2:		%{name}-targetcpu.patch
+Patch3:		%{name}-sparc.patch
+Patch4:		%{name}-ppc-ioctl-errno.patch
+Patch5:		%{name}-syscallerror.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	gcc >= 5:3.0
@@ -26,6 +23,7 @@ BuildRequires:	which
 ExclusiveArch:	alpha %{ix86} ppc sparc sparc64 sparcv9 %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+%define		uclibc_root	/usr/%{_target_cpu}-linux-uclibc
 # note: the 2nd '\' is needed (some shell expansions?)
 %define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium./i386/;s/ppc/powerpc/;s/amd64\\|ia32e/x86_64/')
 
@@ -68,12 +66,11 @@ Biblioteki statyczne uClibc.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
+# this one obsolete, add do_div_10 from ldso/arm/dl-sysdep.h to ldso/sparc/dl-sysdep.h if needed
+#%patch3 -p1
+# shouldn't be needed now
+#%patch4 -p1
+#%patch5 -p1
 
 sed -i -e '
 %ifarch sparc sparc64 sparcv9
@@ -91,9 +88,9 @@ sed -i -e '
 	' extra/Configs/Config.in
 
 # ldso on x86_64 not ready yet (missing resolve.S)
-sed -i -e '/HAS_NO_THREADS/a\\n\tselect HAVE_NO_SHARED\n\tselect ARCH_HAS_NO_LDSO' \
-	extra/Configs/Config.x86_64
-sed -i -e '/HAS_NO_THREADS/d' extra/Configs/Config.alpha
+#sed -i -e '/HAS_NO_THREADS/a\\n\tselect HAVE_NO_SHARED\n\tselect ARCH_HAS_NO_LDSO' \
+#	extra/Configs/Config.x86_64
+#sed -i -e '/HAS_NO_THREADS/d' extra/Configs/Config.alpha
 
 %ifarch sparc64
 ln -sf /usr/include/asm-sparc include/asm-sparc
@@ -114,7 +111,7 @@ ln -sf /usr/include/asm-sparc64 include/asm-sparc64
 mv -f .config .config.tmp
 sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
 	s/^.*DO_C99_MATH.*$/DO_C99_MATH=y/;
-	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set/;
+	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set\n# UCLIBC_HAS_REENTRANT_RPC is not set/;
 	s/^.*UCLIBC_HAS_SYS_SIGLIST.*$/UCLIBC_HAS_SYS_SIGLIST=y/;
 	s,^SHARED_LIB_LOADER_PREFIX=.*,SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib",
 	s/^.*UCLIBC_HAS_PRINTF_M_SPEC.*$/UCLIBC_HAS_PRINTF_M_SPEC=y/;
@@ -147,56 +144,60 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 	CC="%{__cc}" \
 	PREFIX=$RPM_BUILD_ROOT
 
+mv -f $RPM_BUILD_ROOT%{uclibc_root}/usr/lib/{libpthread-uclibc,libpthread}.so
+ln -sf libpthread-0.9.29.so $RPM_BUILD_ROOT%{uclibc_root}/lib/libpthread.so.0
+
 # these links are *needed* (by stuff in bin/)
-for f in $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/bin/*; do
+for f in $RPM_BUILD_ROOT%{uclibc_root}/bin/*; do
 	mv -f $f $RPM_BUILD_ROOT%{_bindir}
 	ln -sf ../../bin/`basename $f` $f
 done
 
 for f in c++ cc g++ gcc ld; do
 	ln -sf /usr/bin/%{_target_cpu}-uclibc-$f \
-		$RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/bin/$f
+		$RPM_BUILD_ROOT%{uclibc_root}/usr/bin/$f
 done
 
-rm -rf $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/{linux,asm*}
-ln -sf /usr/include/asm $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm
-ln -sf /usr/include/asm-generic $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-generic
+rm -rf $RPM_BUILD_ROOT%{uclibc_root}/usr/include/{linux,asm*}
+ln -sf /usr/include/asm $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm
+ln -sf /usr/include/asm-generic $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-generic
 %ifarch %{x8664}
-	ln -sf /usr/include/asm-i386 $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-i386
-	ln -sf /usr/include/asm-x86_64 $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-x86_64
+	ln -sf /usr/include/asm-i386 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-i386
+	ln -sf /usr/include/asm-x86_64 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-x86_64
 %endif
 %ifarch sparc64
-ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc
-ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/asm-sparc64
+ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc
+ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc64
 %endif
-ln -sf /usr/include/linux $RPM_BUILD_ROOT/usr/%{_target_cpu}-linux-uclibc/usr/include/linux
+ln -sf /usr/include/linux $RPM_BUILD_ROOT%{uclibc_root}/usr/include/linux
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc Changelog* DEDICATION.mjn3 MAINTAINERS README TODO docs/threads.txt
-%dir %{_prefix}/*-linux-uclibc
+%doc Changelog* DEDICATION.mjn3 MAINTAINERS README TODO
+%dir %{uclibc_root}
 %ifarch %{ix86} ppc sparc sparc64 sparcv9
-%dir %{_prefix}/*-linux-uclibc/lib
-%attr(755,root,root) %{_prefix}/*-linux-uclibc/lib/*.so*
+%dir %{uclibc_root}/lib
+%attr(755,root,root) %{uclibc_root}/lib/*.so*
 %endif
 
 %files devel
 %defattr(644,root,root,755)
-%doc docs/uclibc.org/*
+%doc docs/*.txt
 %attr(755,root,root) %{_bindir}/*
-%{_prefix}/*-linux-uclibc/usr/lib/*.o
-%dir %{_prefix}/*-linux-uclibc/usr
-%dir %{_prefix}/*-linux-uclibc/usr/bin
-%attr(755,root,root) %{_prefix}/*-linux-uclibc/usr/bin/*
-%dir %{_prefix}/*-linux-uclibc/usr/lib
+%{uclibc_root}/usr/lib/*.o
+%dir %{uclibc_root}/usr
+%dir %{uclibc_root}/usr/bin
+%attr(755,root,root) %{uclibc_root}/usr/bin/*
+%dir %{uclibc_root}/usr/lib
+%{uclibc_root}/usr/lib/uclibc_nonshared.a
 %ifarch %{ix86} ppc sparc sparc64 sparcv9
-%attr(755,root,root) %{_prefix}/*-linux-uclibc/usr/lib/*.so
+%attr(755,root,root) %{uclibc_root}/usr/lib/*.so
 %endif
-%{_prefix}/*-linux-uclibc/usr/include
+%{uclibc_root}/usr/include
 
 %files static
 %defattr(644,root,root,755)
-%{_prefix}/*-linux-uclibc/usr/lib/lib*.a
+%{uclibc_root}/usr/lib/lib*.a
