@@ -1,40 +1,10 @@
---- uClibc-0.9.28/ldso/ldso/ldso.c.orig	2005-08-18 00:49:41.000000000 +0200
-+++ uClibc-0.9.28/ldso/ldso/ldso.c	2005-08-28 00:19:31.295473168 +0200
-@@ -597,7 +597,7 @@
- 			for (; runp; runp = runp->next) {
- 				if (runp->tpnt == tcurr) {
- 					struct elf_resolve *here = init_fini_list[k];
--					_dl_if_debug_dprint("Move %s from pos %d to %d in INIT/FINI list\n", here->libname, k, j);
-+					_dl_if_debug_dprint("Move %s from pos %x to %x in INIT/FINI list\n", here->libname, k, j);
- 					for (i = (k - j); i; --i)
- 						init_fini_list[i+j] = init_fini_list[i+j-1];
- 					init_fini_list[j] = here;
-@@ -837,7 +837,7 @@
- 	void *retval;
+--- uClibc-0.9.29/ldso/ldso/sparc/dl-sysdep.h.orig	2006-01-17 01:00:04.000000000 +0000
++++ uClibc-0.9.29/ldso/ldso/sparc/dl-sysdep.h	2007-05-12 13:06:23.000000000 +0000
+@@ -80,6 +80,7 @@
+ }
  
- #if 0
--	_dl_debug_early("request for %d bytes\n", size);
-+	_dl_debug_early("request for %x bytes\n", size);
+ #define do_rem(result, n, base) ((result) = sparc_mod(n, base))
++#define do_div_10(result, remain) ((result) = (((result) - (remain)) / 2) * -(-1ul / 5ul))
  #endif
  
- 	if (_dl_malloc_function)
---- uClibc-0.9.28/ldso/ldso/dl-elf.c.orig	2005-08-18 00:49:41.000000000 +0200
-+++ uClibc-0.9.28/ldso/ldso/dl-elf.c	2005-08-28 00:20:16.525597144 +0200
-@@ -813,7 +813,8 @@
- 					else
- 						_dl_write(fd, string, _dl_strlen(string));
- 					break;
--
-+#ifndef __sparc__
-+				/* _dl_simple_ltoa() uses undefined .udiv */
- 				case 'i':
- 				case 'd':
- 					{
-@@ -824,6 +825,7 @@
- 						_dl_write(fd, string, _dl_strlen(string));
- 						break;
- 					}
-+#endif
- 				case 'x':
- 				case 'X':
- 					{
+ /* 4096 bytes alignment */
