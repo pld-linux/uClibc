@@ -1,8 +1,9 @@
+# WARNING: broken heavily on TH. int main() { return 0; } fails with SIGFPE
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.29
-Release:	1
+Release:	1.1
 Epoch:		2
 License:	LGPL
 Group:		Libraries
