@@ -9,3 +9,14 @@
  extern int *weak_const_function __errno_location(void);
  extern int *weak_const_function __h_errno_location(void);
  #ifdef __UCLIBC_HAS_LOCALE__
+--- uClibc-0.9.29/libc/stdlib/_atexit.c.orig	2007-05-04 16:13:17.000000000 +0200
++++ uClibc-0.9.29/libc/stdlib/_atexit.c	2007-06-04 00:40:04.671116329 +0200
+@@ -305,7 +305,7 @@
+ #endif
+ 
+ #ifdef L_exit
+-extern void weak_function _stdio_term(void) attribute_hidden;
++extern void weak_function _stdio_term(void);
+ attribute_hidden void (*__exit_cleanup) (int) = 0;
+ __UCLIBC_MUTEX_INIT(__atexit_lock, PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP);
+ 
