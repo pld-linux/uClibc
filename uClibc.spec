@@ -1,9 +1,8 @@
-# WARNING: broken heavily on TH. int main() { return 0; } fails with SIGFPE
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.29
-Release:	1.1
+Release:	2
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -86,7 +85,7 @@ sed -i -e '
 	' extra/Configs/Config.in
 
 %build
-%{__make} defconfig \
+%{__make} -j1 defconfig \
 	TARGET_ARCH="%{TARGET_ARCH}" \
 	TARGET_CPU="%{_target_cpu}" \
 	KERNEL_SOURCE=%{_prefix} \
@@ -109,7 +108,7 @@ sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
 rm -f include/bits/uClibc_config.h
 
 # note: defconfig and all must be run in separate make process because of macros
-%{__make} \
+%{__make} -j1 \
 	TARGET_ARCH="%{TARGET_ARCH}" \
 	TARGET_CPU="%{_target_cpu}" \
 	KERNEL_SOURCE=%{_prefix} \
@@ -122,7 +121,7 @@ rm -f include/bits/uClibc_config.h
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 
-%{__make} install \
+%{__make} -j1 install \
 	NATIVE_CC="%{__cc}" \
 	NATIVE_CFLAGS="%{rpmcflags} %{rpmldflags}" \
 	TARGET_ARCH="%{TARGET_ARCH}" \
