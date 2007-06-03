@@ -1,0 +1,11 @@
+--- uClibc-0.9.29/libc/misc/internals/__uClibc_main.c.orig	2007-06-03 22:49:56.106515000 +0200
++++ uClibc-0.9.29/libc/misc/internals/__uClibc_main.c	2007-06-03 23:04:27.296161963 +0200
+@@ -78,7 +78,7 @@
+ /*
+  * Prototypes.
+  */
+-extern void weak_function _stdio_init(void) attribute_hidden;
++extern void weak_function _stdio_init(void);
+ extern int *weak_const_function __errno_location(void);
+ extern int *weak_const_function __h_errno_location(void);
+ #ifdef __UCLIBC_HAS_LOCALE__
