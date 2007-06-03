@@ -12,7 +12,8 @@ Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-toolchain-wrapper.patch
 Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-debug.patch
-Patch4:		%{name}-sparc.patch
+Patch4:		%{name}-stdio-unhide.patch
+Patch5:		%{name}-sparc.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	gcc >= 5:3.0
@@ -66,8 +67,9 @@ Biblioteki statyczne uClibc.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 # check if it's needed now... ldso is broken on sparc anyway
-#%patch4 -p1
+#%patch5 -p1
 
 sed -i -e '
 %ifarch sparc sparcv9
