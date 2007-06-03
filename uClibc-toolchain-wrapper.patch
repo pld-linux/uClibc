@@ -1,88 +1,180 @@
 diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gcc-uClibc/gcc-uClibc.c
 --- uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c	1970-01-01 01:00:00.000000000 +0100
-+++ uClibc-0.9.29/extra/gcc-uClibc/gcc-uClibc.c	2007-06-03 22:03:22.061912354 +0200
-@@ -0,0 +1,518 @@
-+/* vi: set ts=4 :*/
++++ uClibc-0.9.29/extra/gcc-uClibc/gcc-uClibc.c	2007-06-03 22:10:49.372320596 +0200
+@@ -0,0 +1,668 @@
++/* vi: set sw=4 ts=4: */
 +/*
 + * Copyright (C) 2000 Manuel Novoa III
 + * Copyright (C) 2002-2003 Erik Andersen
-+ * Copyright (C) 2006 Rob Landley <rob@landley.net>
 + *
-+ * Wrapper to use uClibc with gcc, and make gcc relocatable.
++ * This is a crude wrapper to use uClibc with gcc.
++ * It was originally written to work around ./configure for ext2fs-utils.
++ * It certainly can be improved, but it works for me in the normal cases.
++ *
++ * April 7, 2001
++ *
++ * A bug was fixed in building the gcc command line when dynamic linking.
++ * The functions dlopen, etc. now work.  At this time, you must make sure
++ * the correct libdl.so is included however.  It is safest to, for example,
++ * add /lib/libdl.so.1 if using ld-linux.so.1 rather than adding -ldl to the
++ * command line.
++ *
++ * Note: This is only a problem if devel and target archs are the same.  To
++ * avoid the problem, you can use a customized dynamic linker.
++ *
++ *
++ * April 18, 2001
++ *
++ * The wrapper now works with either installed and uninstalled uClibc versions.
++ * If you want to use the uninstalled header files and libs, either include
++ * the string "build" in the invocation name such as
++ *       'ln -s <ARCH>-uclibc-gcc <ARCH>-uclibc-gcc-build'
++ * or include it in the environment variable setting of UCLIBC_ENV.
++ * Note: This automatically enables the "rpath" behavior described below.
++ *
++ * The wrapper will now pass the location of the uClibc shared libs used to
++ * the linker with the "-rpath" option if the invocation name includes the
++ * string "rpath" or if the environment variable UCLIBC_ENV include it (as
++ * with "build" above).  This is primarily intended to be used on devel
++ * platforms of the same arch as the target.  A good place to use this feature
++ * would be in the uClibc/test directory.
++ *
++ * The wrapper now displays the command line passed to gcc when '-v' is used.
++ *
++ * May 31, 2001
++ *
++ * "rpath" and "build" behavior are now decoupled.  You can of course get
++ * the old "build" behavior by setting UCLIBC_ENV="rpath-build".  Order
++ * isn't important here, as only the substrings are searched for.
++ *
++ * Added environment variable check for UCLIBC_GCC_DLOPT to let user specify
++ * an alternative dynamic linker at runtime without using command line args.
++ * Since this wouldn't commonly be used, I made it easy on myself.  You have
++ * to match the option you would have passed to the gcc wrapper.  As an
++ * example,
++ *
++ *   export UCLIBC_GCC_DLOPT="-Wl,--dynamic-linker,/lib/ld-alt-linker.so.3"
++ *
++ * This is really only useful if target arch == devel arch and DEVEL_PREFIX
++ * isn't empty.  It involves a recompile, but you can at least test apps
++ * on your devel system if combined with the "rpath" behavor if by using
++ * LD_LIBRARY_PATH, etc.
++ *
++ * Also added check for "-Wl,--dynamic-linker" on the command line.  The
++ * use default dynamic linker or the envirnment-specified dynamic linker
++ * is disabled in that case.
++ *
++ * Added options --uclibc-use-build-dir and --uclibc-use-rpath so that those
++ * behaviors can be invoked from the command line.
++ *
 + */
 +
-+#define _GNU_SOURCE
++/*
++ *
++ * TODO:
++ * Check/modify gcc-specific environment variables?
++ */
++
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <stdarg.h>
 +#include <string.h>
-+#include <strings.h>
 +#include <unistd.h>
 +#include <errno.h>
 +#include <sys/stat.h>
 +#include <sys/wait.h>
 +
-+static char *topdir;
++#include "gcc-uClibc.h"
++
++static char *our_usr_lib_path = "-L"UCLIBC_DEVEL_PREFIX"/lib";
++
 +static char static_linking[] = "-static";
 +static char nostdinc[] = "-nostdinc";
 +static char nostartfiles[] = "-nostartfiles";
 +static char nodefaultlibs[] = "-nodefaultlibs";
 +static char nostdlib[] = "-nostdlib";
-+
-+// For C++
++#ifdef __UCLIBC_CTOR_DTOR__
 +static char nostdinc_plus[] = "-nostdinc++";
++#endif
 +
-+
-+// Confirm that a regular file exists, and (optionally) has the executable bit.
-+int is_file(char *filename, int has_exe)
++/* Include a local implementation of basename, since this
++ * uses the host system's C lib, and CYGWIN apparently
++ * doesn't provide an implementation of basename(). */
++char *basename(const char *path)
 +{
-+	// Confirm it has the executable bit set, if necessary.
-+	if (!has_exe || !access(filename, X_OK)) {
-+		struct stat st;
-+
-+		// Confirm it exists and is not a directory.
-+		if (!stat(filename, &st) && S_ISREG(st.st_mode)) return 1;
++	register const char *s;
++	register const char *p;
++	p = s = path;
++	while (*s) {
++		if (*s++ == '/') {
++			p = s;
++		}
 +	}
-+	return 0;
++	return (char *) p;
 +}
 +
-+// Find an executable in a colon-separated path
-+
-+char *find_in_path(char *path, char *filename, int has_exe)
++char *dirname(char *path)
 +{
-+	char *cwd = getcwd(NULL, 0);
++	static const char null_or_empty_or_noslash[] = ".";
++	register char *s;
++	register char *last;
++	char *first;
 +
-+	if (index(filename, '/') && is_file(filename, has_exe))
-+		return strdup(filename);
++	last = s = path;
 +
-+	for (;;) {
-+		char *str, *next = path ? index(path, ':') : NULL;
-+		int len = next ? next-path : strlen(path);
++	if (s != NULL) {
 +
-+		// The +3 is a corner case: if strlen(filename) is 1, make sure we
-+		// have enough space to append ".." to make topdir.
-+		str = malloc(strlen(filename) + (len ? len : strlen(cwd)) + 3);
-+		if (!len) sprintf(str, "%s/%s", cwd, filename);
-+		else {
-+			char *str2 = str;
-+
-+			strncpy(str, path, len);
-+			str2 = str+len;
-+			*(str2++) = '/';
-+			strcpy(str2, filename);
++LOOP:
++		while (*s && (*s != '/')) ++s;
++		first = s;
++		while (*s == '/') ++s;
++		if (*s) {
++			last = first;
++			goto LOOP;
 +		}
 +
-+		// If it's not a directory, return it.
-+		if (is_file(str, has_exe)) return str;
-+		else free(str);
-+
-+		if (!next) break;
-+		path += len;
-+		path++;
++		if (last == path) {
++			if (*last != '/') {
++				goto DOT;
++			}
++			if ((*++last == '/') && (last[1] == 0)) {
++				++last;
++			}
++		}
++		*last = 0;
++		return path;
 +	}
-+	free(cwd);
++DOT:
++	return (char *) null_or_empty_or_noslash;
++}
 +
-+	return NULL;
++
++extern void *xmalloc(size_t size)
++{
++	void *ptr = malloc(size);
++
++	if (!ptr) {
++		fprintf(stderr, "memory exhausted");
++		exit(EXIT_FAILURE);
++	}
++	return ptr;
++}
++
++void xstrcat(char **string, ...)
++{
++	const char *c;
++	va_list p; 
++	/* Don't bother to calculate how big exerything 
++	 * will be, just be careful to not overflow...  */
++	va_start(p, string);
++	*string = xmalloc(BUFSIZ);
++	**string = '\0';
++	while(1) {
++		if (!(c = va_arg(p, const char *)))
++			break;
++		strcat(*string, c); 
++	}
++	va_end(p);
 +}
 +
 +int main(int argc, char **argv)
@@ -90,63 +182,62 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gc
 +	int use_build_dir = 0, linking = 1, use_static_linking = 0;
 +	int use_stdinc = 1, use_start = 1, use_stdlib = 1, use_pic = 0;
 +	int source_count = 0, use_rpath = 0, verbose = 0;
-+	int i, argcnt, liblen, n, sawM = 0, sawdotoa = 0, sawcES = 0;
-+	char **gcc_argv, **libraries, **libpath;
-+	char *dlstr, *incstr, *devprefix, *libstr, *build_dlstr = 0;
-+	char *cc, *ep, *rpath_link[2], *rpath[2], *uClibc_inc[2], *our_lib_path[2];
-+	char *crt0_path[2], *crtbegin_path[2], *crtend_path[2];
-+	char *debug_wrapper=getenv("DEBUG_WRAPPER");
-+
-+	// For C++
-+
-+	char *crti_path[2], *crtn_path[2], *cpp = NULL;
-+	int len, ctor_dtor = 1, cplusplus = 0, use_nostdinc_plus = 0;
-+
-+	// For profiling
++	int i, j, k, l, m, n;
++	char ** gcc_argv;
++	char ** gcc_argument;
++	char ** libraries;
++	char ** libpath;
++	char *dlstr;
++	char *incstr;
++	char *devprefix;
++   char *runprefix;
++	char *builddir;
++	char *libstr;
++	char *build_dlstr = 0;
++	char *cc;
++	char *ep;
++	char *rpath_link[2];
++	char *rpath[2];
++	char *uClibc_inc[2];
++	char *our_lib_path[2];
++	char *crt0_path[2];
++	char *crtbegin_path[2];
++	char *crtend_path[2];
++	const char *application_name;
++#ifdef __UCLIBC_CTOR_DTOR__
++	char *crti_path[2];
++	char *crtn_path[2];
++	int len;
++	int ctor_dtor = 1, cplusplus = 0, use_nostdinc_plus = 0;
++	int findlibgcc = 1;
++	char *cpp = NULL;
++#endif
++#ifdef __UCLIBC_PROFILING__
 +	int profile = 0;
 +	char *gcrt1_path[2];
++#endif
 +
-+	if(debug_wrapper) {
-+		dprintf(2,"incoming: ");
-+		for(gcc_argv=argv;*gcc_argv;gcc_argv++) dprintf(2,"%s ",*gcc_argv);
-+		dprintf(2,"\n\n");
++	cc     = getenv("UCLIBC_CC");
++	if (cc==NULL) {
++		cc = GCC_BIN;
++#ifdef __UCLIBC_CTOR_DTOR__
++		findlibgcc = 0;
++#endif
 +	}
 +
-+	// Allocate space for new command line
-+	gcc_argv = __builtin_alloca(sizeof(char*) * (argc + 128));
++	application_name = basename(argv[0]);
++	if (application_name[0] == '-')
++		application_name++;
 +
-+	// What directory is the wrapper script in?
-+	if(!(topdir = find_in_path(getenv("PATH"), argv[0], 1))) {
-+		fprintf(stderr, "can't find %s in $PATH\n", argv[0]);
-+		exit(1);
-+	} else {
-+		char *path = getenv("PATH"), *temp;
-+
-+		// Add that directory to the start of $PATH.  (Better safe than sorry.)
-+		*rindex(topdir,'/') = 0;
-+		temp = malloc(strlen(topdir)+strlen(path)+7);
-+		sprintf(temp,"PATH=%s:%s",topdir,path);
-+		putenv(temp);
-+
-+		// The directory above the wrapper script should have include, gcc,
-+		// and lib directories.  However, the script could have a symlink
-+		// pointing to its directory (ala /bin -> /usr/bin), so append ".."
-+		// instead of trucating the path.
-+		strcat(topdir,"/..");
-+	}
-+
-+	// What's the name of the C compiler we're wrapping?  (It may have a
-+	// cross-prefix.)
-+	cc = getenv("UCLIBC_CC");
-+	if (!cc) cc = "gcc-unwrapped";
-+
-+	
-+	// Check end of name, since there could be a cross-prefix on the thing
-+	len = strlen(argv[0]);
-+	if (!strcmp(argv[0]+len-2, "ld")) {
-+		// We're wrapping the linker.
-+	// Wrapping the c++ compiler?
-+	} else if (!strcmp(argv[0]+len-3, "g++") || !strcmp(argv[0]+len-3, "c++")) {
++#ifdef __UCLIBC_CTOR_DTOR__
++	/* We must use strstr since g++ might be named like a
++	 * cross compiler (i.e. arm-linux-g++).   We must also
++	 * search carefully, in case we are searching something 
++	 * like /opt/c++/gcc-3.1/bin/arm-linux-g++ or some similar 
++	 * perversion...  */
++	len = strlen(application_name);
++	if ((strcmp(application_name+len-3, "g++")==0) ||
++			(strcmp(application_name+len-3, "c++")==0)) {
 +		len = strlen(cc);
 +		if (strcmp(cc+len-3, "gcc")==0) {
 +			cpp = strdup(cc);
@@ -156,10 +247,21 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gc
 +		cplusplus = 1;
 +		use_nostdinc_plus = 1;
 +	}
++#endif
 +
 +	devprefix = getenv("UCLIBC_DEVEL_PREFIX");
 +	if (!devprefix) {
-+		devprefix = topdir;
++		devprefix = UCLIBC_DEVEL_PREFIX;
++	}
++
++	runprefix = getenv("UCLIBC_RUNTIME_PREFIX");
++	if (!runprefix) {
++		runprefix = UCLIBC_RUNTIME_PREFIX;
++	}
++
++	builddir = getenv("UCLIBC_BUILD_DIR");
++	if (!builddir) {
++		builddir = UCLIBC_BUILD_DIR;
 +	}
 +
 +	incstr = getenv("UCLIBC_GCC_INC");
@@ -179,50 +281,60 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gc
 +	}
 +
 +
-+	asprintf(rpath_link,"-Wl,-rpath-link,%s/lib", devprefix);
-+	asprintf(rpath, "-Wl,-rpath,%s/lib", devprefix);
-+	asprintf(uClibc_inc, "%s/include/", devprefix);
++	xstrcat(&(rpath_link[0]), "-Wl,-rpath-link,", devprefix, "/lib:", runprefix, "/lib", NULL);
++	xstrcat(&(rpath_link[1]), "-Wl,-rpath-link,", builddir, "/lib", NULL);
 +
-+//#ifdef CTOR_DTOR
-+    asprintf(crt0_path, "%s/lib/crt1.o", devprefix);
-+	asprintf(crti_path, "%s/lib/crti.o", devprefix);
-+	asprintf(crtn_path, "%s/lib/crtn.o", devprefix);
-+//#else
-+//	*crt0_path = asprintf("%s/lib/crt0.o", devprefix);
-+//#endif
++	xstrcat(&(rpath[0]), "-Wl,-rpath,", devprefix, "/lib:", runprefix, "/lib", NULL);
++	xstrcat(&(rpath[1]), "-Wl,-rpath,", builddir, "/lib", NULL);
 +
-+	// profiling
-+	asprintf(gcrt1_path, "%s/lib/gcrt1.o", devprefix, "/lib/gcrt1.o");
-+	asprintf(our_lib_path, "-L%s/lib", devprefix);
++	xstrcat(&(uClibc_inc[0]), devprefix, "/include/", NULL);
++	xstrcat(&(uClibc_inc[1]), builddir, "/include/", NULL);
 +
-+	// Figure out where the dynamic linker is.
-+	dlstr = getenv("UCLIBC_DYNAMIC_LINKER");
-+	if (!dlstr) dlstr = "/lib/ld-uClibc.so.0";
-+	asprintf(&dlstr, "-Wl,--dynamic-linker,%s", dlstr);
++#ifdef __UCLIBC_CTOR_DTOR__
++	xstrcat(&(crt0_path[0]), devprefix, "/lib/crt1.o", NULL);
++	xstrcat(&(crt0_path[1]), builddir, "/lib/crt1.o", NULL);
++	xstrcat(&(crti_path[0]), devprefix, "/lib/crti.o", NULL);
++	xstrcat(&(crti_path[1]), builddir, "/lib/crti.o", NULL);
++	xstrcat(&(crtn_path[0]), devprefix, "/lib/crtn.o", NULL);
++	xstrcat(&(crtn_path[1]), builddir, "/lib/crtn.o", NULL);
++#else
++	xstrcat(&(crt0_path[0]), devprefix, "/lib/crt0.o", NULL);
++	xstrcat(&(crt0_path[1]), builddir, "/lib/crt0.o", NULL);
++#endif
++#ifdef __UCLIBC_PROFILING__
++	xstrcat(&(gcrt1_path[0]), devprefix, "/lib/gcrt1.o", NULL);
++	xstrcat(&(gcrt1_path[1]), builddir, "/lib/gcrt1.o", NULL);
++#endif
 +
-+	liblen = 0;
++	xstrcat(&(our_lib_path[0]), "-L", devprefix, "/lib", NULL);
++	xstrcat(&(our_lib_path[1]), "-L", builddir, "/lib", NULL);
++
++#ifdef __UCLIBC_HAS_SHARED__
++	build_dlstr = "-Wl,--dynamic-linker," BUILD_DYNAMIC_LINKER;
++	dlstr = getenv("UCLIBC_GCC_DLOPT");
++	if (!dlstr) {
++		dlstr = "-Wl,--dynamic-linker," DYNAMIC_LINKER;
++	}
++#endif
++
++	m = 0;
 +	libraries = __builtin_alloca(sizeof(char*) * (argc));
-+	libraries[liblen] = '\0';
++	libraries[m] = '\0';
 +
 +	n = 0;
 +	libpath = __builtin_alloca(sizeof(char*) * (argc));
 +	libpath[n] = '\0';
 +
-+	// Parse the incoming gcc arguments.
-+
 +	for ( i = 1 ; i < argc ; i++ ) {
-+		if (argv[i][0] == '-' && argv[i][1]) { /* option */
++		if (argv[i][0] == '-') { /* option */
 +			switch (argv[i][1]) {
 +				case 'c':		/* compile or assemble */
 +				case 'S':		/* generate assembler code */
 +				case 'E':		/* preprocess only */
 +				case 'M':	    /* generate dependencies */
 +					linking = 0;
-+					if (argv[i][1] == 'M') sawM = 1;
-+					else sawcES = 1;
 +					break;
-+
-+				case 'L': 		/* library path */
++				case 'L': 		/* library */
 +					libpath[n++] = argv[i];
 +					libpath[n] = '\0';
 +					if (argv[i][2] == 0) {
@@ -232,39 +344,41 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gc
 +					}
 +					argv[i] = '\0';
 +					break;
-+
 +				case 'l': 		/* library */
-+					libraries[liblen++] = argv[i];
-+					libraries[liblen] = '\0';
++					libraries[m++] = argv[i];
++					libraries[m] = '\0';
 +					argv[i] = '\0';
 +					break;
-+
 +				case 'v':		/* verbose */
 +					if (argv[i][2] == 0) verbose = 1;
 +					printf("Invoked as %s\n", argv[0]);
-+					printf("Reference path: %s\n", topdir);
 +					break;
-+
 +				case 'n':
 +					if (strcmp(nostdinc,argv[i]) == 0) {
 +						use_stdinc = 0;
 +					} else if (strcmp(nostartfiles,argv[i]) == 0) {
++#ifdef __UCLIBC_CTOR_DTOR__
 +						ctor_dtor = 0;
++#endif
 +						use_start = 0;
 +					} else if (strcmp(nodefaultlibs,argv[i]) == 0) {
 +						use_stdlib = 0;
 +						argv[i] = '\0';
 +					} else if (strcmp(nostdlib,argv[i]) == 0) {
++#ifdef __UCLIBC_CTOR_DTOR__
 +						ctor_dtor = 0;
++#endif
 +						use_start = 0;
 +						use_stdlib = 0;
-+					} else if (strcmp(nostdinc_plus,argv[i]) == 0) {
++					} 
++#ifdef __UCLIBC_CTOR_DTOR__
++					else if (strcmp(nostdinc_plus,argv[i]) == 0) {
 +						if (cplusplus==1) {
 +							use_nostdinc_plus = 0;
 +						}
 +					}
++#endif
 +					break;
-+
 +				case 's':
 +					if (strstr(argv[i],static_linking) != NULL) {
 +						use_static_linking = 1;
@@ -274,7 +388,6 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gc
 +						use_pic = 1;
 +					}
 +					break;
-+
 +				case 'W':		/* -static could be passed directly to ld */
 +					if (strncmp("-Wl,",argv[i],4) == 0) {
 +						if (strstr(argv[i],static_linking) != 0) {
@@ -285,78 +398,31 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gc
 +						}
 +					}
 +					break;
-+
-+                case 'p':
-+wow_this_sucks:
-+					if (!strncmp("-print-",argv[i],7)) {
-+						char *temp, *temp2;
-+						int itemp, showall = 0;
-+
-+						temp = argv[i]+7;
-+						if (!strcmp(temp, "search-dirs")) {
-+							printf("install: %s/\n",devprefix);
-+							printf("programs: %s\n",getenv("PATH"));
-+							printf("libraries: ");
-+							temp2 = "";
-+							showall = 1;
-+						} else if (!strncmp(temp, "file-name=", 10))
-+							temp2 = temp+10;
-+						else if (!strcmp(temp, "libgcc-file-name"))
-+							temp2="libgcc.a";
-+						else break;
-+
-+						// Find this entry in the library path.
-+						for(itemp=0;;itemp++) {
-+							if (itemp == n) {
-+								asprintf(&temp, "%s/gcc/lib/%s", devprefix, temp2);
-+							} else if (itemp == n+1) {
-+								// This is so "include" finds the gcc internal
-+								// include dir.  The uClibc build needs this.
-+								asprintf(&temp, "%s/gcc/%s", devprefix, temp2);
-+							} else if (itemp == n+2) {
-+								temp = temp2;
-+								break;
-+							} else {
-+								asprintf(&temp, "%s/%s", libpath[itemp],
-+											temp2);
-+							}
-+							if (showall) printf(":%s"+(itemp?0:1), temp);
-+							else if (!access(temp, F_OK)) break;
-+						}
-+
-+						printf("%s\n"+(showall ? 2 : 0), temp);
-+						exit(0);
-+
-+					// Profiling.
-+					} else if (!strcmp("-pg",argv[i])) profile = 1;
++#ifdef __UCLIBC_PROFILING__
++				case 'p':
++					if (strcmp("-pg",argv[i]) == 0) {
++						profile = 1;
++					}
 +					break;
-+
++#endif
 +				case 'f':
 +					/* Check if we are doing PIC */
 +					if (strcmp("-fPIC",argv[i]) == 0) {
 +						use_pic = 1;
 +					} else if (strcmp("-fpic",argv[i]) == 0) {
 +						use_pic = 1;
-+ 
-+					// profiling
-+					} else if (strcmp("-fprofile-arcs",argv[i]) == 0) {
++					} 
++#ifdef __UCLIBC_PROFILING__
++					else if (strcmp("-fprofile-arcs",argv[i]) == 0) {
 +						profile = 1;
 +					}
++#endif
 +					break;
 +
-+				// --longopts
-+
 +				case '-':
-+					if (!strncmp(argv[i],"--print-",8)) {
-+						argv[i]++;
-+						goto wow_this_sucks;
-+					} else if (strstr(argv[i]+1,static_linking) != NULL) {
++					if (strstr(argv[i]+1,static_linking) != NULL) {
 +						use_static_linking = 1;
 +						argv[i]='\0';
-+					} else if (!strcmp("--version",argv[i])) {
-+						printf("uClibc ");
-+						fflush(stdout);
-+						break;
 +					} else if (strcmp("--uclibc-use-build-dir",argv[i]) == 0) {
 +						use_build_dir = 1;
 +						argv[i]='\0';
@@ -370,159 +436,243 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gc
 +					} else if (strncmp ("--uclibc-cc=", argv[i], 12) == 0) {
 +						cc = argv[i] + 12;
 +						argv[i] = 0;
-+					} else if (strcmp("--uclibc-no-ctors",argv[i]) == 0) {
++					}
++#ifdef __UCLIBC_CTOR_DTOR__
++					else if (strcmp("--uclibc-no-ctors",argv[i]) == 0) {
 +						ctor_dtor = 0;
 +						argv[i]='\0';
 +					}
++#endif
 +					break;
 +			}
 +		} else {				/* assume it is an existing source file */
-+			char *p = strchr (argv[i], '\0') - 2;
-+			if (p > argv[i] && sawM && (!strcmp(p, ".o") || !strcmp(p, ".a")))
-+				  sawdotoa = 1;
 +			++source_count;
 +		}
 +	}
 +
-+	if (sawdotoa && sawM && !sawcES)
-+		linking = 1;
++	gcc_argv = __builtin_alloca(sizeof(char*) * (argc + 64));
++	gcc_argument = __builtin_alloca(sizeof(char*) * (argc + 20));
 +
-+	argcnt = 0;
++	i = 0; k = 0;
++#ifdef __UCLIBC_CTOR_DTOR__
 +	if (ctor_dtor) {
-+		asprintf(crtbegin_path, "%s/gcc/lib/crtbegin.o", devprefix);
-+		asprintf(crtbegin_path+1, "%s/gcc/lib/crtbeginS.o", devprefix);
-+		asprintf(crtend_path, "%s/gcc/lib/crtend.o", devprefix);
-+		asprintf(crtend_path+1, "%s/gcc/lib/crtendS.o", devprefix);
++		struct stat statbuf;
++		if (findlibgcc==1 || stat(LIBGCC_DIR, &statbuf)!=0 || 
++				!S_ISDIR(statbuf.st_mode))
++		{
++			/* Bummer, gcc is hiding from us. This is going
++			 * to really slow things down... bummer.  */
++			int status, gcc_pipe[2];
++			pid_t pid, wpid;
++
++			pipe(gcc_pipe);
++			if (!(pid = fork())) {
++				char *argv[4];
++				close(gcc_pipe[0]);
++				close(1);
++				close(2);
++				dup2(gcc_pipe[1], 1);
++				dup2(gcc_pipe[1], 2);
++				argv[0] = cc;
++				argv[1] = "-print-libgcc-file-name";
++				argv[2] = NULL;
++				execvp(cc, argv);
++				close(gcc_pipe[1]);
++				_exit(EXIT_FAILURE);
++			}
++			wpid=0;
++			while (wpid != pid) {
++				wpid = wait(&status);
++			}
++			close(gcc_pipe[1]);
++			if (WIFEXITED(status) && WEXITSTATUS(status)) {
++crash_n_burn:
++				fprintf(stderr, "Unable to locale crtbegin.o provided by gcc");
++				exit(EXIT_FAILURE);
++			}
++			if (WIFSIGNALED(status)) {
++				fprintf(stderr, "%s exited because of uncaught signal %d", cc, WTERMSIG(status));
++				exit(EXIT_FAILURE);
++			}
++
++			{
++				char buf[1024], *dir;
++				status = read(gcc_pipe[0], buf, sizeof(buf));
++				close(gcc_pipe[0]);
++				if (status < 0) {
++					goto crash_n_burn;
++				}
++				buf[(status == sizeof(buf)) ? status-1 : status] = 0;
++				dir = dirname(buf);
++				xstrcat(&(crtbegin_path[0]), dir, "/crtbegin.o", NULL);
++				xstrcat(&(crtbegin_path[1]), dir, "/crtbeginS.o", NULL);
++				xstrcat(&(crtend_path[0]), dir, "/crtend.o", NULL);
++				xstrcat(&(crtend_path[1]), dir, "/crtendS.o", NULL);
++			}
++
++		} else {
++			xstrcat(&(crtbegin_path[0]), LIBGCC_DIR, "crtbegin.o", NULL);
++			xstrcat(&(crtbegin_path[1]), LIBGCC_DIR, "crtbeginS.o", NULL);
++			xstrcat(&(crtend_path[0]), LIBGCC_DIR, "crtend.o", NULL);
++			xstrcat(&(crtend_path[1]), LIBGCC_DIR, "crtendS.o", NULL);
++		}
 +	}
 +
-+	gcc_argv[argcnt++] = cpp ? cpp : cc;
++	if (cplusplus && cpp)
++		gcc_argv[i++] = cpp;
++	else
++#endif
++		gcc_argv[i++] = cc;
 +
-+	if (cplusplus) gcc_argv[argcnt++] = "-fno-use-cxa-atexit";
++	for ( j = 1 ; j < argc ; j++ ) {
++		if (argv[j]=='\0') {
++			continue;
++		} else {
++			gcc_argument[k++] = argv[j];
++			gcc_argument[k] = '\0';
++		}
++	}
 +
 +	if (linking && source_count) {
-+//#if defined HAS_ELF && ! defined HAS_MMU
-+//		gcc_argv[argcnt++] = "-Wl,-elf2flt";
-+//#endif
-+		gcc_argv[argcnt++] = "-Wl,--hash-style=sysv";
-+		gcc_argv[argcnt++] = nostdlib;
++		gcc_argv[i++] = "-Wl,--hash-style=sysv";
++#if defined __HAVE_ELF__ && ! defined __UCLIBC_HAS_MMU__
++		gcc_argv[i++] = "-Wl,-elf2flt";
++#endif
++		gcc_argv[i++] = nostdlib;
 +		if (use_static_linking) {
-+			gcc_argv[argcnt++] = static_linking;
-+		} else {
++			gcc_argv[i++] = static_linking;
++		}
++		if (!use_static_linking) {
 +			if (dlstr && use_build_dir) {
-+				gcc_argv[argcnt++] = build_dlstr;
++				gcc_argv[i++] = build_dlstr;
 +			} else if (dlstr) {
-+				gcc_argv[argcnt++] = dlstr;
++				gcc_argv[i++] = dlstr;
 +			}
 +			if (use_rpath) {
-+				gcc_argv[argcnt++] = rpath[use_build_dir];
++				gcc_argv[i++] = rpath[use_build_dir];
 +			}
 +		}
-+		for ( i = 0 ; i < n ; i++ )
-+			if (libpath[i]) gcc_argv[argcnt++] = libpath[i];
-+		gcc_argv[argcnt++] = rpath_link[use_build_dir]; /* just to be safe */
++		for ( l = 0 ; l < n ; l++ ) {
++			if (libpath[l]) gcc_argv[i++] = libpath[l];
++		}
++		gcc_argv[i++] = rpath_link[use_build_dir]; /* just to be safe */
 +		if( libstr )
-+			gcc_argv[argcnt++] = libstr;
-+		gcc_argv[argcnt++] = our_lib_path[use_build_dir];
-+		if (!use_build_dir)
-+			asprintf(gcc_argv+(argcnt++), "-L%s/gcc/lib", devprefix);
++			gcc_argv[i++] = libstr;
++		gcc_argv[i++] = our_lib_path[use_build_dir];
++		if (!use_build_dir) {
++			gcc_argv[i++] = our_usr_lib_path;
++		}
 +	}
 +	if (use_stdinc && source_count) {
-+		gcc_argv[argcnt++] = nostdinc;
-+
++		gcc_argv[i++] = nostdinc;
++#ifdef __UCLIBC_CTOR_DTOR__
 +		if (cplusplus) {
++			char *cppinc;
 +			if (use_nostdinc_plus) {
-+				gcc_argv[argcnt++] = nostdinc_plus;
++				gcc_argv[i++] = nostdinc_plus;
 +			}
-+			gcc_argv[argcnt++] = "-isystem";
-+			asprintf(gcc_argv+(argcnt++), "%sc++/4.1.1", uClibc_inc[use_build_dir]);
-+			//char *cppinc;
-+			//#define TARGET_DIR "gcc/armv4l-unknown-linux/gnu/4.1.1"
-+			//xstrcat(&cppinc, uClibc_inc[use_build_dir], "c++/4.1.1/" TARGET_DIR, NULL);
-+			//gcc_argv[argcnt++] = "-isystem";
-+			//gcc_argv[argcnt++] = cppinc;
-+			//xstrcat(&cppinc, uClibc_inc[use_build_dir], "c++/4.1.1", NULL);
-+			//gcc_argv[argcnt++] = "-isystem";
-+			//gcc_argv[argcnt++] = cppinc;
++			xstrcat(&cppinc, uClibc_inc[use_build_dir], "g++/", NULL);
++			gcc_argv[i++] = "-isystem";
++			gcc_argv[i++] = cppinc;
++			xstrcat(&cppinc, uClibc_inc[use_build_dir], "g++-v3/", NULL);
++			gcc_argv[i++] = "-isystem";
++			gcc_argv[i++] = cppinc;
 +		}
-+
-+		gcc_argv[argcnt++] = "-isystem";
-+		gcc_argv[argcnt++] = uClibc_inc[use_build_dir];
-+		gcc_argv[argcnt++] = "-isystem";
-+		asprintf(gcc_argv+(argcnt++), "%s/gcc/include", devprefix);
-+		if(incstr) gcc_argv[argcnt++] = incstr;
++#endif
++		gcc_argv[i++] = "-isystem";
++		gcc_argv[i++] = uClibc_inc[use_build_dir];
++		gcc_argv[i++] = "-iwithprefix";
++		gcc_argv[i++] = "include";
++		if( incstr )
++			gcc_argv[i++] = incstr;
 +	}
-+
-+    gcc_argv[argcnt++] = "-U__nptl__";
 +
 +	if (linking && source_count) {
 +
++#ifdef __UCLIBC_PROFILING__
 +		if (profile) {
-+			gcc_argv[argcnt++] = gcrt1_path[use_build_dir];
++			gcc_argv[i++] = gcrt1_path[use_build_dir];
 +		}
++#endif
++#ifdef __UCLIBC_CTOR_DTOR__
 +		if (ctor_dtor) {
-+			gcc_argv[argcnt++] = crti_path[use_build_dir];
++			gcc_argv[i++] = crti_path[use_build_dir];
 +			if (use_pic) {
-+				gcc_argv[argcnt++] = crtbegin_path[1];
++				gcc_argv[i++] = crtbegin_path[1];
 +			} else {
-+				gcc_argv[argcnt++] = crtbegin_path[0];
++				gcc_argv[i++] = crtbegin_path[0];
 +			}
 +		}
++#endif
 +		if (use_start) {
-+			if (!profile) {
-+				gcc_argv[argcnt++] = crt0_path[use_build_dir];
++#ifdef __UCLIBC_PROFILING__
++			if (!profile)
++#endif
++			{
++				gcc_argv[i++] = crt0_path[use_build_dir];
 +			}
 +		}
-+
-+		// Add remaining unclaimed arguments.
-+
-+		for (i=1; i<argc; i++) if (argv[i]) gcc_argv[argcnt++] = argv[i];
-+
-+		if (use_stdlib) {
-+			//gcc_argv[argcnt++] = "-Wl,--start-group";
-+			gcc_argv[argcnt++] = "-lgcc";
-+//			gcc_argv[argcnt++] = "-lgcc_eh";
++		for ( l = 0 ; l < k ; l++ ) {
++			if (gcc_argument[l]) gcc_argv[i++] = gcc_argument[l];
 +		}
-+		for (i = 0 ; i < liblen ; i++)
-+			if (libraries[i]) gcc_argv[argcnt++] = libraries[i];
 +		if (use_stdlib) {
++			//gcc_argv[i++] = "-Wl,--start-group";
++			gcc_argv[i++] = "-lgcc";
++		}
++		for ( l = 0 ; l < m ; l++ ) {
++			if (libraries[l]) gcc_argv[i++] = libraries[l];
++		}
++		if (use_stdlib) {
++#ifdef __UCLIBC_CTOR_DTOR__
 +			if (cplusplus) {
-+				gcc_argv[argcnt++] = "-lstdc++";
-+				gcc_argv[argcnt++] = "-lm";
++				gcc_argv[ i++ ] = "-lstdc++";
++				gcc_argv[ i++ ] = "-lm";
 +			}
-+			gcc_argv[argcnt++] = "-lc";
-+			gcc_argv[argcnt++] = "-lgcc";
-+//			gcc_argv[argcnt++] = "-lgcc_eh";
-+			//gcc_argv[argcnt++] = "-Wl,--end-group";
++#endif
++			gcc_argv[i++] = "-lc";
++			gcc_argv[i++] = "-lgcc";
++			//gcc_argv[i++] = "-Wl,--end-group";
 +		}
++#ifdef __UCLIBC_CTOR_DTOR__
 +		if (ctor_dtor) {
-+			gcc_argv[argcnt++] = crtend_path[use_pic ? 1 : 0];
-+			gcc_argv[argcnt++] = crtn_path[use_build_dir];
-+		}
-+	} else for (i=1; i<argc; i++) if (argv[i]) gcc_argv[argcnt++] = argv[i];
++			if (use_pic) {
++				gcc_argv[i++] = crtend_path[1];
++			} else {
++				gcc_argv[i++] = crtend_path[0];
++			}
 +
-+	gcc_argv[argcnt++] = NULL;
++			gcc_argv[i++] = crtn_path[use_build_dir];
++		}
++#endif
++	} else {
++		for ( l = 0 ; l < k ; l++ ) {
++			if (gcc_argument[l]) gcc_argv[i++] = gcc_argument[l];
++		}
++	}
++	gcc_argv[i++] = NULL;
 +
 +	if (verbose) {
-+		for ( i = 0 ; gcc_argv[i] ; i++ ) {
-+			printf("arg[%2i] = %s\n", i, gcc_argv[i]);
++		for ( j = 0 ; gcc_argv[j] ; j++ ) {
++			printf("arg[%2i] = %s\n", j, gcc_argv[j]);
 +		}
 +		fflush(stdout);
 +	}
-+
-+	if (debug_wrapper) {
-+		dprintf(2, "outgoing: ");
-+		for(i=0; gcc_argv[i]; i++) dprintf(2, "%s ",gcc_argv[i]);
-+		dprintf(2, "\n\n");
++	//no need to free memory from xstrcat because we never return... 
++#ifdef __UCLIBC_CTOR_DTOR__
++	if (cplusplus && cpp) {
++		execvp(cpp, gcc_argv);
++		fprintf(stderr, "%s: %s\n", cpp, strerror(errno));
++	} else
++#endif
++	{
++		execvp(cc, gcc_argv);
++		fprintf(stderr, "%s: %s\n", cc, strerror(errno));
 +	}
-+
-+	//no need to free memory from xstrcat because we never return.
-+	execvp(gcc_argv[0], gcc_argv);
-+	fprintf(stderr, "%s: %s\n", cpp ? cpp : cc, strerror(errno));
 +	exit(EXIT_FAILURE);
 +}
 diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uClibc/Makefile
 --- uClibc-0.9.29.org/extra/gcc-uClibc/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ uClibc-0.9.29/extra/gcc-uClibc/Makefile	2007-06-03 22:02:11.494833771 +0200
++++ uClibc-0.9.29/extra/gcc-uClibc/Makefile	2007-06-03 22:10:14.593807939 +0200
 @@ -0,0 +1,93 @@
 +# Makefile for building a fake gcc/binutils toolchain
 +# that simply spoofs the location of the C library
@@ -619,7 +769,7 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
 +
 diff -urN uClibc-0.9.29.org/Makefile.in uClibc-0.9.29/Makefile.in
 --- uClibc-0.9.29.org/Makefile.in	2007-03-19 10:49:04.000000000 +0100
-+++ uClibc-0.9.29/Makefile.in	2007-06-03 22:02:11.494833771 +0200
++++ uClibc-0.9.29/Makefile.in	2007-06-03 22:10:14.593807939 +0200
 @@ -17,7 +17,7 @@
  
  ifeq ($(HAVE_DOT_CONFIG),y)
@@ -651,3 +801,370 @@ diff -urN uClibc-0.9.29.org/Makefile.in uClibc-0.9.29/Makefile.in
  utils:
  	$(Q)$(MAKE) CROSS="$(CROSS)" CC="$(CC)" -C utils
  
+diff -urN uClibc-0.9.29.org/Makefile.in.orig uClibc-0.9.29/Makefile.in.orig
+--- uClibc-0.9.29.org/Makefile.in.orig	1970-01-01 01:00:00.000000000 +0100
++++ uClibc-0.9.29/Makefile.in.orig	2007-03-19 10:49:04.000000000 +0100
+@@ -0,0 +1,363 @@
++# Makefile for uClibc
++#
++# Copyright (C) 2000-2005 Erik Andersen <andersen@uclibc.org>
++#
++# Licensed under the LGPL v2.1, see the file COPYING.LIB in this tarball.
++#
++
++#--------------------------------------------------------------
++# You shouldn't need to mess with anything beyond this point...
++#--------------------------------------------------------------
++noconfig_targets := menuconfig config oldconfig silentoldconfig randconfig \
++	defconfig allyesconfig allnoconfig clean distclean \
++	release dist tags
++
++include $(top_builddir)Rules.mak
++sub_headers := headers
++
++ifeq ($(HAVE_DOT_CONFIG),y)
++
++all: pregen libs
++
++# In this section, we need .config
++-include .config.cmd
++
++include $(top_srcdir)ldso/Makefile.in
++include $(top_srcdir)libcrypt/Makefile.in
++include $(top_srcdir)libintl/Makefile.in
++include $(top_srcdir)libm/Makefile.in
++include $(top_srcdir)libnsl/Makefile.in
++include $(top_srcdir)libresolv/Makefile.in
++include $(top_srcdir)libutil/Makefile.in
++include $(top_srcdir)libpthread/Makefile.in
++include $(top_srcdir)librt/Makefile.in
++include $(top_srcdir)extra/locale/Makefile.in
++
++# last included to catch all the objects added by others (locales/threads)
++include $(top_srcdir)libc/Makefile.in
++
++include/bits/uClibc_config.h: extra/config/conf .config
++	$(Q)$(INSTALL) -d $(dir $@)
++	$(Q)@$< -o $(top_srcdir)extra/Configs/Config.in
++	$(top_srcdir)extra/scripts/conf-header.sh .config > include/bits/uClibc_config.h
++
++
++# For the moment, we have to keep re-running this target
++# because the fix includes scripts rely on pre-processers
++# in order to generate the headers correctly :(.  That
++# means we can't use the $(HOSTCC) in order to get the
++# correct output.
++ifeq ($(ARCH_USE_MMU),y)
++export header_extra_args =
++else
++export header_extra_args = -n
++endif
++HEADERS_BITS_COMMON := $(notdir $(wildcard $(top_srcdir)libc/sysdeps/linux/common/bits/*.h))
++HEADERS_BITS_ARCH   := $(notdir $(wildcard $(top_srcdir)libc/sysdeps/linux/$(TARGET_ARCH)/bits/*.h))
++HEADERS_BITS_SUBARCH   := $(notdir $(wildcard $(top_srcdir)libc/sysdeps/linux/$(TARGET_ARCH)/bits/$(TARGET_SUBARCH)/*.h))
++HEADERS_BITS_COMMON := $(filter-out $(HEADERS_BITS_ARCH) $(HEADERS_BITS_SUBARCH),$(HEADERS_BITS_COMMON))
++headers: include/bits/uClibc_config.h
++	$(Q)$(MAKE) headers-y
++	$(Q)\
++	set -e; \
++	if [ -e libc/sysdeps/linux/$(TARGET_ARCH)/fpu_control.h ] ; then \
++		$(LN) -fs ../libc/sysdeps/linux/$(TARGET_ARCH)/fpu_control.h include/ ; \
++	else \
++		$(LN) -fs ../libc/sysdeps/linux/common/fpu_control.h include/ ; \
++	fi; \
++	for f in dl-osinfo.h hp-timing.h ; do \
++		$(LN) -fs ../libc/sysdeps/linux/common/$$f include/ ; \
++	done
++	$(Q)\
++	cd include/bits; \
++	set -e; \
++	for i in $(HEADERS_BITS_COMMON) ; do \
++		$(LN) -fs ../../libc/sysdeps/linux/common/bits/$$i .; \
++	done; \
++	for i in $(HEADERS_BITS_ARCH) ; do \
++		$(LN) -fs ../../libc/sysdeps/linux/$(TARGET_ARCH)/bits/$$i .; \
++	done; \
++	for i in $(HEADERS_BITS_SUBARCH) ; do \
++		$(LN) -fs ../../libc/sysdeps/linux/$(TARGET_ARCH)/bits/$(TARGET_SUBARCH)/$$i .; \
++	done
++	$(Q)\
++	cd include/sys; \
++	set -e; \
++	for i in `ls ../../libc/sysdeps/linux/common/sys/*.h` ; do \
++		$(LN) -fs $$i .; \
++	done; \
++	if [ -d ../../libc/sysdeps/linux/$(TARGET_ARCH)/sys ] ; then \
++		for i in `ls ../../libc/sysdeps/linux/$(TARGET_ARCH)/sys/*.h` ; do \
++			$(LN) -fs $$i .; \
++		done; \
++	fi
++	$(Q)\
++	set -e; \
++	cd $(top_builddir); \
++	tmp=`mktemp include/bits/sysnum.h.XXXXXX 2>/dev/null`; \
++	[ -z "$$tmp" ] && tmp='include/bits/sysnum.h.new'; \
++	KERNEL_HEADERS="${KERNEL_HEADERS}" top_builddir=. CC="$(CC) $(CPU_CFLAGS)" $(SHELL) extra/scripts/gen_bits_syscall_h.sh > $$tmp; \
++	if cmp include/bits/sysnum.h $$tmp >/dev/null 2>&1; then \
++		$(RM) $$tmp; \
++	else \
++		mv -f $$tmp include/bits/sysnum.h; \
++	fi
++ifeq ($(UCLIBC_HAS_LOCALE),y)
++	$(MAKE) locale_headers
++endif
++
++pregen: headers
++
++install: install_runtime install_dev
++
++
++RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB=$(shell $(top_srcdir)extra/scripts/relative_path.sh $(DEVEL_PREFIX)lib $(RUNTIME_PREFIX)lib)
++
++# Installs header files.
++install_headers:
++	$(INSTALL) -d $(PREFIX)$(DEVEL_PREFIX)include
++	printf ".svn\n.cvsignore\nCVS\n" > tar_exclude ; \
++	$(TAR) -chf - -X tar_exclude include \
++		| $(TAR) -xf - -C $(PREFIX)$(DEVEL_PREFIX)
++	rm -f tar_exclude
++	printf '#ifndef _LIBC_INTERNAL_H\n#define _LIBC_INTERNAL_H 1\n#endif\n' > \
++		$(PREFIX)$(DEVEL_PREFIX)include/libc-internal.h
++	echo '/* Dont use _syscall#() macros; use the syscall() function */' > \
++		$(PREFIX)$(DEVEL_PREFIX)include/bits/syscalls.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/dl-osinfo.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/_lfs_64.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/bits/uClibc_uintmaxtostr.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/bits/kernel_sigaction.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/bits/kernel_stat.h
++ifneq ($(UCLIBC_HAS_FLOATS),y)
++	# Remove floating point related headers since float support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/complex.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/fpu_control.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/ieee754.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/math.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/tgmath.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/bits/uClibc_fpmax.h
++endif
++ifneq ($(UCLIBC_HAS_WCHAR),y)
++	# Remove wide char headers since wide char support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/wctype.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/wchar.h
++endif
++ifneq ($(UCLIBC_HAS_LOCALE),y)
++	# Remove iconv header since locale support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/iconv.h
++endif
++ifneq ($(UCLIBC_HAS_GLIBC_CUSTOM_PRINTF),y)
++	# Remove printf header since custom print specifier support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/printf.h
++endif
++ifneq ($(UCLIBC_HAS_XLOCALE),y)
++	# Remove xlocale header since extended locale support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/xlocale.h
++endif
++ifneq ($(UCLIBC_HAS_GETTEXT_AWARENESS),y)
++	# Remove libintl header since gettext support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/libintl.h
++endif
++ifneq ($(UCLIBC_HAS_REGEX),y)
++	# Remove regex headers since regex support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/regex.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/regexp.h
++endif
++ifneq ($(UCLIBC_HAS_WORDEXP),y)
++	# Remove wordexp header since wordexp support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/wordexp.h
++endif
++ifneq ($(UCLIBC_HAS_FTW),y)
++	# Remove ftw header since ftw support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/ftw.h
++endif
++ifneq ($(UCLIBC_HAS_GLOB),y)
++	# Remove glob header since glob support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/glob.h
++endif
++ifneq ($(UCLIBC_HAS_GNU_GETOPT),y)
++ifneq ($(UCLIBC_HAS_GETOPT_LONG),y)
++	# Remove getopt header since gnu getopt support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/getopt.h
++endif
++endif
++ifneq ($(UCLIBC_HAS_SHADOW),y)
++	# Remove shadow header since shadow password support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/shadow.h
++endif
++ifneq ($(PTHREADS_DEBUG_SUPPORT),y)
++	# Remove thread_db header since thread debug support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/thread_db.h
++endif
++ifneq ($(UCLIBC_HAS_THREADS),y)
++	# Remove pthread headers since thread support is disabled.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/*thread*.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/semaphore.h
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/bits/*thread*.h
++endif
++ifeq ($(UCLIBC_HAS_THREADS_NATIVE),y)
++	# Remove this as it is only used internally.
++	$(RM) $(PREFIX)$(DEVEL_PREFIX)include/tls.h
++endif
++	-@for i in `find $(PREFIX)$(DEVEL_PREFIX)include -type d` ; do \
++	    chmod 755 $$i; chmod 644 $$i/*.h > /dev/null 2>&1; \
++	done
++	-chown -R `id | sed 's/^uid=\([0-9]*\).*gid=\([0-9]*\).*$$/\1:\2/'` $(PREFIX)$(DEVEL_PREFIX)include
++
++# Installs development library links.
++install_dev: install_headers
++	$(INSTALL) -d $(PREFIX)$(DEVEL_PREFIX)lib
++	-$(INSTALL) -m 644 lib/*.[ao] $(PREFIX)$(DEVEL_PREFIX)lib/
++ifeq ($(HAVE_SHARED),y)
++	for i in `find lib/ -type l -name 'lib[a-zA-Z]*.so' | \
++	sed -e 's/lib\///'` ; do \
++		$(LN) -sf $(RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB)$$i.$(MAJOR_VERSION) \
++		$(PREFIX)$(DEVEL_PREFIX)lib/$$i; \
++	done
++	if [ -f $(top_builddir)lib/libc.so -a -f $(PREFIX)$(RUNTIME_PREFIX)lib/$(SHARED_MAJORNAME) ] ; then \
++		$(RM) $(PREFIX)$(DEVEL_PREFIX)lib/libc.so; \
++		sed -e 's:$(NONSHARED_LIBNAME):$(DEVEL_PREFIX)lib/$(NONSHARED_LIBNAME):' \
++		    -e 's:$(SHARED_MAJORNAME):$(RUNTIME_PREFIX)lib/$(SHARED_MAJORNAME):' \
++		    -e 's:$(UCLIBC_LDSO):$(RUNTIME_PREFIX)lib/$(UCLIBC_LDSO):' \
++		    $(top_builddir)lib/libc.so > $(PREFIX)$(DEVEL_PREFIX)lib/libc.so; \
++	fi
++ifeq ($(UCLIBC_HAS_THREADS),y)
++ifneq ($(LINUXTHREADS_OLD),y)
++	if [ -f $(top_builddir)lib/libpthread.so -a -f $(PREFIX)$(RUNTIME_PREFIX)lib/libpthread.so.$(MAJOR_VERSION) ] ; then \
++		$(RM) $(PREFIX)$(DEVEL_PREFIX)lib/libpthread.so; \
++		cp $(top_srcdir)extra/scripts/format.lds $(PREFIX)$(DEVEL_PREFIX)lib/libpthread.so; \
++		echo "GROUP ( $(RUNTIME_PREFIX)lib/libpthread.so.$(MAJOR_VERSION) $(DEVEL_PREFIX)lib/libpthread_nonshared.a )" \
++			>> $(PREFIX)$(DEVEL_PREFIX)lib/libpthread.so; \
++	fi
++endif
++endif
++ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
++	$(LN) -sf $(RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB)libthread_db.so.1 \
++		$(PREFIX)$(DEVEL_PREFIX)lib/libthread_db.so
++endif
++ifeq ($(DOPIC),y)
++#	# If we build shared libraries then the static libs are PIC...
++#	# Make _pic.a symlinks to make mklibs.py and similar tools happy.
++	if [ -d lib ] ; then \
++		for i in `find lib/  -type f -name 'lib*.a' | sed -e 's/lib\///'` ; do \
++			$(LN) -sf $$i $(PREFIX)$(DEVEL_PREFIX)lib/`echo $$i \
++				| sed -e 's/\.a$$/_pic.a/'`; \
++		done ; \
++	fi
++endif
++endif
++ifeq ($(UCLIBC_FORMAT_SHARED_FLAT),y)
++	for file in lib/lib*.gdb; do \
++		if test -f $$file; then \
++			$(INSTALL) -m 755 $$file $(PREFIX)$(DEVEL_PREFIX)lib; \
++			$(INSTALL) -m 755 `echo $$file | sed 's/\.gdb$$//'` \
++			  $(PREFIX)$(DEVEL_PREFIX)lib; \
++		fi; \
++	done
++endif
++
++# Installs run-time libraries
++install_runtime:
++ifeq ($(HAVE_SHARED),y)
++	$(INSTALL) -d $(PREFIX)$(RUNTIME_PREFIX)lib
++	$(INSTALL) -m 644 lib/lib*-$(VERSION).so \
++		$(PREFIX)$(RUNTIME_PREFIX)lib
++	cd lib && $(TAR) -cf - *.so.* | $(TAR) -xf - -C $(PREFIX)$(RUNTIME_PREFIX)lib
++	@if [ -x lib/$(UCLIBC_LDSO_NAME)-$(VERSION).so ] ; then \
++		set -e; \
++		$(SHELL_SET_X); \
++		$(INSTALL) -m 755 lib/$(UCLIBC_LDSO_NAME)-$(VERSION).so \
++			$(PREFIX)$(RUNTIME_PREFIX)lib; \
++	fi
++endif
++
++utils:
++	$(Q)$(MAKE) CROSS="$(CROSS)" CC="$(CC)" -C utils
++
++# Installs helper applications, such as 'ldd' and 'ldconfig'
++install_utils: utils
++	$(MAKE) CROSS="$(CROSS)" CC="$(CC)" -C utils utils_install
++
++else # ifeq ($(HAVE_DOT_CONFIG),y)
++
++all: menuconfig
++
++headers:
++	@echo "Need to make a config file first, run: make menuconfig"
++	@false
++
++endif # ifeq ($(HAVE_DOT_CONFIG),y)
++
++include/bits:
++	$(INSTALL) -d include/bits
++
++# configuration
++# ---------------------------------------------------------------------------
++extra/config/conf extra/config/mconf: include/bits
++	$(Q)$(MAKE) -C extra/config $(notdir $@)
++
++menuconfig: extra/config/mconf include/bits
++	$(Q)./extra/config/mconf extra/Configs/Config.in
++
++config: extra/config/conf include/bits
++	$(Q)./extra/config/conf extra/Configs/Config.in
++
++oldconfig: extra/config/conf include/bits
++	$(Q)./extra/config/conf -o extra/Configs/Config.in
++
++silentoldconfig: extra/config/conf include/bits
++	$(Q)./extra/config/conf -s extra/Configs/Config.in
++
++randconfig: extra/config/conf include/bits
++	$(Q)./extra/config/conf -r extra/Configs/Config.in
++
++allyesconfig: extra/config/conf include/bits
++	$(Q)./extra/config/conf -y extra/Configs/Config.in
++	sed -i -e "s/^DODEBUG=.*/# DODEBUG is not set/" .config
++	sed -i -e "s/^DOASSERTS=.*/# DOASSERTS is not set/" .config
++	sed -i -e "s/^SUPPORT_LD_DEBUG_EARLY=.*/# SUPPORT_LD_DEBUG_EARLY is not set/" .config
++	sed -i -e "s/^SUPPORT_LD_DEBUG=.*/# SUPPORT_LD_DEBUG is not set/" .config
++	sed -i -e "s/^UCLIBC_MJN3_ONLY=.*/# UCLIBC_MJN3_ONLY is not set/" .config
++	$(Q)./extra/config/conf -o extra/Configs/Config.in
++
++allnoconfig: extra/config/conf include/bits
++	$(Q)./extra/config/conf -n extra/Configs/Config.in
++
++defconfig: extra/config/conf include/bits
++	$(Q)./extra/config/conf -d extra/Configs/Config.in
++
++clean:
++	$(Q)$(RM) -r lib include/bits
++	$(RM) lib*/*.a ldso/*/*.a libpthread/*/*.a
++	$(RM) include/fpu_control.h include/dl-osinfo.h include/hp-timing.h
++	$(MAKE) -C extra/locale locale_clean
++	$(MAKE) headers_clean-y
++	$(MAKE) -s -C test clean
++	$(MAKE) -C utils utils_clean
++	@set -e; \
++	for i in `(cd libc/sysdeps/linux/common/sys; ls *.h)` ; do \
++		$(RM) include/sys/$$i; \
++	done; \
++	if [ -d libc/sysdeps/linux/$(TARGET_ARCH)/sys ] ; then \
++		for i in `(cd libc/sysdeps/linux/$(TARGET_ARCH)/sys; ls *.h)` ; do \
++			$(RM) include/sys/$$i; \
++		done; \
++	fi
++	@$(RM) include/linux include/asm*
++	-find . \( -name \*.o -o -name \*.os -o -name \*.oS \) -exec $(RM) {} \;
++
++distclean: clean
++	-find . \( -name core -o -name \*.orig -o -name \*~ \) -exec $(RM) {} \;
++	$(RM) .config .config.old .config.cmd
++	$(RM) extra/locale/*.tgz
++	$(MAKE) -C extra/config distclean
++
++dist release:
++	$(RM) -r ../uClibc-$(VERSION) ../uClibc-$(VERSION).tar.bz2
++	svn -q export . ../uClibc-$(VERSION)
++	$(TAR) cjf ../uClibc-$(VERSION).tar.bz2 -C .. uClibc-$(VERSION)
++	du -b ../uClibc-$(VERSION).tar.bz2
++
++test check:
++	$(Q)$(MAKE) -C test
