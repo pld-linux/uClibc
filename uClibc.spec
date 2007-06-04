@@ -27,6 +27,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # note: the 2nd '\' is needed (some shell expansions?)
 %define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium./i386/;s/ppc/powerpc/;s/amd64\\|ia32e/x86_64/')
 
+%define		specflags	-fgnu89-inline
+
 %description
 Small libc for building embedded applications.
 
@@ -117,6 +119,7 @@ rm -f include/bits/uClibc_config.h
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os" \
+	DOSTRIP=n \
 	CC="%{__cc}"
 
 %install
