@@ -2,7 +2,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.29
-Release:	4
+Release:	5
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -105,6 +105,7 @@ sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
 	s/^.*UCLIBC_HAS_SYS_SIGLIST.*$/UCLIBC_HAS_SYS_SIGLIST=y/;
 	s,^SHARED_LIB_LOADER_PREFIX=.*,SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib",
 	s/^.*UCLIBC_HAS_PRINTF_M_SPEC.*$/UCLIBC_HAS_PRINTF_M_SPEC=y/;
+	s/^.*UCLIBC_SUSV3_LEGACY.*$/UCLIBC_SUSV3_LEGACY=y\nUCLIBC_SUSV3_LEGACY_MACROS=y/;
 %{?debug:s/^.*\<DODEBUG\>.*$/DODEBUG=y/;s/^.*SUPPORT_LD_DEBUG\>.*$/SUPPORT_LD_DEBUG=y/;s/^.*SUPPORT_LD_DEBUG_EARLY.*$/SUPPORT_LD_DEBUG_EARLY=y/;s/^.*\<DOSTRIP\>.*$/# DOSTRIP is not set/;}
 	' .config.tmp > .config
 
