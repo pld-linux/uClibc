@@ -2,7 +2,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.29
-Release:	10
+Release:	11
 Epoch:		2
 License:	LGPL
 Group:		Libraries
@@ -17,7 +17,7 @@ Patch5:		%{name}-sparc.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	gcc >= 5:3.0
-BuildRequires:	linux-libc-headers >= 7:2.6.20
+BuildRequires:	linux-libc-headers >= 7:2.6.24
 BuildRequires:	sed >= 4.0
 BuildRequires:	which
 ExclusiveArch:	alpha %{ix86} ppc sparc sparcv9 %{x8664}
@@ -41,7 +41,7 @@ Summary(pl.UTF-8):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	binutils
-Requires:	linux-libc-headers >= 7:2.6.20
+Requires:	linux-libc-headers >= 7:2.6.24
 %requires_eq	gcc
 
 %description devel
@@ -152,10 +152,6 @@ done
 rm -rf $RPM_BUILD_ROOT%{uclibc_root}/usr/include/{linux,asm*}
 ln -sf /usr/include/asm $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm
 ln -sf /usr/include/asm-generic $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-generic
-%ifarch %{x8664}
-ln -sf /usr/include/asm-i386 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-i386
-ln -sf /usr/include/asm-x86_64 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-x86_64
-%endif
 # for future use
 %ifarch sparc64
 ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc
