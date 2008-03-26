@@ -4,7 +4,7 @@ Name:		uClibc
 Version:	0.9.29
 Release:	11
 Epoch:		2
-License:	LGPL
+License:	LGPL v2.1
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
 # Source0-md5:	61dc55f43b17a38a074f347e74095b20
