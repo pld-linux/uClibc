@@ -2,10 +2,6 @@
 # Conditional build:
 %bcond_without	shared		# don't build shared lib support
 #
-%ifarch %{x8664}
-%undefine	with_shared
-%endif
-#
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
