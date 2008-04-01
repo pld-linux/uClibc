@@ -1,3 +1,22 @@
+# TODO
+# - unpackaged list:
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-addr2line
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-ar
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-as
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-c++
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-cc
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-cpp
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-g++
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-gasp
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-gcc
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-ld
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-nm
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-objcopy
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-objdump
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-ranlib
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-size
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-strings
+#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-strip
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
