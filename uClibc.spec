@@ -117,16 +117,17 @@ sed -i -e '
 	OPTIMIZATION="%{rpmcflags} -Os" \
 	CC="%{__cc}"
 
-mv -f .config .config.tmp
-sed -e 's/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
+sed -i -e '
+	s/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
 	s/^.*DO_C99_MATH.*$/DO_C99_MATH=y/;
 	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set\n# UCLIBC_HAS_REENTRANT_RPC is not set/;
 	s/^.*UCLIBC_HAS_SYS_SIGLIST.*$/UCLIBC_HAS_SYS_SIGLIST=y/;
 	s,^SHARED_LIB_LOADER_PREFIX=.*,SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib",
 	s/^.*UCLIBC_HAS_PRINTF_M_SPEC.*$/UCLIBC_HAS_PRINTF_M_SPEC=y/;
 	s/^.*UCLIBC_SUSV3_LEGACY.*$/UCLIBC_SUSV3_LEGACY=y\nUCLIBC_SUSV3_LEGACY_MACROS=y/;
-%{?debug:s/^.*\<DODEBUG\>.*$/DODEBUG=y/;s/^.*SUPPORT_LD_DEBUG\>.*$/SUPPORT_LD_DEBUG=y/;s/^.*SUPPORT_LD_DEBUG_EARLY.*$/SUPPORT_LD_DEBUG_EARLY=y/;s/^.*\<DOSTRIP\>.*$/# DOSTRIP is not set/;}
-	' .config.tmp > .config
+	s/^.*\<DOSTRIP\>.*$/# DOSTRIP is not set/;
+%{?debug:s/^.*\<DODEBUG\>.*$/DODEBUG=y/;s/^.*SUPPORT_LD_DEBUG\>.*$/SUPPORT_LD_DEBUG=y/;s/^.*SUPPORT_LD_DEBUG_EARLY.*$/SUPPORT_LD_DEBUG_EARLY=y/;}
+' .config
 
 # force regeneration after .config changes
 rm -f include/bits/uClibc_config.h
@@ -139,7 +140,6 @@ rm -f include/bits/uClibc_config.h
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os" \
-	DOSTRIP=n \
 	CC="%{__cc}"
 
 %install
