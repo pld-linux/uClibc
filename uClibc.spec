@@ -1,22 +1,11 @@
-# TODO
-# - unpackaged list:
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-addr2line
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-ar
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-as
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-c++
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-cc
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-cpp
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-g++
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-gasp
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-gcc
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-ld
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-nm
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-objcopy
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-objdump
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-ranlib
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-size
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-strings
-#   /usr/x86_64-linux-uclibc/bin/x86_64-uclibc-strip
+#
+# Conditional build:
+%bcond_without	shared		# don't build shared lib support
+#
+%ifarch %{x8664}
+%undefine	with_shared
+%endif
+#
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
@@ -35,6 +24,7 @@ Patch4:		%{name}-stdio-unhide.patch
 Patch5:		%{name}-sparc.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
+BuildRequires:	cpp
 BuildRequires:	gcc >= 5:3.0
 BuildRequires:	linux-libc-headers >= 7:2.6.24
 BuildRequires:	sed >= 4.0
@@ -123,6 +113,9 @@ sed -i -e '
 	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set\n# UCLIBC_HAS_REENTRANT_RPC is not set/;
 	s/^.*UCLIBC_HAS_SYS_SIGLIST.*$/UCLIBC_HAS_SYS_SIGLIST=y/;
 	s,^SHARED_LIB_LOADER_PREFIX=.*,SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib",
+%if %{with shared}
+	s/^\(HAVE_SHARED\)=y/# \1 is not set/;
+%endif
 	s/^.*UCLIBC_HAS_PRINTF_M_SPEC.*$/UCLIBC_HAS_PRINTF_M_SPEC=y/;
 	s/^.*UCLIBC_SUSV3_LEGACY.*$/UCLIBC_SUSV3_LEGACY=y\nUCLIBC_SUSV3_LEGACY_MACROS=y/;
 	s/^.*\<DOSTRIP\>.*$/# DOSTRIP is not set/;
@@ -154,18 +147,52 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 	CC="%{__cc}" \
 	PREFIX=$RPM_BUILD_ROOT
 
+%if %{with shared}
 mv -f $RPM_BUILD_ROOT%{uclibc_root}/usr/lib/{libpthread-uclibc,libpthread}.so
 ln -sf libpthread-0.9.29.so $RPM_BUILD_ROOT%{uclibc_root}/lib/libpthread.so.0
+%endif
 
 # these links are *needed* (by stuff in bin/)
 for f in $RPM_BUILD_ROOT%{uclibc_root}/bin/*; do
-	mv -f $f $RPM_BUILD_ROOT%{_bindir}
-	ln -sf ../../bin/`basename $f` $f
+	if [ -L $f ]; then
+		l=$(readlink $f)
+		a=${l##*/}
+		d=${l%/*}
+		case "$d" in
+		%{_bindir})
+			ln -sf ${l#%{_bindir}/} $RPM_BUILD_ROOT%{_bindir}/${f##*/}
+			rm -f $f
+			;;
+		$a)
+			mv -f $f $RPM_BUILD_ROOT%{_bindir}
+			;;
+		*)
+			exit 1
+			;;
+		esac
+	else
+		a=${f#*/%{_target_cpu}-uclibc-}
+		ln -sf %{_bindir}/$(basename $f) $RPM_BUILD_ROOT%{uclibc_root}/usr/bin/$a
+		mv -f $f $RPM_BUILD_ROOT%{_bindir}
+	fi
 done
 
-for f in c++ cc g++ gcc ld; do
-	ln -sf /usr/bin/%{_target_cpu}-uclibc-$f \
-		$RPM_BUILD_ROOT%{uclibc_root}/usr/bin/$f
+for f in $RPM_BUILD_ROOT%{uclibc_root}/usr/bin/*; do
+	if [ -L $f ]; then
+		l=$(readlink $f)
+		case "${l%/*}" in
+		%{uclibc_root}/bin)
+			a=${l#*/%{_target_cpu}-uclibc-}
+			ln -sf %{_bindir}/$a $f
+			;;
+		%{_bindir})
+			:
+			;;
+		*)
+			exit 2
+			;;
+		esac
+	fi
 done
 
 rm -rf $RPM_BUILD_ROOT%{uclibc_root}/usr/include/{linux,asm*}
@@ -186,8 +213,10 @@ rm -rf $RPM_BUILD_ROOT
 %doc Changelog* DEDICATION.mjn3 MAINTAINERS README TODO
 %dir %{uclibc_root}
 %ifarch %{ix86} %{x8664} ppc sparc sparcv9
+%if %{with shared}
 %dir %{uclibc_root}/lib
 %attr(755,root,root) %{uclibc_root}/lib/*.so*
+%endif
 %endif
 
 %files devel
@@ -199,9 +228,11 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{uclibc_root}/usr/bin
 %attr(755,root,root) %{uclibc_root}/usr/bin/*
 %dir %{uclibc_root}/usr/lib
+%if %{with shared}
 %{uclibc_root}/usr/lib/uclibc_nonshared.a
 %ifarch %{ix86} %{x8664} ppc sparc sparcv9
 %attr(755,root,root) %{uclibc_root}/usr/lib/*.so
+%endif
 %endif
 %{uclibc_root}/usr/include
 
