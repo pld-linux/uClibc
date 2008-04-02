@@ -5,7 +5,7 @@
 # Conditional build:
 %bcond_without	shared		# don't build shared lib support
 #
-%ifarch %{x8664} %{ix86}
+%ifarch %{x8664} %{ix86} alpha
 %undefine	with_shared
 %endif
 #
