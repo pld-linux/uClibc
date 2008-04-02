@@ -29,10 +29,6 @@ ExclusiveArch:	alpha %{ix86} ppc sparc sparcv9 %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		uclibc_root	/usr/%{_target_cpu}-linux-uclibc
-# note: the 2nd '\' is needed (some shell expansions?)
-%define		TARGET_ARCH	%(echo %{_target_cpu} | sed -e 's/i.86\\|athlon\\|pentium./i386/;s/ppc/powerpc/;s/amd64\\|ia32e/x86_64/')
-
-%define		specflags	-fgnu89-inline
 
 %description
 Small libc for building embedded applications.
@@ -78,70 +74,95 @@ Biblioteki statyczne uClibc.
 # check if it's needed now... ldso is broken on sparc anyway
 #%patch5 -p1
 
-sed -i -e '
-%ifarch sparc sparcv9
-	s/default TARGET_i386/default TARGET_sparc/
+# ARCH is already determined by uname -m
+%ifarch %{ix86}
+defconfig=extra/Configs/defconfigs/i386
+%ifarch i386
+echo 'CONFIG_386=y' >> $defconfig
 %endif
-%ifarch alpha
-	s/default TARGET_i386/default TARGET_alpha/
+%ifarch i486
+echo 'CONFIG_486=y' >> $defconfig
 %endif
-%ifarch ppc ppc64
-	s/default TARGET_i386/default TARGET_powerpc/
+%ifarch i586
+echo 'CONFIG_586=y' >> $defconfig
+%endif
+%ifarch i686
+echo 'CONFIG_686=y' >> $defconfig
+%endif
+%ifarch pentium3
+echo 'CONFIG_PENTIUMIII=y' >> $defconfig
+%endif
+%ifarch pentium4
+echo 'CONFIG_PENTIUM4=y' >> $defconfig
+%endif
+%ifarch athlon
+echo 'CONFIG_K7=y' >> $defconfig
+%endif
 %endif
 %ifarch %{x8664}
-	s/default TARGET_i386/default TARGET_x86_64/
+defconfig=extra/Configs/defconfigs/x86_64
 %endif
-	' extra/Configs/Config.in
+%ifarch alpha
+defconfig=extra/Configs/defconfigs/alpha
+%endif
+%ifarch sparc sparcv9
+defconfig=extra/Configs/defconfigs/sparc
+%endif
+%ifarch ppc
+defconfig=extra/Configs/defconfigs/powerpc
+%endif
+%ifarch ia64
+defconfig=extra/Configs/defconfigs/ia64
+%endif
+
+cat <<'EOF' >> $defconfig
+UCLIBC_HAS_IPV6=y
+DO_C99_MATH=y
+UCLIBC_HAS_RPC=y
+# UCLIBC_HAS_FULL_RPC is not set
+# UCLIBC_HAS_REENTRANT_RPC is not set
+UCLIBC_HAS_SYS_SIGLIST=y
+SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib"
+%if %{without shared}
+HAVE_NO_SHARED=y
+# HAVE_SHARED is not set
+%endif
+UCLIBC_HAS_PRINTF_M_SPEC=y
+UCLIBC_SUSV3_LEGACY=y
+UCLIBC_SUSV3_LEGACY_MACROS=y
+# DOSTRIP is not set
+%{?debug:DODEBUG=y}
+%{?debug:SUPPORT_LD_DEBUG=y}
+%{?debug:SUPPORT_LD_DEBUG_EARLY=y}
+EOF
 
 %build
-%{__make} -j1 defconfig \
-	TARGET_ARCH="%{TARGET_ARCH}" \
+# NOTE: 'defconfig' and 'all' must be run in separate make process because of macros
+%{__make} defconfig \
 	TARGET_CPU="%{_target_cpu}" \
-	KERNEL_SOURCE=%{_prefix} \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
-	OPTIMIZATION="%{rpmcflags} -Os" \
-	CC="%{__cc}"
+	CC="%{__cc}" \
+	OPTIMIZATION="%{rpmcflags} -Os"
 
-sed -i -e '
-	s/^.*UCLIBC_HAS_IPV6.*$/UCLIBC_HAS_IPV6=y/;
-	s/^.*DO_C99_MATH.*$/DO_C99_MATH=y/;
-	s/^.*UCLIBC_HAS_RPC.*/UCLIBC_HAS_RPC=y\n# UCLIBC_HAS_FULL_RPC is not set\n# UCLIBC_HAS_REENTRANT_RPC is not set/;
-	s/^.*UCLIBC_HAS_SYS_SIGLIST.*$/UCLIBC_HAS_SYS_SIGLIST=y/;
-	s,^SHARED_LIB_LOADER_PREFIX=.*,SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib",
-%if %{without shared}
-	s/^\(HAVE_SHARED\)=y/# \1 is not set/;
-%endif
-	s/^.*UCLIBC_HAS_PRINTF_M_SPEC.*$/UCLIBC_HAS_PRINTF_M_SPEC=y/;
-	s/^.*UCLIBC_SUSV3_LEGACY.*$/UCLIBC_SUSV3_LEGACY=y\nUCLIBC_SUSV3_LEGACY_MACROS=y/;
-	s/^.*\<DOSTRIP\>.*$/# DOSTRIP is not set/;
-%{?debug:s/^.*\<DODEBUG\>.*$/DODEBUG=y/;s/^.*SUPPORT_LD_DEBUG\>.*$/SUPPORT_LD_DEBUG=y/;s/^.*SUPPORT_LD_DEBUG_EARLY.*$/SUPPORT_LD_DEBUG_EARLY=y/;}
-' .config
-
-# force regeneration after .config changes
-rm -f include/bits/uClibc_config.h
-
-# note: defconfig and all must be run in separate make process because of macros
-%{__make} -j1 \
-	TARGET_ARCH="%{TARGET_ARCH}" \
+%{__make} \
 	TARGET_CPU="%{_target_cpu}" \
-	KERNEL_SOURCE=%{_prefix} \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
-	OPTIMIZATION="%{rpmcflags} -Os" \
-	CC="%{__cc}"
+	CC="%{__cc}" \
+	OPTIMIZATION="%{rpmcflags} -Os"
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 
 %{__make} -j1 install \
-	NATIVE_CC="%{__cc}" \
-	NATIVE_CFLAGS="%{rpmcflags} %{rpmldflags}" \
-	TARGET_ARCH="%{TARGET_ARCH}" \
 	TARGET_CPU="%{_target_cpu}" \
+	HOSTCC="%{__cc}" \
+	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	CC="%{__cc}" \
-	PREFIX=$RPM_BUILD_ROOT
+	OPTIMIZATION="%{rpmcflags} -Os" \
+	DESTDIR=$RPM_BUILD_ROOT
 
 %if %{with shared}
 mv -f $RPM_BUILD_ROOT%{uclibc_root}/usr/lib/{libpthread-uclibc,libpthread}.so
