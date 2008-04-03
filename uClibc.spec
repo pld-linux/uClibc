@@ -24,6 +24,7 @@ Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
 Patch5:		%{name}-sparc.patch
 Patch6:		%{name}-gcc3-macro.patch
+Patch7:		%{name}-hash-style.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	cpp
@@ -80,6 +81,7 @@ Biblioteki statyczne uClibc.
 # check if it's needed now... ldso is broken on sparc anyway
 #%patch5 -p1
 %patch6 -p1
+%patch7 -p1
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
@@ -179,6 +181,7 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 %if %{with shared}
 mv -f $RPM_BUILD_ROOT%{uclibc_root}/usr/lib/{libpthread-uclibc,libpthread}.so
 ln -sf libpthread-0.9.29.so $RPM_BUILD_ROOT%{uclibc_root}/lib/libpthread.so.0
+chmod a+rx $RPM_BUILD_ROOT%{uclibc_root}/lib/*.so
 %endif
 
 # these links are *needed* (by stuff in bin/)
@@ -255,11 +258,43 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(644,root,root,755)
 %doc docs/*.txt
-%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-addr2line
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-ar
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-as
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-c++
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-cc
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-cpp
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-g++
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-gasp
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-gcc
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-ld
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-nm
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-objcopy
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-objdump
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-ranlib
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-size
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-strings
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-strip
 %{uclibc_root}/usr/lib/*.o
 %dir %{uclibc_root}/usr
 %dir %{uclibc_root}/usr/bin
-%attr(755,root,root) %{uclibc_root}/usr/bin/*
+%attr(755,root,root) %{uclibc_root}/usr/bin/addr2line
+%attr(755,root,root) %{uclibc_root}/usr/bin/ar
+%attr(755,root,root) %{uclibc_root}/usr/bin/as
+%attr(755,root,root) %{uclibc_root}/usr/bin/c++
+%attr(755,root,root) %{uclibc_root}/usr/bin/cc
+%attr(755,root,root) %{uclibc_root}/usr/bin/cpp
+%attr(755,root,root) %{uclibc_root}/usr/bin/g++
+%attr(755,root,root) %{uclibc_root}/usr/bin/gasp
+%attr(755,root,root) %{uclibc_root}/usr/bin/gcc
+%attr(755,root,root) %{uclibc_root}/usr/bin/ld
+%attr(755,root,root) %{uclibc_root}/usr/bin/nm
+%attr(755,root,root) %{uclibc_root}/usr/bin/objcopy
+%attr(755,root,root) %{uclibc_root}/usr/bin/objdump
+%attr(755,root,root) %{uclibc_root}/usr/bin/ranlib
+%attr(755,root,root) %{uclibc_root}/usr/bin/size
+%attr(755,root,root) %{uclibc_root}/usr/bin/strings
+%attr(755,root,root) %{uclibc_root}/usr/bin/strip
 %dir %{uclibc_root}/usr/lib
 %if %{with shared}
 %{uclibc_root}/usr/lib/uclibc_nonshared.a
