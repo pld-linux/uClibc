@@ -148,6 +148,7 @@ EOF
 %{__make} defconfig \
 	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
+	GCC_BIN=%{_host_cpu}-%{_vendor}-%{_os}-gcc \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	CC="%{__cc}" \
@@ -156,6 +157,7 @@ EOF
 %{__make} \
 	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
+	GCC_BIN=%{_host_cpu}-%{_vendor}-%{_os}-gcc \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	CC="%{__cc}" \
