@@ -1,13 +1,7 @@
-# TODO
-# - fix shared in ix86 not to flip/flop functionality
-# - fix shared on amd64
 #
 # Conditional build:
 %bcond_without	shared		# don't build shared lib support
-#
-%ifarch %{x8664} %{ix86} alpha
-%undefine	with_shared
-%endif
+%bcond_with	verbose		# verbose mode
 #
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
@@ -25,6 +19,7 @@ Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
 Patch5:		%{name}-sparc.patch
+Patch6:		%{name}-gcc3-macro.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	cpp
@@ -80,6 +75,7 @@ Biblioteki statyczne uClibc.
 %patch4 -p1
 # check if it's needed now... ldso is broken on sparc anyway
 #%patch5 -p1
+%patch6 -p1
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
@@ -146,6 +142,7 @@ EOF
 %build
 # NOTE: 'defconfig' and 'all' must be run in separate make process because of macros
 %{__make} defconfig \
+	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
@@ -153,6 +150,7 @@ EOF
 	OPTIMIZATION="%{rpmcflags} -Os"
 
 %{__make} \
+	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
@@ -164,6 +162,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 
 %{__make} -j1 install \
+	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
