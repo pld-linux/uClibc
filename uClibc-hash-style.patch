@@ -1,0 +1,10 @@
+--- uClibc-0.9.29/extra/gcc-uClibc/gcc-uClibc.c~	2008-04-03 17:21:47.000000000 +0300
++++ uClibc-0.9.29/extra/gcc-uClibc/gcc-uClibc.c	2008-04-03 17:28:56.217804561 +0300
+@@ -530,7 +530,6 @@
+ 	}
+ 
+ 	if (linking && source_count) {
+-		gcc_argv[i++] = "-Wl,--hash-style=sysv";
+ #if defined __HAVE_ELF__ && ! defined __UCLIBC_HAS_MMU__
+ 		gcc_argv[i++] = "-Wl,-elf2flt";
+ #endif
