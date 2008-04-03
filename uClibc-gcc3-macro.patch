@@ -1,0 +1,81 @@
+diff -urN uClibc-0.9.29.org/libc/sysdeps/linux/x86_64/clone.S uClibc-0.9.29/libc/sysdeps/linux/x86_64/clone.S
+--- uClibc-0.9.29.org/libc/sysdeps/linux/x86_64/clone.S	2006-08-24 02:05:09.000000000 +0200
++++ uClibc-0.9.29/libc/sysdeps/linux/x86_64/clone.S	2008-04-03 13:52:17.281547280 +0200
+@@ -75,7 +75,7 @@
+ 	movq	%r8, %rdx
+ 	movq	%r9, %r8
+ 	movq	8(%rsp), %r10
+-	movl	$__NR_clone,%eax
++	movl	$ __NR_clone,%eax
+ 
+ 	syscall
+ 
+diff -urN uClibc-0.9.29.org/libc/sysdeps/linux/x86_64/vfork.S uClibc-0.9.29/libc/sysdeps/linux/x86_64/vfork.S
+--- uClibc-0.9.29.org/libc/sysdeps/linux/x86_64/vfork.S	2006-02-13 09:44:48.000000000 +0100
++++ uClibc-0.9.29/libc/sysdeps/linux/x86_64/vfork.S	2008-04-03 13:52:03.327546867 +0200
+@@ -41,7 +41,7 @@
+ 	popq	%rdi
+ 
+ 	/* Stuff the syscall number in RAX and enter into the kernel.  */
+-	movl	$__NR_vfork, %eax
++	movl	$ __NR_vfork, %eax
+ 	syscall
+ 
+ 	/* Push back the return PC.  */
+diff -ur uClibc-0.9.29.org/libc/sysdeps/linux/i386/clone.S uClibc-0.9.29/libc/sysdeps/linux/i386/clone.S
+--- uClibc-0.9.29.org/libc/sysdeps/linux/i386/clone.S	2006-01-14 01:58:03.000000000 +0100
++++ uClibc-0.9.29/libc/sysdeps/linux/i386/clone.S	2008-04-03 13:58:05.748205973 +0200
+@@ -89,7 +89,7 @@
+ 	movl	PTID+12(%esp),%edx
+ 	movl	FLAGS+12(%esp),%ebx
+ 	movl	CTID+12(%esp),%edi
+-	movl	$__NR_clone,%eax
++	movl	$ __NR_clone,%eax
+ 	int	$0x80
+ 	popl	%edi
+ 	popl	%esi
+@@ -111,7 +111,7 @@
+ 	addl	$_GLOBAL_OFFSET_TABLE_+[.-.Lhere], %ebx
+ #endif
+ 	movl	%eax, %ebx
+-	movl	$__NR_exit, %eax
++	movl	$ __NR_exit, %eax
+ 	int	$0x80
+ 
+ /* Need to indirect jump to syscall error 
+diff -ur uClibc-0.9.29.org/libc/sysdeps/linux/i386/mmap64.S uClibc-0.9.29/libc/sysdeps/linux/i386/mmap64.S
+--- uClibc-0.9.29.org/libc/sysdeps/linux/i386/mmap64.S	2005-08-13 00:50:16.000000000 +0200
++++ uClibc-0.9.29/libc/sysdeps/linux/i386/mmap64.S	2008-04-03 13:56:43.627613478 +0200
+@@ -64,7 +64,7 @@
+ 	movl FLAGS(%esp), %esi
+ 	movl FD(%esp), %edi
+ 
+-	movl $__NR_mmap2, %eax	/* System call number in %eax.  */
++	movl $ __NR_mmap2, %eax	/* System call number in %eax.  */
+ 	/* Do the system call trap.  */
+ 	int $0x80
+ 
+diff -ur uClibc-0.9.29.org/libc/sysdeps/linux/i386/mmap.S uClibc-0.9.29/libc/sysdeps/linux/i386/mmap.S
+--- uClibc-0.9.29.org/libc/sysdeps/linux/i386/mmap.S	2006-01-14 01:58:03.000000000 +0100
++++ uClibc-0.9.29/libc/sysdeps/linux/i386/mmap.S	2008-04-03 13:56:48.897865423 +0200
+@@ -29,7 +29,7 @@
+ 	/* Save registers.  */
+ 	movl %ebx, %edx
+ 
+-	movl $__NR_mmap, %eax	/* System call number in %eax.  */
++	movl $ __NR_mmap, %eax	/* System call number in %eax.  */
+ 
+ 	lea 4(%esp), %ebx		/* Address of args is 1st arg.  */
+ 
+diff -ur uClibc-0.9.29.org/libc/sysdeps/linux/i386/vfork.S uClibc-0.9.29/libc/sysdeps/linux/i386/vfork.S
+--- uClibc-0.9.29.org/libc/sysdeps/linux/i386/vfork.S	2006-02-13 09:44:48.000000000 +0100
++++ uClibc-0.9.29/libc/sysdeps/linux/i386/vfork.S	2008-04-03 13:56:35.373885569 +0200
+@@ -19,7 +19,7 @@
+ 
+ __vfork:
+ 	popl %ecx
+-	movl $__NR_vfork,%eax
++	movl $ __NR_vfork,%eax
+ 	int $0x80
+ 	pushl %ecx
+ 	cmpl $-4095,%eax
