@@ -3,6 +3,10 @@
 %bcond_without	shared		# don't build shared lib support
 %bcond_with	verbose		# verbose mode
 #
+%ifarch alpha
+%undefine	with_shared
+%endif
+#
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
