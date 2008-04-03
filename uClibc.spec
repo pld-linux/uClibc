@@ -11,7 +11,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.29
-Release:	12
+Release:	13
 Epoch:		2
 License:	LGPL v2.1
 Group:		Libraries
@@ -146,6 +146,7 @@ UCLIBC_SUSV3_LEGACY_MACROS=y
 EOF
 
 %build
+
 # NOTE: 'defconfig' and 'all' must be run in separate make process because of macros
 %{__make} defconfig \
 	%{?with_verbose:VERBOSE=1} \
@@ -156,9 +157,16 @@ EOF
 	CC="%{__cc}" \
 	OPTIMIZATION="%{rpmcflags} -Os"
 
+# The Makefile includes .config and later tries to assign same variable,
+# eventually it gets lost and sets wrong value for TARGET_ARCH and bad value
+# for UCLIBC_LDSO in extra/gcc-uClibc.
+# So we pass it as make arg to be sure it's proper!
+target_arch=$(grep -s '^TARGET_ARCH' .config | sed -e 's/^TARGET_ARCH=//' -e 's/"//g')
+
 %{__make} \
 	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
+	TARGET_ARCH=$target_arch \
 	GCC_BIN=%{_host_cpu}-%{_vendor}-%{_os}-gcc \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
@@ -180,7 +188,7 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 
 %if %{with shared}
 mv -f $RPM_BUILD_ROOT%{uclibc_root}/usr/lib/{libpthread-uclibc,libpthread}.so
-ln -sf libpthread-0.9.29.so $RPM_BUILD_ROOT%{uclibc_root}/lib/libpthread.so.0
+ln -sf libpthread-%{version}.so $RPM_BUILD_ROOT%{uclibc_root}/lib/libpthread.so.0
 chmod a+rx $RPM_BUILD_ROOT%{uclibc_root}/lib/*.so
 %endif
 
