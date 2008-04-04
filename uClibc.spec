@@ -1,12 +1,17 @@
 #
 # Conditional build:
 %bcond_without	shared		# don't build shared lib support
+%bcond_with	verbose		# verbose mode
+#
+%ifarch alpha
+%undefine	with_shared
+%endif
 #
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.29
-Release:	11
+Release:	14
 Epoch:		2
 License:	LGPL v2.1
 Group:		Libraries
@@ -139,16 +144,28 @@ UCLIBC_SUSV3_LEGACY_MACROS=y
 EOF
 
 %build
+
 # NOTE: 'defconfig' and 'all' must be run in separate make process because of macros
 %{__make} defconfig \
+	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
+	GCC_BIN=%{_host_cpu}-%{_vendor}-%{_os}-gcc \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	CC="%{__cc}" \
 	OPTIMIZATION="%{rpmcflags} -Os"
 
+# The Makefile includes .config and later tries to assign same variable,
+# eventually it gets lost and sets wrong value for TARGET_ARCH and bad value
+# for UCLIBC_LDSO in extra/gcc-uClibc.
+# So we pass it as make arg to be sure it's proper!
+target_arch=$(grep -s '^TARGET_ARCH' .config | sed -e 's/^TARGET_ARCH=//' -e 's/"//g')
+
 %{__make} \
+	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
+	TARGET_ARCH=$target_arch \
+	GCC_BIN=%{_host_cpu}-%{_vendor}-%{_os}-gcc \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	CC="%{__cc}" \
@@ -159,6 +176,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 
 %{__make} -j1 install \
+	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
 	HOSTCC="%{__cc}" \
 	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
@@ -168,7 +186,8 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 
 %if %{with shared}
 mv -f $RPM_BUILD_ROOT%{uclibc_root}/usr/lib/{libpthread-uclibc,libpthread}.so
-ln -sf libpthread-0.9.29.so $RPM_BUILD_ROOT%{uclibc_root}/lib/libpthread.so.0
+ln -sf libpthread-%{version}.so $RPM_BUILD_ROOT%{uclibc_root}/lib/libpthread.so.0
+chmod a+rx $RPM_BUILD_ROOT%{uclibc_root}/lib/*.so
 %endif
 
 # these links are *needed* (by stuff in bin/)
@@ -241,11 +260,43 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(644,root,root,755)
 %doc docs/*.txt
-%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-addr2line
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-ar
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-as
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-c++
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-cc
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-cpp
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-g++
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-gasp
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-gcc
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-ld
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-nm
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-objcopy
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-objdump
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-ranlib
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-size
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-strings
+%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-strip
 %{uclibc_root}/usr/lib/*.o
 %dir %{uclibc_root}/usr
 %dir %{uclibc_root}/usr/bin
-%attr(755,root,root) %{uclibc_root}/usr/bin/*
+%attr(755,root,root) %{uclibc_root}/usr/bin/addr2line
+%attr(755,root,root) %{uclibc_root}/usr/bin/ar
+%attr(755,root,root) %{uclibc_root}/usr/bin/as
+%attr(755,root,root) %{uclibc_root}/usr/bin/c++
+%attr(755,root,root) %{uclibc_root}/usr/bin/cc
+%attr(755,root,root) %{uclibc_root}/usr/bin/cpp
+%attr(755,root,root) %{uclibc_root}/usr/bin/g++
+%attr(755,root,root) %{uclibc_root}/usr/bin/gasp
+%attr(755,root,root) %{uclibc_root}/usr/bin/gcc
+%attr(755,root,root) %{uclibc_root}/usr/bin/ld
+%attr(755,root,root) %{uclibc_root}/usr/bin/nm
+%attr(755,root,root) %{uclibc_root}/usr/bin/objcopy
+%attr(755,root,root) %{uclibc_root}/usr/bin/objdump
+%attr(755,root,root) %{uclibc_root}/usr/bin/ranlib
+%attr(755,root,root) %{uclibc_root}/usr/bin/size
+%attr(755,root,root) %{uclibc_root}/usr/bin/strings
+%attr(755,root,root) %{uclibc_root}/usr/bin/strip
 %dir %{uclibc_root}/usr/lib
 %if %{with shared}
 %{uclibc_root}/usr/lib/uclibc_nonshared.a
