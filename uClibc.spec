@@ -1,4 +1,8 @@
 #
+# TODO:
+# - add filtering out -Wl,-z,-combreloc in gcc wrapper
+#   (causes linking to be done against glibc instead of uclibc)
+#
 # Conditional build:
 %bcond_without	shared		# don't build shared lib support
 %bcond_with	verbose		# verbose mode
