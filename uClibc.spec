@@ -52,7 +52,7 @@ Summary:	Development files for uClibc
 Summary(pl.UTF-8):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}-%{release}
-Requires:	binutils
+Requires:	binutils-gasp
 Requires:	linux-libc-headers >= 7:2.6.24
 %requires_eq	gcc
 
