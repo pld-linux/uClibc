@@ -150,7 +150,7 @@ EOF
 %build
 
 # NOTE: 'defconfig' and 'all' must be run in separate make process because of macros
-%{__make} defconfig \
+%{__make} -j1 defconfig \
 	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
 	GCC_BIN=%{_host_cpu}-%{_vendor}-%{_os}-gcc \
@@ -165,7 +165,7 @@ EOF
 # So we pass it as make arg to be sure it's proper!
 target_arch=$(grep -s '^TARGET_ARCH' .config | sed -e 's/^TARGET_ARCH=//' -e 's/"//g')
 
-%{__make} \
+%{__make} -j1 \
 	%{?with_verbose:VERBOSE=1} \
 	TARGET_CPU="%{_target_cpu}" \
 	TARGET_ARCH=$target_arch \
