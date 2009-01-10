@@ -1,11 +1,11 @@
---- uClibc-0.9.29/libpthread/linuxthreads.old/Makefile.in.orig	2007-03-19 10:49:04.000000000 +0100
-+++ uClibc-0.9.29/libpthread/linuxthreads.old/Makefile.in	2007-05-12 12:00:56.716329632 +0200
+--- uClibc-0.9.30/libpthread/linuxthreads.old/Makefile.in.orig	2008-11-07 22:15:53.000000000 +0100
++++ uClibc-0.9.30/libpthread/linuxthreads.old/Makefile.in	2009-01-10 11:36:18.378455532 +0100
 @@ -12,15 +12,15 @@
  CFLAGS-libpthread/linuxthreads.old/sysdeps/$(TARGET_ARCH)/ := $(CFLAGS-linuxthreads.old)
  
  ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
--LDFLAGS-libpthread.so := $(LDFLAGS_NOSTRIP) -z defs
-+LDFLAGS-libpthread-uclibc.so := $(LDFLAGS_NOSTRIP) -z defs
+-LDFLAGS-libpthread.so := $(LDFLAGS_NOSTRIP) -Wl,-z,defs
++LDFLAGS-libpthread-uclibc.so := $(LDFLAGS_NOSTRIP) -Wl,-z,defs
  else
 -LDFLAGS-libpthread.so := $(LDFLAGS)
 +LDFLAGS-libpthread-uclibc.so := $(LDFLAGS)
@@ -21,23 +21,20 @@
  
  libpthread_FULL_NAME := libpthread-$(VERSION).so
  
-@@ -70,19 +70,23 @@
+@@ -70,16 +70,20 @@
  libpthread-so-y += $(libpthread_OBJ:.o=.os) $(libpthread-shared-y)
  
  lib-a-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.a
 -lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.so
 +lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread-uclibc.so
- objclean-y += libpthread_clean
- headers-$(UCLIBC_HAS_THREADS) += linuxthreads_headers
- headers_clean-y += linuxthreads_headers_clean
  
  #ifeq ($(DOMULTI),n)
--$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc)
-+$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread_so.a $(libc)
+-$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc.depend)
++$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread_so.a $(libc.depend)
  	$(call link.so,$(libpthread_FULL_NAME),$(MAJOR_VERSION))
  #else
--#$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread.oS | $(libc)
-+#$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread.oS | $(libc)
+-#$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread.oS | $(libc.depend)
++#$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread.oS | $(libc.depend)
  #	$(call linkm.so,$(libpthread_FULL_NAME),$(MAJOR_VERSION))
  #endif
  
@@ -45,17 +42,17 @@
 +	$(LN) -sf $(notdir $<).$(MAJOR_VERSION) $@.$(MAJOR_VERSION)
 +	$(LN) -sf $(notdir $<) $@
 +
- $(libpthread_OUT)/libpthread_so.a: $(libpthread-so-y)
- 	$(Q)$(RM) $@
  ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
---- uClibc-0.9.29/libpthread/linuxthreads/Makefile.in.orig	2007-03-19 10:49:04.000000000 +0100
-+++ uClibc-0.9.29/libpthread/linuxthreads/Makefile.in	2007-05-12 11:56:54.194509100 +0200
+ $(libpthread_OUT)/libpthread_so.a: STRIP_FLAGS:=$(STRIP_FLAGS:-x=-X --strip-debug)
+ endif
+--- uClibc-0.9.30/libpthread/linuxthreads/Makefile.in.orig	2008-11-07 22:15:53.000000000 +0100
++++ uClibc-0.9.30/libpthread/linuxthreads/Makefile.in	2009-01-10 11:38:44.322453856 +0100
 @@ -19,15 +19,15 @@
  #CFLAGS:=$(CFLAGS:-O0=-O1)
  
  ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
--LDFLAGS-libpthread.so := $(LDFLAGS_NOSTRIP) -z defs
-+LDFLAGS-libpthread-uclibc.so := $(LDFLAGS_NOSTRIP) -z defs
+-LDFLAGS-libpthread.so := $(LDFLAGS_NOSTRIP) -Wl,-z,defs
++LDFLAGS-libpthread-uclibc.so := $(LDFLAGS_NOSTRIP) -Wl,-z,defs
  else
 -LDFLAGS-libpthread.so := $(LDFLAGS)
 +LDFLAGS-libpthread-uclibc.so := $(LDFLAGS)
@@ -71,23 +68,20 @@
  
  libpthread_FULL_NAME := libpthread-$(VERSION).so
  
-@@ -80,22 +80,26 @@
- libpthread-so-y += $(libpthread_OBJ:.o=.os)
+@@ -80,19 +80,23 @@
+ libpthread-so-y += $(libpthread_OBJ:.o=.oS)
  
  lib-a-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.a
 -lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.so
 +lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread-uclibc.so
- objclean-y += libpthread_clean
- headers-$(UCLIBC_HAS_THREADS) += linuxthreads_headers
- headers_clean-y += linuxthreads_headers_clean
  
  #ifeq ($(DOMULTI),n)
--$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc) $(top_builddir)lib/libpthread_nonshared.a
-+$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread_so.a $(libc) $(top_builddir)lib/libpthread_nonshared.a
+-$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc.depend) $(top_builddir)lib/libpthread_nonshared.a
++$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread_so.a $(libc.depend) $(top_builddir)lib/libpthread_nonshared.a
  	$(call link.so,$(libpthread_FULL_NAME),$(MAJOR_VERSION))
  #else
--#$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread.oS | $(libc) $(top_builddir)lib/libpthread_nonshared.a
-+#$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread.oS | $(libc) $(top_builddir)lib/libpthread_nonshared.a
+-#$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread.oS | $(libc.depend) $(top_builddir)lib/libpthread_nonshared.a
++#$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread.oS | $(libc.depend) $(top_builddir)lib/libpthread_nonshared.a
  #	$(call linkm.so,$(libpthread_FULL_NAME),$(MAJOR_VERSION))
  #endif
  	$(Q)$(RM) $@
@@ -98,6 +92,6 @@
 +	$(LN) -sf $(notdir $<).$(MAJOR_VERSION) $@.$(MAJOR_VERSION)
 +	$(LN) -sf $(notdir $<) $@
 +
- $(libpthread_OUT)/libpthread_so.a: $(libpthread-so-y)
- 	$(Q)$(RM) $@
  ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
+ $(libpthread_OUT)/libpthread_so.a: STRIP_FLAGS:=$(STRIP_FLAGS:-x=-X --strip-debug)
+ endif
