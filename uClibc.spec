@@ -2,6 +2,9 @@
 # TODO:
 # - add filtering out -Wl,-z,-combreloc in gcc wrapper
 #   (causes linking to be done against glibc instead of uclibc)
+# - 0.9.30 is broken. First build it and then try to build
+#   lvm2.spec on i686 (or any *.c program like printf("test")).
+#   Fails with: symbol '_stdio_openlist_use_count': can't resolve symbol ...
 #
 # Conditional build:
 %bcond_without	shared		# don't build shared lib support
@@ -15,7 +18,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.30
-Release:	3
+Release:	3.1
 Epoch:		2
 License:	LGPL v2.1
 Group:		Libraries
