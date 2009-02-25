@@ -34,6 +34,7 @@ BuildRequires:	binutils-gasp
 BuildRequires:	cpp
 BuildRequires:	gcc >= 5:3.0
 BuildRequires:	linux-libc-headers >= 7:2.6.24
+BuildRequires:	ncurses-devel
 BuildRequires:	sed >= 4.0
 BuildRequires:	which
 ExclusiveArch:	alpha %{ix86} ppc sparc sparcv9 %{x8664}
