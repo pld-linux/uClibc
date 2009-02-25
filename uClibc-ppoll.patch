@@ -11,16 +11,16 @@
 @@ -26,24 +27,26 @@
  
  # define __NR___libc_ppoll __NR_ppoll
- static __always_inline
+ static inline
 -_syscall4(int, __libc_ppoll, struct pollfd *, fds,
 -	nfds_t, nfds, const struct timespec *, timeout,
--	const __sigset_t *, sigmask)
+-	const __sigset_t *, sigmask);
 +_syscall5(int, __libc_ppoll,
 +	struct pollfd *, fds,
 +	nfds_t, nfds,
 +	const struct timespec *, timeout,
 +	const __sigset_t *, sigmask,
-+	size_t, sigsetsize)
++	size_t, sigsetsize);
  
  int
 -ppoll (struct pollfd *fds, nfds_t nfds, const struct timespec *timeout,
