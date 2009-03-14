@@ -534,7 +534,7 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gc
 +	}
 +
 +	if (linking && source_count) {
-+		gcc_argv[i++] = "-Wl,--hash-style=sysv";
++		gcc_argv[i++] = "-Wl,--hash-style=gnu";
 +#if defined __HAVE_ELF__ && ! defined __UCLIBC_HAS_MMU__
 +		gcc_argv[i++] = "-Wl,-elf2flt";
 +#endif
