@@ -11,7 +11,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.30.1
-Release:	1
+Release:	1.1
 Epoch:		3
 License:	LGPL v2.1
 Group:		Libraries
@@ -24,6 +24,7 @@ Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
 Patch5:		%{name}-sparc.patch
 Patch6:		%{name}-ppoll.patch
+Patch7:		%{name}-ldouble_wrappers.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	cpp
@@ -83,6 +84,7 @@ Biblioteki statyczne uClibc.
 # check if it's needed now... ldso is broken on sparc anyway
 #%patch5 -p1
 %patch6 -p2
+%patch7 -p2
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
