@@ -24,3 +24,19 @@
  #endif
  
  #ifdef L_isnanl
+@@ -568,7 +565,6 @@
+ {
+ 	return __isnan ( (double)x );
+ }
+-libm_hidden_def(__isnanl)
+ #endif
+ 
+ #ifdef L_isinfl
+@@ -576,7 +572,6 @@
+ {
+ 	return __isinf ( (double)x );
+ }
+-libm_hidden_def(__isinfl)
+ #endif
+ 
+ #endif
