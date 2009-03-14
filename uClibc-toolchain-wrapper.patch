@@ -1,7 +1,7 @@
 diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gcc-uClibc/gcc-uClibc.c
 --- uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c	1970-01-01 01:00:00.000000000 +0100
 +++ uClibc-0.9.29/extra/gcc-uClibc/gcc-uClibc.c	2007-06-03 22:10:49.372320596 +0200
-@@ -0,0 +1,668 @@
+@@ -0,0 +1,674 @@
 +/* vi: set sw=4 ts=4: */
 +/*
 + * Copyright (C) 2000 Manuel Novoa III
@@ -395,6 +395,12 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/gcc-uClibc.c uClibc-0.9.29/extra/gc
 +						}
 +						if (strstr(argv[i],"--dynamic-linker") != 0) {
 +							dlstr = 0;
++						}
++						if (strstr(argv[i],"-z,-combreloc") != 0) {
++							argv[i] = '\0';
++						}
++						if (strstr(argv[i],"-z,relro") != 0) {
++							argv[i] = '\0';
 +						}
 +					}
 +					break;
