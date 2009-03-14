@@ -1,11 +1,4 @@
 #
-# TODO:
-# - add filtering out -Wl,-z,-combreloc in gcc wrapper
-#   (causes linking to be done against glibc instead of uclibc)
-# - 0.9.30 is broken. First build it and then try to build
-#   lvm2.spec on i686 (or any *.c program like printf("test")).
-#   Fails with: symbol '_stdio_openlist_use_count': can't resolve symbol ...
-#
 # Conditional build:
 %bcond_without	shared		# don't build shared lib support
 %bcond_with	verbose		# verbose mode
@@ -17,20 +10,20 @@
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.30
-Release:	3.1
-Epoch:		2
+Version:	0.9.30.1
+Release:	1
+Epoch:		3
 License:	LGPL v2.1
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	e5766e2566e0297adebebbcc0aba1f2d
+# Source0-md5:	1a4b84e5536ad8170563ffa88c34679c
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-toolchain-wrapper.patch
 Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
 Patch5:		%{name}-sparc.patch
-Patch6:		%{name}-headers.patch
+Patch6:		%{name}-ppoll.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	cpp
@@ -89,7 +82,7 @@ Biblioteki statyczne uClibc.
 %patch4 -p1
 # check if it's needed now... ldso is broken on sparc anyway
 #%patch5 -p1
-%patch6 -p1
+%patch6 -p2
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
@@ -140,6 +133,7 @@ UCLIBC_HAS_RPC=y
 # UCLIBC_HAS_REENTRANT_RPC is not set
 UCLIBC_HAS_SYS_SIGLIST=y
 SHARED_LIB_LOADER_PREFIX="$(RUNTIME_PREFIX)/lib"
+LDSO_GNU_HASH_SUPPORT=y
 %if %{without shared}
 HAVE_NO_SHARED=y
 # HAVE_SHARED is not set
@@ -161,8 +155,8 @@ EOF
 	TARGET_CPU="%{_target_cpu}" \
 	GCC_BIN=%{_host_cpu}-%{_vendor}-%{_os}-gcc \
 	HOSTCC="%{__cc}" \
-	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	CC="%{__cc}" \
+	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os"
 
 # The Makefile includes .config and later tries to assign same variable,
@@ -177,8 +171,8 @@ target_arch=$(grep -s '^TARGET_ARCH' .config | sed -e 's/^TARGET_ARCH=//' -e 's/
 	TARGET_ARCH=$target_arch \
 	GCC_BIN=%{_host_cpu}-%{_vendor}-%{_os}-gcc \
 	HOSTCC="%{__cc}" \
-	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	CC="%{__cc}" \
+	HOSTCFLAGS="%{rpmcflags} %{rpmldflags}" \
 	OPTIMIZATION="%{rpmcflags} -Os"
 
 %install
