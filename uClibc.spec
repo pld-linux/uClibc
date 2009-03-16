@@ -36,7 +36,9 @@ BuildRequires:	which
 ExclusiveArch:	alpha %{ix86} ppc sparc sparcv9 %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+%if "%{cc_version}" >= "4.2"
 %define		specflags	-fgnu89-inline
+%endif
 
 %define		uclibc_root	/usr/%{_target_cpu}-linux-uclibc
 
