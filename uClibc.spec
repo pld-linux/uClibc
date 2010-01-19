@@ -23,9 +23,6 @@ Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
 Patch5:		%{name}-sparc.patch
-Patch6:		%{name}-ppoll.patch
-Patch7:		%{name}-ldouble_wrappers.patch
-Patch8:		%{name}-getline.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	cpp
@@ -87,9 +84,6 @@ Biblioteki statyczne uClibc.
 %patch4 -p1
 # check if it's needed now... ldso is broken on sparc anyway
 #%patch5 -p1
-%patch6 -p2
-%patch7 -p2
-%patch8 -p0
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
