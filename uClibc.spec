@@ -10,13 +10,13 @@
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.30.3
-Release:	3
+Version:	0.9.31
+Release:	1
 Epoch:		3
 License:	LGPL v2.1
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	73a4bf4a0fa508b01a7a3143574e3d21
+# Source0-md5:	52fb8a494758630c8d3ddd7f1e0daafd
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-toolchain-wrapper.patch
 Patch2:		%{name}-targetcpu.patch
@@ -24,11 +24,13 @@ Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
 Patch5:		%{name}-inotify_init1.patch
 Patch6:		%{name}-sockflags.patch
+Patch7:		%{name}-make.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	cpp
 BuildRequires:	gcc >= 5:3.0
 BuildRequires:	linux-libc-headers >= 7:2.6.24
+BuildRequires:	make >= 3.80
 BuildRequires:	ncurses-devel
 BuildRequires:	rpmbuild(macros) >= 1.453
 BuildRequires:	sed >= 4.0
@@ -85,6 +87,7 @@ Biblioteki statyczne uClibc.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
@@ -128,6 +131,8 @@ defconfig=extra/Configs/defconfigs/ia64
 %endif
 
 cat <<'EOF' >> $defconfig
+# HAS_NO_THREADS is not set
+LINUXTHREADS_OLD=y
 UCLIBC_HAS_IPV6=y
 DO_C99_MATH=y
 UCLIBC_HAS_RPC=y
@@ -150,7 +155,6 @@ UCLIBC_SUSV3_LEGACY_MACROS=y
 EOF
 
 %build
-
 # NOTE: 'defconfig' and 'all' must be run in separate make process because of macros
 %{__make} -j1 defconfig \
 	%{?with_verbose:VERBOSE=1} \
