@@ -11,7 +11,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.30.3
-Release:	6
+Release:	7
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
@@ -240,14 +240,15 @@ for f in $RPM_BUILD_ROOT%{uclibc_root}/usr/bin/*; do
 done
 
 rm -rf $RPM_BUILD_ROOT%{uclibc_root}/usr/include/{linux,asm*}
-ln -sf /usr/include/asm $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm
-ln -sf /usr/include/asm-generic $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-generic
+# rpm -ql linux-libc-headers | awk -F/ ' /^\/usr\/include\// { print "/usr/include/" $4 } ' | sort -u
+for dir in asm asm-generic linux mtd rdma sound video xen; do
+	ln -sf /usr/include/${dir} $RPM_BUILD_ROOT%{uclibc_root}/usr/include/${dir}
+done
 # for future use
 %ifarch sparc64
 ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc
 ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc64
 %endif
-ln -sf /usr/include/linux $RPM_BUILD_ROOT%{uclibc_root}/usr/include/linux
 
 %clean
 rm -rf $RPM_BUILD_ROOT
