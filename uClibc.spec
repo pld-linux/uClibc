@@ -24,6 +24,8 @@ Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
 Patch5:		%{name}-inotify_init1.patch
 Patch6:		%{name}-sockflags.patch
+Patch7:		%{name}-nosize.patch
+Patch8:		%{name}-warn-once.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	cpp
@@ -85,6 +87,8 @@ Biblioteki statyczne uClibc.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
+%patch8 -p1
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
