@@ -102,3 +102,60 @@
  ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
  $(libpthread_OUT)/libpthread_so.a: STRIP_FLAGS:=$(STRIP_FLAGS:-x=-X --strip-debug)
  endif
+--- uClibc-0.9.32/libpthread/nptl/Makefile.in.orig	2011-06-08 21:35:20.000000000 +0200
++++ uClibc-0.9.32/libpthread/nptl/Makefile.in	2011-06-12 10:54:46.594236173 +0200
+@@ -64,17 +64,17 @@
+ librt-so-y += $(librt_OBJS:.o=.oS) $(librt-pt-shared-only-routines-y:.o=.oS)
+ 
+ ifeq ($(UCLIBC_CTOR_DTOR),y)
+-START_FILE-libpthread.so := $(top_builddir)/libpthread/nptl/sysdeps/pthread/crti.o
+-END_FILE-libpthread.so := $(top_builddir)/libpthread/nptl/sysdeps/pthread/crtn.o
+-LDFLAGS-libpthread.so += -nostartfiles
+-$(top_builddir)lib/libpthread.so: | $(START_FILE-libpthread.so) $(END_FILE-libpthread.so)
++START_FILE-libpthread-uclibc.so := $(top_builddir)/libpthread/nptl/sysdeps/pthread/crti.o
++END_FILE-libpthread-uclibc.so := $(top_builddir)/libpthread/nptl/sysdeps/pthread/crtn.o
++LDFLAGS-libpthread-uclibc.so += -nostartfiles
++$(top_builddir)lib/libpthread-uclibc.so: | $(START_FILE-libpthread-uclibc.so) $(END_FILE-libpthread-uclibc.so)
+ endif
+ 
+ libpthread_FULL_NAME := libpthread-$(VERSION).so
+ lib-a-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.a
+-lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread.so
++lib-so-$(UCLIBC_HAS_THREADS) += $(top_builddir)lib/libpthread-uclibc.so
+ 
+-$(top_builddir)lib/libpthread.so: $(libpthread_OUT)/libpthread_so.a $(libc.depend) $(libdl.depend) $(top_builddir)lib/libpthread_nonshared.a
++$(top_builddir)lib/libpthread-uclibc.so: $(libpthread_OUT)/libpthread_so.a $(libc.depend) $(libdl.depend) $(top_builddir)lib/libpthread_nonshared.a
+ 	$(call link.so,$(libpthread_FULL_NAME),$(ABI_VERSION))
+ 	$(Q)cat $(top_srcdir)extra/scripts/format.lds > $@.tmp
+ 	$(Q)echo "GROUP ( $(notdir $@).$(ABI_VERSION) libpthread_nonshared.a )" >> $@.tmp
+@@ -92,6 +92,10 @@
+ 	$(Q)$(RM) $@
+ 	$(do_ar)
+ 
++$(top_builddir)lib/libpthread.so: $(top_builddir)lib/libpthread-uclibc.so
++	$(LN) -sf $(notdir $<).$(MAJOR_VERSION) $@.$(MAJOR_VERSION)
++	$(LN) -sf $(notdir $<) $@
++
+ #
+ # Create 'pthread-errnos.h' header file.
+ #
+@@ -139,15 +143,15 @@
+ 	$(do_rm) $(addprefix $(libpthread_OUT)/*., o os oS a)
+ 
+ ifeq ($(PTHREADS_DEBUG_SUPPORT),y)
+-LDFLAGS-libpthread.so += $(LDFLAGS_NOSTRIP) -Wl,-z,defs
++LDFLAGS-libpthread-uclibc.so += $(LDFLAGS_NOSTRIP) -Wl,-z,defs
+ else
+-LDFLAGS-libpthread.so += $(LDFLAGS)
++LDFLAGS-libpthread-uclibc.so += $(LDFLAGS)
+ endif
+ 
+-LDFLAGS-libpthread.so += $(top_builddir)lib/$(UCLIBC_LDSO_NAME)-$(VERSION).so $(top_builddir)lib/libdl-$(VERSION).so \
++LDFLAGS-libpthread-uclibc.so += $(top_builddir)lib/$(UCLIBC_LDSO_NAME)-$(VERSION).so $(top_builddir)lib/libdl-$(VERSION).so \
+ 	-Wl,-z,nodelete,-z,initfirst,-init=__pthread_initialize_minimal_internal
+ 
+-LIBS-libpthread.so := $(LIBS)
++LIBS-libpthread-uclibc.so := $(LIBS)
+ 
+ CFLAGS-nptl = -DNOT_IN_libc -DIS_IN_libpthread $(SSP_ALL_CFLAGS)
+ 
