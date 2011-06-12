@@ -10,21 +10,19 @@
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.31
+Version:	0.9.32
 Release:	1
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
-Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	52fb8a494758630c8d3ddd7f1e0daafd
+Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.xz
+# Source0-md5:	51660b93b8f1edb486049981fecfd148
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-toolchain-wrapper.patch
 Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
-Patch5:		%{name}-inotify_init1.patch
-Patch6:		%{name}-sockflags.patch
-Patch7:		%{name}-make.patch
+Patch5:		%{name}-epoll.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	cpp
@@ -34,7 +32,9 @@ BuildRequires:	make >= 3.80
 BuildRequires:	ncurses-devel
 BuildRequires:	rpmbuild(macros) >= 1.453
 BuildRequires:	sed >= 4.0
+BuildRequires:	tar >= 1:1.22
 BuildRequires:	which
+BuildRequires:	xz
 ExclusiveArch:	alpha %{ix86} ppc sparc sparcv9 %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -86,8 +86,6 @@ Biblioteki statyczne uClibc.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
-%patch7 -p1
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
@@ -245,7 +243,6 @@ for f in $RPM_BUILD_ROOT%{uclibc_root}/usr/bin/*; do
 	fi
 done
 
-%{__rm} -r $RPM_BUILD_ROOT%{uclibc_root}/usr/include/{linux,asm*}
 # rpm -ql linux-libc-headers | awk -F/ ' /^\/usr\/include\// { print "/usr/include/" $4 } ' | sort -u
 for dir in asm asm-generic linux mtd rdma sound video xen; do
 	ln -sf /usr/include/${dir} $RPM_BUILD_ROOT%{uclibc_root}/usr/include/${dir}
