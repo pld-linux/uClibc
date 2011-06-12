@@ -758,7 +758,7 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
 +	ln -fs $(RUNTIME_PREFIX)/bin/$(TARGET_ARCH)-uclibc-gcc $(PREFIX)$(DEVEL_PREFIX)/bin/c++
 +	ln -fs $(RUNTIME_PREFIX)/bin/$(TARGET_ARCH)-uclibc-gcc $(PREFIX)$(DEVEL_PREFIX)/bin/g++
 +endif
-+	for app in addr2line ar as cpp gasp nm objcopy \
++	for app in addr2line ar as cpp nm objcopy \
 +	    objdump ranlib size strings strip; do \
 +	  APPNAME=`which $(CROSS)$${app}`; \
 +	  if [ -x "$$APPNAME" ] ; then \
