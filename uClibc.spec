@@ -12,7 +12,7 @@ Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.31
 Release:	1
-Epoch:		3
+Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
@@ -29,7 +29,7 @@ URL:		http://uclibc.org/
 BuildRequires:	binutils-gasp
 BuildRequires:	cpp
 BuildRequires:	gcc >= 5:3.0
-BuildRequires:	linux-libc-headers >= 7:2.6.24
+BuildRequires:	linux-libc-headers >= 7:2.6.27
 BuildRequires:	make >= 3.80
 BuildRequires:	ncurses-devel
 BuildRequires:	rpmbuild(macros) >= 1.453
@@ -56,7 +56,7 @@ Summary(pl.UTF-8):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}-%{release}
 Requires:	binutils-gasp
-Requires:	linux-libc-headers >= 7:2.6.24
+Requires:	linux-libc-headers >= 7:2.6.27
 %requires_eq	gcc
 
 %description devel
@@ -245,15 +245,11 @@ for f in $RPM_BUILD_ROOT%{uclibc_root}/usr/bin/*; do
 	fi
 done
 
-rm -rf $RPM_BUILD_ROOT%{uclibc_root}/usr/include/{linux,asm*}
-ln -sf /usr/include/asm $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm
-ln -sf /usr/include/asm-generic $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-generic
-# for future use
-%ifarch sparc64
-ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc
-ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc64
-%endif
-ln -sf /usr/include/linux $RPM_BUILD_ROOT%{uclibc_root}/usr/include/linux
+%{__rm} -r $RPM_BUILD_ROOT%{uclibc_root}/usr/include/{linux,asm*}
+# rpm -ql linux-libc-headers | awk -F/ ' /^\/usr\/include\// { print "/usr/include/" $4 } ' | sort -u
+for dir in asm asm-generic linux mtd rdma sound video xen; do
+	ln -sf /usr/include/${dir} $RPM_BUILD_ROOT%{uclibc_root}/usr/include/${dir}
+done
 
 %clean
 rm -rf $RPM_BUILD_ROOT
