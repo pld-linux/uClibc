@@ -771,9 +771,9 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
 +	rm -f gcc-uClibc.h *-uclibc-gcc *-uclibc-ld core
 +
 +
---- uClibc-0.9.31/Makefile.in.orig	2010-04-02 17:34:27.000000000 +0200
-+++ uClibc-0.9.31/Makefile.in	2010-08-19 22:42:13.974823295 +0200
-@@ -24,7 +24,7 @@
+--- uClibc-0.9.32/Makefile.in.orig	2011-06-08 21:35:20.000000000 +0200
++++ uClibc-0.9.32/Makefile.in	2011-06-12 09:20:09.634046086 +0200
+@@ -23,7 +23,7 @@
  
  ifeq ($(HAVE_DOT_CONFIG),y)
  
@@ -782,7 +782,7 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
  libs: pregen
  
  # In this section, we need .config
-@@ -188,7 +188,7 @@
+@@ -192,7 +192,7 @@
  	HOSTCC="$(HOSTCC)" \
  	install
  
@@ -791,7 +791,7 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
  
  
  RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB=$(shell $(top_srcdir)extra/scripts/relative_path.sh $(DEVEL_PREFIX)$(MULTILIB_DIR) $(RUNTIME_PREFIX)$(MULTILIB_DIR))
-@@ -383,6 +383,12 @@
+@@ -405,6 +405,12 @@
  
  endif # ifeq ($(HAVE_DOT_CONFIG),y)
  
@@ -801,6 +801,6 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
 +install_toolchain: toolchain
 +	$(MAKE) CROSS="$(CROSS)" CC="$(CC)" -C extra/gcc-uClibc install
 +
- hostutils:
+ hostutils: | pregen
  	$(Q)$(MAKE) CROSS="$(CROSS)" CC="$(CC)" HOSTCC="$(HOSTCC)" DOTHOST=.host -C utils $@
  
