@@ -1,9 +1,9 @@
---- uClibc-0.9.31/libc/misc/internals/__uClibc_main.c.orig	2010-04-02 17:34:27.000000000 +0200
-+++ uClibc-0.9.31/libc/misc/internals/__uClibc_main.c	2010-08-19 22:44:43.818819943 +0200
-@@ -68,7 +68,7 @@
+--- uClibc-0.9.32/libc/misc/internals/__uClibc_main.c.orig	2011-06-08 21:35:20.000000000 +0200
++++ uClibc-0.9.32/libc/misc/internals/__uClibc_main.c	2011-06-12 09:23:48.324053409 +0200
+@@ -118,7 +118,7 @@
+  */
+ extern int *weak_const_function __errno_location(void);
  extern int *weak_const_function __h_errno_location(void);
- libc_hidden_proto(__h_errno_location)
- 
 -extern void weak_function _stdio_init(void) attribute_hidden;
 +extern void weak_function _stdio_init(void);
  #ifdef __UCLIBC_HAS_LOCALE__
