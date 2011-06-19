@@ -1,6 +1,7 @@
 #
 # Conditional build:
 %bcond_without	shared		# don't build shared lib support
+%bcond_with	nptl		# libpthread: NPTL instead of LinuxThreads (experimental; no i386)
 %bcond_with	verbose		# verbose mode
 #
 %ifarch alpha
@@ -10,32 +11,39 @@
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.30.3
-Release:	7
+Version:	0.9.32
+Release:	1
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
-Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.bz2
-# Source0-md5:	73a4bf4a0fa508b01a7a3143574e3d21
+Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.xz
+# Source0-md5:	51660b93b8f1edb486049981fecfd148
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-toolchain-wrapper.patch
 Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
-Patch5:		%{name}-inotify_init1.patch
-Patch6:		%{name}-sockflags.patch
-Patch7:		%{name}-nosize.patch
-Patch8:		%{name}-warn-once.patch
+Patch5:		%{name}-epoll.patch
 URL:		http://uclibc.org/
-BuildRequires:	binutils-gasp
+BuildRequires:	binutils >= 2.16
 BuildRequires:	cpp
+%if %{with nptl}
+BuildRequires:	gcc >= 5:4.1
+%else
 BuildRequires:	gcc >= 5:3.0
-BuildRequires:	linux-libc-headers >= 7:2.6.24
+%endif
+BuildRequires:	linux-libc-headers >= 7:2.6.27
+BuildRequires:	make >= 3.80
 BuildRequires:	ncurses-devel
 BuildRequires:	rpmbuild(macros) >= 1.453
 BuildRequires:	sed >= 4.0
+BuildRequires:	tar >= 1:1.22
 BuildRequires:	which
+BuildRequires:	xz
+%{?with_nptl:Requires:	uname(version) >= 2.6}
+# only these supported by this .spec; uClibc code supports some more
 ExclusiveArch:	alpha %{ix86} ppc sparc sparcv9 %{x8664}
+%{?with_nptl:ExcludeArch:	i386}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %if "%{cc_version}" >= "4.2"
@@ -55,8 +63,7 @@ Summary:	Development files for uClibc
 Summary(pl.UTF-8):	Pliki dla programistów uClibc
 Group:		Development/Libraries
 Requires:	%{name} = %{epoch}:%{version}-%{release}
-Requires:	binutils-gasp
-Requires:	linux-libc-headers >= 7:2.6.24
+Requires:	linux-libc-headers >= 7:2.6.27
 %requires_eq	gcc
 
 %description devel
@@ -86,9 +93,6 @@ Biblioteki statyczne uClibc.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
@@ -132,6 +136,9 @@ defconfig=extra/Configs/defconfigs/ia64
 %endif
 
 cat <<'EOF' >> $defconfig
+# HAS_NO_THREADS is not set
+%{!?with_nptl:LINUXTHREADS_OLD=y}
+%{?with_nptl:UCLIBC_HAS_THREADS_NATIVE=y}
 UCLIBC_HAS_IPV6=y
 DO_C99_MATH=y
 UCLIBC_HAS_RPC=y
@@ -195,8 +202,10 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 	DESTDIR=$RPM_BUILD_ROOT
 
 %if %{with shared}
+%if %{without nptl}
 mv -f $RPM_BUILD_ROOT%{uclibc_root}/usr/lib/{libpthread-uclibc,libpthread}.so
 ln -sf libpthread-%{version}.so $RPM_BUILD_ROOT%{uclibc_root}/lib/libpthread.so.0
+%endif
 chmod a+rx $RPM_BUILD_ROOT%{uclibc_root}/lib/*.so
 %endif
 
@@ -243,16 +252,10 @@ for f in $RPM_BUILD_ROOT%{uclibc_root}/usr/bin/*; do
 	fi
 done
 
-rm -rf $RPM_BUILD_ROOT%{uclibc_root}/usr/include/{linux,asm*}
 # rpm -ql linux-libc-headers | awk -F/ ' /^\/usr\/include\// { print "/usr/include/" $4 } ' | sort -u
 for dir in asm asm-generic linux mtd rdma sound video xen; do
 	ln -sf /usr/include/${dir} $RPM_BUILD_ROOT%{uclibc_root}/usr/include/${dir}
 done
-# for future use
-%ifarch sparc64
-ln -sf /usr/include/asm-sparc $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc
-ln -sf /usr/include/asm-sparc64 $RPM_BUILD_ROOT%{uclibc_root}/usr/include/asm-sparc64
-%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -278,7 +281,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-cc
 %attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-cpp
 %attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-g++
-%attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-gasp
 %attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-gcc
 %attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-ld
 %attr(755,root,root) %{_bindir}/%{_target_cpu}-uclibc-nm
@@ -298,7 +300,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{uclibc_root}/usr/bin/cc
 %attr(755,root,root) %{uclibc_root}/usr/bin/cpp
 %attr(755,root,root) %{uclibc_root}/usr/bin/g++
-%attr(755,root,root) %{uclibc_root}/usr/bin/gasp
 %attr(755,root,root) %{uclibc_root}/usr/bin/gcc
 %attr(755,root,root) %{uclibc_root}/usr/bin/ld
 %attr(755,root,root) %{uclibc_root}/usr/bin/nm

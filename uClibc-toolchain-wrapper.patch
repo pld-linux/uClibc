@@ -758,7 +758,7 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
 +	ln -fs $(RUNTIME_PREFIX)/bin/$(TARGET_ARCH)-uclibc-gcc $(PREFIX)$(DEVEL_PREFIX)/bin/c++
 +	ln -fs $(RUNTIME_PREFIX)/bin/$(TARGET_ARCH)-uclibc-gcc $(PREFIX)$(DEVEL_PREFIX)/bin/g++
 +endif
-+	for app in addr2line ar as cpp gasp nm objcopy \
++	for app in addr2line ar as cpp nm objcopy \
 +	    objdump ranlib size strings strip; do \
 +	  APPNAME=`which $(CROSS)$${app}`; \
 +	  if [ -x "$$APPNAME" ] ; then \
@@ -771,9 +771,9 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
 +	rm -f gcc-uClibc.h *-uclibc-gcc *-uclibc-ld core
 +
 +
---- uClibc-0.9.30.3/Makefile.in.orig	2010-03-12 20:32:42.000000000 +0100
-+++ uClibc-0.9.30.3/Makefile.in	2010-03-25 08:10:37.622710245 +0100
-@@ -19,7 +19,7 @@
+--- uClibc-0.9.32/Makefile.in.orig	2011-06-08 21:35:20.000000000 +0200
++++ uClibc-0.9.32/Makefile.in	2011-06-12 09:20:09.634046086 +0200
+@@ -23,7 +23,7 @@
  
  ifeq ($(HAVE_DOT_CONFIG),y)
  
@@ -782,7 +782,7 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
  libs: pregen
  
  # In this section, we need .config
-@@ -187,7 +187,7 @@
+@@ -192,7 +192,7 @@
  	HOSTCC="$(HOSTCC)" \
  	install_dev
  
@@ -790,8 +790,8 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
 +install: install_runtime install_dev install_toolchain
  
  
- RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB=$(shell $(top_srcdir)extra/scripts/relative_path.sh $(DEVEL_PREFIX)lib $(RUNTIME_PREFIX)lib)
-@@ -445,6 +445,12 @@
+ RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB=$(shell $(top_srcdir)extra/scripts/relative_path.sh $(DEVEL_PREFIX)$(MULTILIB_DIR) $(RUNTIME_PREFIX)$(MULTILIB_DIR))
+@@ -405,6 +405,12 @@
  
  endif # ifeq ($(HAVE_DOT_CONFIG),y)
  
@@ -801,6 +801,6 @@ diff -urN uClibc-0.9.29.org/extra/gcc-uClibc/Makefile uClibc-0.9.29/extra/gcc-uC
 +install_toolchain: toolchain
 +	$(MAKE) CROSS="$(CROSS)" CC="$(CC)" -C extra/gcc-uClibc install
 +
- hostutils: headers
+ hostutils: | pregen
  	$(Q)$(MAKE) CROSS="$(CROSS)" CC="$(CC)" HOSTCC="$(HOSTCC)" DOTHOST=.host -C utils $@
  

@@ -1,11 +1,11 @@
---- uClibc-0.9.30/Rules.mak.orig	2008-11-12 13:24:16.000000000 +0100
-+++ uClibc-0.9.30/Rules.mak	2009-01-10 11:52:34.766458047 +0100
-@@ -528,7 +528,7 @@
+--- uClibc-0.9.32/Rules.mak.orig	2011-06-08 21:35:20.000000000 +0200
++++ uClibc-0.9.32/Rules.mak	2011-06-12 09:22:09.454050098 +0200
+@@ -624,7 +624,7 @@
  
  LDFLAGS:=$(LDFLAGS_NOSTRIP) -Wl,-z,defs
  ifeq ($(DODEBUG),y)
--CFLAGS += -O0 -g3
-+CFLAGS += $(OPTIMIZATION) -O0 -g3
+-CFLAGS += -O0 -g3 -DDEBUG
++CFLAGS += $(OPTIMIZATION) -O0 -g3 -DDEBUG
  else
- CFLAGS += $(OPTIMIZATION) $(XARCH_CFLAGS)
+ CFLAGS += $(OPTIMIZATION)
  endif
