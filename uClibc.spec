@@ -12,7 +12,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.32
-Release:	2
+Release:	3
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
@@ -161,6 +161,10 @@ UCLIBC_SUSV3_LEGACY_MACROS=y
 EOF
 
 %build
+# use ld.bfd; gold doesn't work well for now
+install -d our-ld
+ln -s %{_bindir}/ld.bfd our-ld/ld
+PATH=$(pwd)/our-ld:$PATH; export PATH
 
 # NOTE: 'defconfig' and 'all' must be run in separate make process because of macros
 %{__make} -j1 defconfig \
