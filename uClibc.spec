@@ -11,13 +11,13 @@
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.32
-Release:	4
+Version:	0.9.32.1
+Release:	1
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.xz
-# Source0-md5:	51660b93b8f1edb486049981fecfd148
+# Source0-md5:	85fbafaf3e634988e49e2b222e8a2180
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-toolchain-wrapper.patch
 Patch2:		%{name}-targetcpu.patch
