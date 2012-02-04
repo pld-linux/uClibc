@@ -11,19 +11,18 @@
 Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
-Version:	0.9.32.1
+Version:	0.9.33
 Release:	1
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
 Source0:	http://uclibc.org/downloads/%{name}-%{version}.tar.xz
-# Source0-md5:	85fbafaf3e634988e49e2b222e8a2180
+# Source0-md5:	940b411bfac938a77d25a86cb53d67ff
 Patch0:		%{name}-newsoname.patch
 Patch1:		%{name}-toolchain-wrapper.patch
 Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
-Patch5:		%{name}-epoll.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils >= 2.16
 BuildRequires:	cpp
@@ -92,11 +91,10 @@ Biblioteki statyczne uClibc.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
-%patch5 -p1
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
-defconfig=extra/Configs/defconfigs/i386
+defconfig=extra/Configs/defconfigs/i386/defconfig
 %ifarch i386
 echo 'CONFIG_386=y' >> $defconfig
 %endif
@@ -120,19 +118,19 @@ echo 'CONFIG_K7=y' >> $defconfig
 %endif
 %endif
 %ifarch %{x8664}
-defconfig=extra/Configs/defconfigs/x86_64
+defconfig=extra/Configs/defconfigs/x86_64/defconfig
 %endif
 %ifarch alpha
-defconfig=extra/Configs/defconfigs/alpha
+defconfig=extra/Configs/defconfigs/alpha/defconfig
 %endif
 %ifarch sparc sparcv9
-defconfig=extra/Configs/defconfigs/sparc
+defconfig=extra/Configs/defconfigs/sparc/defconfig
 %endif
 %ifarch ppc
-defconfig=extra/Configs/defconfigs/powerpc
+defconfig=extra/Configs/defconfigs/powerpc/defconfig
 %endif
 %ifarch ia64
-defconfig=extra/Configs/defconfigs/ia64
+defconfig=extra/Configs/defconfigs/ia64/defconfig
 %endif
 
 cat <<'EOF' >> $defconfig
