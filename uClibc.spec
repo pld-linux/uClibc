@@ -2,7 +2,7 @@
 # Conditional build:
 %bcond_without	shared		# don't build shared lib support
 %bcond_with	nptl		# libpthread: NPTL instead of LinuxThreads (experimental; no i386)
-%bcond_with	verbose		# verbose mode
+%bcond_without	verbose		# verbose mode
 #
 %ifarch alpha
 %undefine	with_shared
@@ -12,7 +12,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.33.2
-Release:	4
+Release:	5
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
@@ -48,6 +48,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %if "%{cc_version}" >= "4.2"
 %define		specflags	-fgnu89-inline
 %endif
+
+%define		filterout	-fstack-protector --param=ssp-buffer-size=4
 
 %define		uclibc_root	/usr/%{_target_cpu}-linux-uclibc
 
