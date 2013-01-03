@@ -12,7 +12,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.33.2
-Release:	5
+Release:	6
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
@@ -139,6 +139,7 @@ cat <<'EOF' >> $defconfig
 # HAS_NO_THREADS is not set
 %{!?with_nptl:LINUXTHREADS_OLD=y}
 %{?with_nptl:UCLIBC_HAS_THREADS_NATIVE=y}
+UCLIBC_HAS_IPV4=y
 UCLIBC_HAS_IPV6=y
 DO_C99_MATH=y
 UCLIBC_HAS_RPC=y
@@ -154,6 +155,13 @@ HAVE_NO_SHARED=y
 UCLIBC_HAS_PRINTF_M_SPEC=y
 UCLIBC_SUSV3_LEGACY=y
 UCLIBC_SUSV3_LEGACY_MACROS=y
+UCLIBC_SUSV4_LEGACY=y
+UCLIBC_USE_NETLINK=y
+UCLIBC_SUPPORT_AI_ADDRCONFIG=y
+UCLIBC_HAS_RESOLVER_SUPPORT=y
+UCLIBC_HAS_LIBRESOLV_STUB=y
+UCLIBC_HAS_COMPAT_RES_STATE=y
+UCLIBC_HAS_EXTRA_COMPAT_RES_STATE=y
 # DOSTRIP is not set
 %{?debug:DODEBUG=y}
 %{?debug:SUPPORT_LD_DEBUG=y}
