@@ -12,7 +12,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.33.2
-Release:	17
+Release:	18
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
@@ -50,7 +50,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		specflags	-fgnu89-inline
 %endif
 
-%define		filterout	-fstack-protector --param=ssp-buffer-size=4
+%define		filterout	-fstack-protector -fstack-protector-strong --param=ssp-buffer-size=4
 
 %define		uclibc_root	/usr/%{_target_cpu}-linux-uclibc
 
