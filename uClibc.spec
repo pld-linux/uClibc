@@ -12,7 +12,7 @@ Summary:	C library optimized for size
 Summary(pl.UTF-8):	Biblioteka C zoptymalizowana na rozmiar
 Name:		uClibc
 Version:	0.9.33.2
-Release:	21
+Release:	22
 Epoch:		4
 License:	LGPL v2.1
 Group:		Libraries
@@ -24,6 +24,7 @@ Patch2:		%{name}-targetcpu.patch
 Patch3:		%{name}-debug.patch
 Patch4:		%{name}-stdio-unhide.patch
 Patch5:		%{name}-kernel-types.patch
+Patch6:		%{name}-features.patch
 URL:		http://uclibc.org/
 BuildRequires:	binutils >= 2.16
 BuildRequires:	cpp
@@ -95,6 +96,7 @@ Biblioteki statyczne uClibc.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 # ARCH is already determined by uname -m
 %ifarch %{ix86}
